@@ -37,7 +37,7 @@ class AMysql_Statement {
 
 	public $mysqlResource;
     
-    
+    public $beforeSql = '';
     public $prepared = '';
     public $binds = array();
 
@@ -101,10 +101,11 @@ class AMysql_Statement {
                 }
             }
         }
-        return $sql;
+        return $this->beforeSql . $sql;
     }
         
     public function prepare($sql) {
+    	$this->beforeSql = '';
         $this->prepared = $sql;
         $this->binds = array();
         return $this;
@@ -133,7 +134,7 @@ class AMysql_Statement {
 					throw $e;
 				}
 				else {
-					trigger_error($e->getLogMessage(), E_USER_WARNING);
+					trigger_error($e, E_USER_WARNING);
 				}
 			}
 		}
@@ -391,8 +392,9 @@ class AMysql_Statement {
             $sets[] = "`$columnName` = " . $this->escape($value);
         }
         $setsString = join(', ', $sets);
-        $sql = "UPDATE `$tableName` SET $setsString WHERE $where";
-        $this->prepare($sql);
+        $beforeSql = "UPDATE `$tableName` SET $setsString WHERE ";
+        $this->prepare($where);
+        $this->beforeSql = $beforeSql;
         return $this;
     }
 

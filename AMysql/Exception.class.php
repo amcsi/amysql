@@ -19,7 +19,7 @@ class AMysql_Exception extends RuntimeException {
 	 * manuálisan. Ez akkor jó, ha a PHP scripteken belül
 	 * set_error_handler() használva van, és átalakítja a hibakezelést.
 	 **/     	
-	public $autoTriggerErrors = -1;
+	public $autoTriggerErrors = 1;
 	/**
 	 * @var int Az automatikus hiba szintje
 	 **/     	
@@ -28,12 +28,15 @@ class AMysql_Exception extends RuntimeException {
 	 * @var Automatikusan logolja-e a hibákat. Ha az error triggerelés logol
 	 * is egyben, nem logol mégegyszer feleslegesen.	 
 	 **/
-	public $autoLog = true;
+	public $autoLog = false;
+	
+	public $origMsg;
     
 
 	public function __construct($msg, $errno, $query) {
 		$this->query = $query;
 		parent::__construct($msg, $errno);
+		$this->origMsg = $msg;
 		$toLog = $this->autoLog;
 		$logMessage = $this->getLogMessage();
 		if ($this->autoTriggerErrors) {
@@ -52,7 +55,7 @@ class AMysql_Exception extends RuntimeException {
             }
             else {
         		trigger_error(
-        			$logMessage,
+        			$this,
         			$errorLevel
         		);
         		/**
@@ -78,6 +81,12 @@ class AMysql_Exception extends RuntimeException {
     
     public function getLogMessage() {
         return "Mysql error!\n" . $this->getDetails();
+    }
+    
+    public function __toString() {
+        return "AMysqlException: `$this->message`\n" .
+        "Error code `$this->code` in $this->file:$this->line\n" .
+        "Query: $this->query\n";
     }
 }
 ?>
