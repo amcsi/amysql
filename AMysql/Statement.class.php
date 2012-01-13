@@ -21,7 +21,7 @@
  * }  
  *    
  * @author Szerémi Attila
- * @version 5
+ * @version 7
  **/ 
 class AMysql_Statement {
     public $amysql;
@@ -392,9 +392,15 @@ class AMysql_Statement {
             $sets[] = "`$columnName` = " . $this->escape($value);
         }
         $setsString = join(', ', $sets);
+        
+        /**
+         * Ezt beforeSql-el kell megoldani, különben az értékekben lévő
+         * kérdőjelek bezavarnak.         
+         **/		         
         $beforeSql = "UPDATE `$tableName` SET $setsString WHERE ";
         $this->prepare($where);
         $this->beforeSql = $beforeSql;
+        
         return $this;
     }
 
@@ -523,6 +529,25 @@ class AMysql_Statement {
             return $value->__toString();
         }
     }
+    
+    /**
+     * Visszaadja az új insertált id-t
+     * @return int     
+     **/	     
+    public function insertId() {
+    	$ret = mysql_insert_id($this->mysqlResource);
+    	if (false !== $ret) {
+			return $ret;
+		}
+		else {
+			$msg = 'No MySQL connection was established.';
+			if ($this->throwExceptions) {
+				throw new RuntimeException($msg);
+			}
+			trigger_error($msg, E_USER_WARNING);
+			return false;
+		}
+	}
     
     /**
      * Ha nem marad példány ebből az objektumból, szabadítsa fel a result-ot,
