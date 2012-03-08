@@ -34,6 +34,7 @@ class AMysql_Statement {
     public $fetchMode = 'assoc';
 	public $throwExceptions;
 	public $lastException = null;
+	public $insertId;
 
 	public $mysqlResource;
     
@@ -122,7 +123,10 @@ class AMysql_Statement {
         $this->errno = mysql_errno($res);
         $this->result = $result;
         $this->results[] = $result;
-        $this->affectedRows = mysql_affected_rows($res);
+		$this->affectedRows = mysql_affected_rows($res);
+		$this->amysql->affectedRows = $this->affectedRows;
+		$this->insertId = mysql_insert_id($res);
+		$this->amysql->insertId = $this->insertId;
 		if (false === $result) {
 			try {
 				$this->throwException();
@@ -211,6 +215,10 @@ class AMysql_Statement {
     public function affectedRows() {
         return $this->affectedRows;
     }
+	
+	public function numRows() {
+		return mysql_num_rows($this->result);
+	}
     
     /**
      * Egy SELECT utasítást kezdeményez úgy, hogy az épülendő sql utasítás

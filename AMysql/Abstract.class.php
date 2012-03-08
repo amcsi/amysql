@@ -7,7 +7,7 @@
  **/
 abstract class AMysql_Abstract {
 
-    public $lastInsertId;
+    public $insertId;
     public $lastStatement;
     public $mysqlResource = null;
     public $error;
@@ -189,17 +189,28 @@ abstract class AMysql_Abstract {
     public function update($tableName, array $data, $where, $binds = null) {
         $stmt = new AMysql_Statement($this);
         $stmt->update($tableName, $data, $where);
-        $stmt->execute($binds);
-        return $stmt->affectedRows();
+        $result = $stmt->execute($binds);
+        return $result;
     }
-    
+
+	/**
+	 * @return a mysql_inser_id(), ha van auto increment, különben true.
+	 **/
     public function insert($tableName, array $data) {
         $stmt = new AMysql_Statement($this);
         $stmt->insert($tableName, $data);
-        $stmt->execute();
-        return $stmt->affectedRows();
+		$success = $stmt->execute();
+		if ($success) {
+			return $stmt->insertId ? $stmt->insertId : true;
+		}
+		else {
+			return false;
+		}
     }
     
+	/**
+	 * @return a törlött sorok száma
+	 **/
     public function delete($tableName, $where, $binds = null) {
         $stmt = new AMysql_Statement($this);
         $stmt->delete($tableName, $where);
