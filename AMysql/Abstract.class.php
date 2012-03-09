@@ -1,7 +1,7 @@
 <?php
 /**
- * Mysql absztrakció, amely csak a sima mysql függvényeket hivogatja
- * @author Szerémi Attila
+ * Mysql absztrakciÃ³, amely csak a sima mysql fÃ¼ggvÃ©nyeket hivogatja
+ * @author SzerÃ©mi Attila
  * @version 6
  *   
  **/
@@ -32,7 +32,7 @@ abstract class AMysql_Abstract {
     }
     
     /**
-     * Backtickeket tesz az oszlop vagy táblanév köré
+     * Backtickeket tesz az oszlop vagy tÃ¡blanÃ©v kÃ¶rÃ©
      * 
      **/          
     protected static function _escapeColumn($column) {
@@ -87,7 +87,7 @@ abstract class AMysql_Abstract {
     }
     
     /**
-     * AMysql_Exception-t dob a legutolsó Mysql hiba szöveggel és számmal.
+     * AMysql_Exception-t dob a legutolsÃ³ Mysql hiba szÃ¶veggel Ã©s szÃ¡mmal.
      * 
      **/              
     public function throwException() {
@@ -95,9 +95,9 @@ abstract class AMysql_Abstract {
     }
     
     /**
-     * Végrehajt egy kérést.
-     * @param string $sql A kérés stringje.
-     * @return resource $result Az eredmény resource-ja.     
+     * VÃ©grehajt egy kÃ©rÃ©st.
+     * @param string $sql A kÃ©rÃ©s stringje.
+     * @return resource $result Az eredmÃ©ny resource-ja.     
      **/              
     public function query($sql) {
         $stmt = new AMysql_Statement($this);
@@ -113,10 +113,10 @@ abstract class AMysql_Abstract {
     }
     
     /**
-     * Egy eredményen végez mysql_fetch_assoc()-ot. Ha nem adunk meg eredmény
-     * resource-t, akkor az utolsó, ezen objektumon létrejött eredmény
-     * resource-t használja.          
-     * @return mixed Egy eredménysor, ha van, különban false.
+     * Egy eredmÃ©nyen vÃ©gez mysql_fetch_assoc()-ot. Ha nem adunk meg eredmÃ©ny
+     * resource-t, akkor az utolsÃ³, ezen objektumon lÃ©trejÃ¶tt eredmÃ©ny
+     * resource-t hasznÃ¡lja.          
+     * @return mixed Egy eredmÃ©nysor, ha van, kÃ¼lÃ¶nban false.
      **/         
     public function fetchAssoc($result = null) {
         if (is_resource($result)) {
@@ -194,7 +194,7 @@ abstract class AMysql_Abstract {
     }
 
 	/**
-	 * @return a mysql_inser_id(), ha van auto increment, kÃ¼lÃ¶nben true.
+	 * @return a mysql_inser_id(), ha van auto increment, kÄ‚Ä½lÄ‚Â¶nben true.
 	 **/
     public function insert($tableName, array $data) {
         $stmt = new AMysql_Statement($this);
@@ -209,7 +209,7 @@ abstract class AMysql_Abstract {
     }
     
 	/**
-	 * @return a tÃ¶rlÃ¶tt sorok szÃ¡ma
+	 * @return a tÄ‚Â¶rlÄ‚Â¶tt sorok szÄ‚Ë‡ma
 	 **/
     public function delete($tableName, $where, $binds = null) {
         $stmt = new AMysql_Statement($this);
@@ -220,25 +220,25 @@ abstract class AMysql_Abstract {
     
     
     /**
-     * Escape-el, és aposztrófok közé teszi az átadott értéket. Illetve típustól
-     * függõen formáz.
+     * Escape-el, Ã©s aposztrÃ³fok kÃ¶zÃ© teszi az Ã¡tadott Ã©rtÃ©ket. Illetve tÃ­pustÃ³l
+     * fÃ¼ggÅ‘en formÃ¡z.
      * 
      **/                   
     public function escape($value) {
         $res = $this->mysqlResource;
-        // string esetén escape-eljük a stringet, és aposztrófok közé tesszük
+        // string esetÃ©n escape-eljÃ¼k a stringet, Ã©s aposztrÃ³fok kÃ¶zÃ© tesszÃ¼k
         if (is_string($value)) {
             return "'" . mysql_real_escape_string($value, $res) . "'";
         }
-        // integer esetén csak visszaadjuk a számot
+        // integer esetÃ©n csak visszaadjuk a szÃ¡mot
         if (is_int($value)) {
             return $value;
         }
-        // null esetén idézõjelek nélkül a NULL kulcsszót adjuk vissza stringként
+        // null esetÃ©n idÃ©zÅ‘jelek nÃ©lkÃ¼l a NULL kulcsszÃ³t adjuk vissza stringkÃ©nt
         if (null === $value) {
             return 'NULL';
         }
-        // boolean esetén a TRUE vagy FALSE kulcsszót adjuk vissza stringként
+        // boolean esetÃ©n a TRUE vagy FALSE kulcsszÃ³t adjuk vissza stringkÃ©nt
         if (is_bool($value)) {
             return $value ? 'TRUE' : 'FALSE';
         }
