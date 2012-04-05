@@ -53,7 +53,7 @@ class AMysql_Statement {
             $this->binds = $binds;
         }
         $sql = $this->getSql();
-        $result = $this->query($sql);
+        $result = $this->_query($sql);
         return $result;
     }
     
@@ -64,8 +64,10 @@ class AMysql_Statement {
      * létrejön execute()-nál.
      * @author Szerémi Attila               
      **/         
-    public function getSql() {
-        $prepared = $this->prepared;
+	public function getSql($prepared = null) {
+		if (!$prepared) {
+			$prepared = $this->prepared;
+		}
         $sql = $this->prepared;
         $binds =& $this->binds;
         if ($binds) {
@@ -111,8 +113,14 @@ class AMysql_Statement {
         $this->binds = array();
         return $this;
     }
+
+	public function query($sql, array $binds = array ()) {
+		$this->prepare($sql);
+		$result = $this->execute($binds);
+		return $result;
+	}
     
-    public function query($sql) {
+    protected function _query($sql) {
         $this->query = $sql; 
         $res = $this->mysqlResource;
         if ('mysql link' != get_resource_type($res)) {
@@ -146,15 +154,15 @@ class AMysql_Statement {
     }
     
     public function startTransaction() {
-        return $this->query('START TRANSACTION');
+        return $this->_query('START TRANSACTION');
     }
     
     public function commit() {
-        return $this->query('COMMIT');
+        return $this->_query('COMMIT');
     }
     
     public function rollback() {
-        return $this->query('ROLLBACK');
+        return $this->_query('ROLLBACK');
     }
     
     /**
