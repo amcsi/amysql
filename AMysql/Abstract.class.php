@@ -185,7 +185,10 @@ abstract class AMysql_Abstract {
 	public function newStatement() {
 		return new AMysql_Statement($this);
 	}
-    
+
+	/**
+	 * @return boolean Sikerült-e az update
+	 **/
     public function update($tableName, array $data, $where, $binds = null) {
         $stmt = new AMysql_Statement($this);
         $stmt->update($tableName, $data, $where);
@@ -194,7 +197,7 @@ abstract class AMysql_Abstract {
     }
 
 	/**
-	 * @return a mysql_inser_id(), ha van auto increment, kĂĽlĂ¶nben true.
+	 * @return mixed a mysql_insert_id(), ha van auto increment, különben true.
 	 **/
     public function insert($tableName, array $data) {
         $stmt = new AMysql_Statement($this);
@@ -209,7 +212,7 @@ abstract class AMysql_Abstract {
     }
     
 	/**
-	 * @return a tĂ¶rlĂ¶tt sorok szĂˇma
+	 * @return mixed a törölt sorok száma, ha sikerült, különben false
 	 **/
     public function delete($tableName, $where, $binds = null) {
         $stmt = new AMysql_Statement($this);
