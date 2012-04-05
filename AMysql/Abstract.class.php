@@ -99,11 +99,11 @@ abstract class AMysql_Abstract {
      * @param string $sql A kérés stringje.
      * @return resource $result Az eredmény resource-ja.     
      **/              
-    public function query($sql, $binds = null) {
+    public function query($sql, array $binds = array ()) {
         $stmt = new AMysql_Statement($this);
         $result = $stmt->query($sql, $binds);
         $this->lastStatement = $stmt;
-        return $result;
+        return $stmt;
     }
     
     public function prepare($sql) {
