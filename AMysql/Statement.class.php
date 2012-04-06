@@ -334,6 +334,10 @@ class AMysql_Statement {
 		return $this;
 	}
 
+	public function escapeColumnSimple($columnName) {
+	    return AMysql::escapeColumnSimple($columnName);
+    }
+
 	/**
 	 * Egy oszlopnevet escape-el.
 	 * @param string $columnName Az oszlop neve.
@@ -341,23 +345,6 @@ class AMysql_Statement {
 	 **/
 	public function escapeColumn($columnName, $as = null) {
 	    return AMysql::escapeColumn($columnName, $as);
-		$asString = '';
-		$escapeColumnName = true;
-		if ($as and !is_int($as)) {
-			$asString = ' AS ' . $as; 
-		}
-		else if (is_string($columnName) and (false !== strpos($columnName, ' AS '))) {
-			$exploded = explode(' AS ', $columnName);
-			$columnName = $exploded[0];
-			$asString = ' AS ' . $exploded[1];
-		}
-		if ($columnName instanceof AMysql_Expr) {
-            $ret = $columnName->__toString() . $asString;
-        }
-        else {
-		    $ret = '`' . $columnName . '`' . $asString;
-        }
-		return $ret;
     }
     
     public function escapeTable($tableName, $as = null) {
@@ -405,7 +392,8 @@ class AMysql_Statement {
         }
         $sets = array ();
         foreach ($data as $columnName => $value) {
-            $sets[] = "`$columnName` = " . $this->escape($value);
+			$columnName = $this->escapeColumnSimple($columnName);
+            $sets[] = "$columnName = " . $this->escape($value);
         }
         $setsString = join(', ', $sets);
         
@@ -442,7 +430,7 @@ class AMysql_Statement {
         }
         if (empty($data[0])) {
             foreach ($data as $columnName => $values) {
-                $cols[] = $this->escapeColumn($columnName);
+                $cols[] = $this->escapeColumnSimple($columnName);
                 if (!is_array($values)) {
                     $values = array($values);
                 }
@@ -455,8 +443,12 @@ class AMysql_Statement {
             }
         }
         else {
-            $akeys = array_keys($data[0]);
-            $cols = array_combine($akeys, $akeys);
+			$akeys = array_keys($data[0]);
+			$cols = array ();
+			foreach ($akeys as $col) {
+				$cols[] = $this->escapeColumnSimple($col);
+			}
+			
             foreach ($data as $row) {
                 $vals[$i] = array ();
                 $row2 = array_fill_keys($akeys, null);

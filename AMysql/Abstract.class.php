@@ -30,6 +30,10 @@ abstract class AMysql_Abstract {
 			throw new RuntimeException('Resource given is not a mysql resource.', 0);
 		}
     }
+
+	public static function escapeColumnSimple($column) {
+		return '`' . addcslashes($column, '`\\') . '`';
+	}
     
     /**
      * Backtickeket tesz az oszlop vagy táblanév köré
