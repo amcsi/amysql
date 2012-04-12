@@ -3,7 +3,7 @@
  * Mysql-es kifejezésekkel foglalkozó osztály az AMysql-hez.
  * @author Szerémi Attila
  * @created 2011.06.10. 13:26:56  
- * @version 5
+ * @version 0.8
  **/ 
 class AMysql_Expr {
 

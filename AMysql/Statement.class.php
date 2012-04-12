@@ -19,9 +19,11 @@
  *          "SQL query string: $e->query"   
  *      );
  * }  
+ *
+ * TODO: a query() $this-t adjon vissza.
  *    
  * @author Szerémi Attila
- * @version 7
+ * @version 0.8
  **/ 
 class AMysql_Statement {
     public $amysql;
@@ -54,7 +56,7 @@ class AMysql_Statement {
         }
         $sql = $this->getSql();
         $result = $this->_query($sql);
-        return $result;
+        return $this;
     }
     
     /**
@@ -117,7 +119,7 @@ class AMysql_Statement {
 	public function query($sql, array $binds = array ()) {
 		$this->prepare($sql);
 		$result = $this->execute($binds);
-		return $result;
+		return $this;
 	}
     
     protected function _query($sql) {
@@ -150,7 +152,7 @@ class AMysql_Statement {
 				}
 			}
 		}
-        return $result;
+        return $this;
     }
     
     public function startTransaction() {
@@ -190,33 +192,51 @@ class AMysql_Statement {
         if ('assoc' == $this->fetchMode) {
             return $this->fetchAssoc();
         }
+		else if ('object' == $this->fetchMode) {
+			return $this->fetchObject();
+		}
+		else if ('row' == $this->fetchMode) {
+			return $this->fetchRow();
+		}
         else {
             throw new Exception("Unknown fetch mode: `$this->fetchMode`");
         }
     }
     
-    public function fetchAssoc($result = null) {
-        if (!$result) {
-            $result = $this->result;
-        }
+    public function fetchAssoc() {
+		$result = $this->result;
         return mysql_fetch_assoc($result);
     }
         
-    public function fetchAllAssoc($result = null) {
-        if (!$result) {
-            $result = $this->result;
-        }
-        $ret = array();
-        while (false !== ($row = $this->fetchAssoc($result))) {
+    public function fetchAllAssoc() {
+		$result = $this->result;
+		$ret = array();
+		$numRows = $this->numRows();
+		if (0 === $numRows) {
+			return array ();
+		}
+		else if (false === $numRows) {
+			return false;
+		}
+		mysql_data_seek($result, 0);
+        while (false !== ($row = $this->fetchAssoc())) {
             $ret[] = $row;
         }
         return $ret;
     }
+	
+	public function fetchRow() {
+		$result = $this->result;
+        return mysql_fetch_row($result);
+	}
+
+	public function result($row = 0, $field = 0) {
+		$result = $this->result;
+		return mysql_result($result, $row, $field);
+	}
     
-    public function fetchObject($result = null) {
-        if (!$result) {
-            $result = $this->result;
-        }
+    public function fetchObject() {
+		$result = $this->result;
         return mysql_fetch_object($result);
     }
     
@@ -229,6 +249,9 @@ class AMysql_Statement {
 	}
     
     /**
+	 * Do not use this method! It requires a lot of revision, and is subject
+	 * to change a lot.
+	 * 
      * Egy SELECT utasítást kezdeményez úgy, hogy az épülendő sql utasítás
      * SELECT-tel kezdődjön, és megjelölje azokat az oszlopneveket, amiket
      * átadunk. 
@@ -325,6 +348,7 @@ class AMysql_Statement {
 		if ($on) {
 			$this->on($on);
 		}
+
 		return $this;
 	}
 
@@ -544,17 +568,7 @@ class AMysql_Statement {
      **/	     
     public function insertId() {
     	$ret = mysql_insert_id($this->mysqlResource);
-    	if (false !== $ret) {
-			return $ret;
-		}
-		else {
-			$msg = 'No MySQL connection was established.';
-			if ($this->throwExceptions) {
-				throw new RuntimeException($msg);
-			}
-			trigger_error($msg, E_USER_WARNING);
-			return false;
-		}
+		return $ret;
 	}
     
     /**

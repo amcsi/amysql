@@ -2,7 +2,7 @@
 /**
  * Mysql absztrakció, amely csak a sima mysql függvényeket hivogatja
  * @author Szerémi Attila
- * @version 7
+ * @version 0.8
  *   
  **/
 $dir = dirname(realpath(__FILE__));

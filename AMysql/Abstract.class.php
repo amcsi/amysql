@@ -2,8 +2,8 @@
 /**
  * Mysql absztrakció, amely csak a sima mysql függvényeket hivogatja
  * @author Szerémi Attila
- * @version 6
- *   
+ * @version 0.8
+ *
  **/
 abstract class AMysql_Abstract {
 
@@ -109,6 +109,17 @@ abstract class AMysql_Abstract {
         $this->lastStatement = $stmt;
         return $stmt;
     }
+	
+	/**
+	 * Végrehajt egy kérést, amiből az első talált sor első oszlopának értékét adja
+	 * vissza rögtön.
+     * @param string $sql A kérés stringje.
+	 **/
+	public function getOne($sql, array $binds = array ()) {
+        $stmt = new AMysql_Statement($this);
+        $stmt->query($sql, $binds);
+		return $stmt->result(0, 0);
+	}
     
     public function prepare($sql) {
         $stmt = new AMysql_Statement($this);
