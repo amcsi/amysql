@@ -1,6 +1,6 @@
 <?php
 /**
- * Mysql absztrakció, amely csak a sima mysql függvényeket hivogatja
+ * Mysql abstraction which only uses mysql_* functions
  * @author Szerémi Attila
  * @version 0.8
  *   

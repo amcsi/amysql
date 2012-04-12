@@ -1,21 +1,21 @@
 <?php
 /**
- * Mysql absztrakció, amely csak a sima mysql függvényeket hivogatja
+ * Mysql abstraction which only uses mysql_* functions
  * @author Szerémi Attila
  * @version 0.8
- *
+ *   
  **/
 abstract class AMysql_Abstract {
 
-    public $insertId;
-    public $lastStatement;
-    public $mysqlResource = null;
-    public $error;
-    public $errno;
-    public $result;
-    public $query;
-    public $affectedRows;
-    public $throwExceptions = true;
+    public $insertId; // last insert id
+    public $lastStatement; // last AMysql_Statement
+    public $mysqlResource = null; // mysql link
+    public $error; // last error message
+    public $errno; // last error number
+    public $result; // last mysql result
+    public $query; // last used query string
+    public $affectedRows; // last affected rows count
+    public $throwExceptions = true; // whether to throw exceptions
     
     /**
      * @constructor
@@ -244,6 +244,9 @@ abstract class AMysql_Abstract {
      **/                   
     public function escape($value) {
         $res = $this->mysqlResource;
+        if ('mysql link' != get_resource_type($res)) {
+			throw new RuntimeException('Resource is not a mysql resource.', 0, $sql);
+        }
         // string esetén escape-eljük a stringet, és aposztrófok közé tesszük
         if (is_string($value)) {
             return "'" . mysql_real_escape_string($value, $res) . "'";
@@ -259,6 +262,11 @@ abstract class AMysql_Abstract {
         // boolean esetén a TRUE vagy FALSE kulcsszót adjuk vissza stringként
         if (is_bool($value)) {
             return $value ? 'TRUE' : 'FALSE';
+        }
+        // AMysql_Expr esetén az objektum toString() metódusát hívva kapjuk
+        // meg a literális stringet
+        if ($value instanceof AMysql_Expr) {
+            return $value->__toString();
         }
     }
 }

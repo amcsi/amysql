@@ -79,7 +79,7 @@ class AMysql_Statement {
                 if (count($parts)-1 == count($binds)) {
                     foreach ($binds as &$bind) {
                         $sql .= array_shift($parts);
-                        $sql .= $this->escape($bind);
+                        $sql .= $this->amysql->escape($bind);
                     };
                     $sql .= array_shift($parts);
                 }
@@ -417,7 +417,7 @@ class AMysql_Statement {
         $sets = array ();
         foreach ($data as $columnName => $value) {
 			$columnName = $this->escapeColumnSimple($columnName);
-            $sets[] = "$columnName = " . $this->escape($value);
+            $sets[] = "$columnName = " . $this->amysql->escape($value);
         }
         $setsString = join(', ', $sets);
         
@@ -462,7 +462,7 @@ class AMysql_Statement {
                     if (!isset($vals[$key])) {
                         $vals[$key] = array ();
                     }
-                    $vals[$key][] = $this->escape($value);
+                    $vals[$key][] = $this->amysql->escape($value);
                 }
             }
         }
@@ -477,7 +477,7 @@ class AMysql_Statement {
                 $vals[$i] = array ();
                 $row2 = array_fill_keys($akeys, null);
                 foreach ($row as $columnName => $value) {
-                    $row2[$columnName] = $this->escape($value);
+                    $row2[$columnName] = $this->amysql->escape($value);
                     
                 }
                 $vals[$i] = $row2;
@@ -527,39 +527,6 @@ class AMysql_Statement {
             $this->prepared .= "OFFSET $offset";
         }
         return $this;
-    }
-    
-    /**
-     * Escape-el, és aposztrófok közé teszi az átadott értéket. Illetve típustól
-     * függően formáz.
-     * 
-     **/                   
-    public function escape($value) {
-        $res = $this->mysqlResource;
-        if ('mysql link' != get_resource_type($res)) {
-			throw new RuntimeException('Resource is not a mysql resource.', 0, $sql);
-        }
-        // string esetén escape-eljük a stringet, és aposztrófok közé tesszük
-        if (is_string($value)) {
-            return "'" . mysql_real_escape_string($value, $res) . "'";
-        }
-        // integer esetén csak visszaadjuk a számot
-        if (is_int($value)) {
-            return $value;
-        }
-        // null esetén idézőjelek nélkül a NULL kulcsszót adjuk vissza stringként
-        if (null === $value) {
-            return 'NULL';
-        }
-        // boolean esetén a TRUE vagy FALSE kulcsszót adjuk vissza stringként
-        if (is_bool($value)) {
-            return $value ? 'TRUE' : 'FALSE';
-        }
-        // AMysql_Expr esetén az objektum toString() metódusát hívva kapjuk
-        // meg a literális stringet
-        if ($value instanceof AMysql_Expr) {
-            return $value->__toString();
-        }
     }
     
     /**
