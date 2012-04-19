@@ -3,6 +3,11 @@
  * Mysql abstraction which only uses mysql_* functions
  * @author Szerémi Attila
  * @version 0.8
+ *
+ * @todo mysql_select_db
+ * @todo cleaning up the escape methods, so there would be one
+ * 	for all tables and columns
+ * @todo try to make a new select class that works similarly like in Zend
  *   
  **/
 abstract class AMysql_Abstract {
@@ -18,6 +23,7 @@ abstract class AMysql_Abstract {
     public $throwExceptions = true; // whether to throw exceptions
     
     /**
+	 * @todo Allow for making a new connection here
      * @constructor
      * @param resource $res A mysql kapcsolat resource-ja.
      * 
@@ -91,14 +97,6 @@ abstract class AMysql_Abstract {
     }
     
     /**
-     * AMysql_Exception-t dob a legutolsó Mysql hiba szöveggel és számmal.
-     * 
-     **/              
-    public function throwException() {
-        throw new AMysql_Exception($this->error, $this->errno);
-    }
-    
-    /**
      * Végrehajt egy kérést.
      * @param string $sql A kérés stringje.
      * @return resource $result Az eredmény resource-ja.     
@@ -126,76 +124,12 @@ abstract class AMysql_Abstract {
         $stmt->prepare($sql);
         return $stmt;
     }
-    
-    /**
-     * Egy eredményen végez mysql_fetch_assoc()-ot. Ha nem adunk meg eredmény
-     * resource-t, akkor az utolsó, ezen objektumon létrejött eredmény
-     * resource-t használja.          
-     * @return mixed Egy eredménysor, ha van, különban false.
-     **/         
-    public function fetchAssoc($result = null) {
-        if (is_resource($result)) {
-            $stmt = $this->lastStatement;
-        }
-        else {
-            $result = null;
-            if ($result instanceof AMysql_Statement) {
-                $stmt = $result;
-            }
-            else {
-                $stmt = $this->lastStatement;
-            }
-        }
-        return $stmt->fetchAssoc($result);
-    }
-        
-    public function fetchAllAssoc($result = null) {
-        if (is_resource($result)) {
-            $stmt = $this->lastStatement;
-        }
-        else {
-            $result = null;
-            if ($result instanceof AMysql_Statement) {
-                $stmt = $result;
-            }
-            else {
-                $stmt = $this->lastStatement;
-            }
-        }
-        return $stmt->fetchAllAssoc($result);
-    }
-    
-    public function fetchObject($result = null) {
-        if (is_resource($result)) {
-            $stmt = $this->lastStatement;
-        }
-        else {
-            $result = null;
-            if ($result instanceof AMysql_Statement) {
-                $stmt = $result;
-            }
-            else {
-                $stmt = $this->lastStatement;
-            }
-        }
-        return $stmt->fetchObject($result);
-    }
 
 	public function select() {
 		$stmt = $this->newStatement();
 		$args = func_get_args();
 		return call_user_func_array(array($stmt, 'select'), $args);
 	}
-    
-	public function affectedRows() {
-		$deprecatedMessage = 'Do not use AMysql::affectedRows(). Use the statement\'s
-				affectedRows() method!';
-		if (class_exists('FB')) {
-			FB::warn($deprecatedMessage);
-		}
-		trigger_error($deprecatedMessage, E_USER_DEPRECATED);
-        return $this->lastStatement->affectedRows();
-    }
 
 	public function newStatement() {
 		return new AMysql_Statement($this);
