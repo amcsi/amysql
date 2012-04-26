@@ -1,6 +1,11 @@
 <?php
 /**
- * Mysql-es kifejezésekkel foglalkozó osztály az AMysql-hez.
+ * Class for making custom expressions for AMysql value binding.
+ * This is what you should use to be able to add specific kinds
+ * of purposely unquoted, non-numeric values into prepared
+ * statements, such as being able to call mysql functions to
+ * set values.
+ *
  * @author Szerémi Attila
  * @created 2011.06.10. 13:26:56  
  * @version 0.8
@@ -10,20 +15,41 @@ class AMysql_Expr {
     public $prepared; 
     
     /**
-     * Literális string
+	 * Literal string
+	 *
+	 * e.g. $currentTimestampBind = new AMysql_Expr(
+	 * 		AMysql_Expr::LITERAL, 'CURRENT_TIMESPAMP'
+	 * 	);
+	 *	// or
+	 *	$currentTimestampBind = new AMysql_Expr('CURRENT_TIMESTAMP');
      **/         
+    const LITERAL = 0;
     const EXPR_LITERAL = 0;
-    /**
-     * IN() függvény. Olyankor a 2. argumentum a tábla neve, a 3. argumentum
-     * az értékek tömbje     
-     **/         
-    const EXPR_COLUMN_IN = 1;
 
     /**
-     * Literális kifejezés esetén csak 1 paramétert kell átadni, annak meg
-     * stringnek kell lennie     
+	 * IN() function. In this case, the 2nd parameter is the table name, the
+	 * third is the array of values
+	 *
+	 * e.g.
+	 * 	$idIn = new AMysql_Expr(AMysql_Expr::COLUMN_IN, 'id', array (
+	 *		'3', '4', '6'
+	 * 	));
      **/         
-    public function __construct() {
+    const COLUMN_IN = 1;
+    const EXPR_COLUMN_IN = 1;
+
+	/**
+	 * @constructor
+	 * This constructor accepts different parameters in different cases, but
+	 * the first parameter is mandatory: the one that gives the type of
+	 * expression. The types of expressions can be found as constants on this
+	 * class, and their documentation can be found above each constant type
+	 * declaration.
+	 * 
+	 * In case of a literal string, you can just pass the literal string as
+	 * the only parameter.
+     **/         
+	public function __construct(/* args */) {
         $args = func_get_args();
         // literál
         if (is_string($args[0])) {
@@ -39,6 +65,10 @@ class AMysql_Expr {
                         $prepared = AMysql::escapeTable($args[1]) . ' IN 
                         (' . join(', ', $args[2]) . ') ';
                     }
+					else {
+						// If the array is empty, don't break the WHERE syntax
+						$prepared = 0;
+					}
                 }
             }
         }
