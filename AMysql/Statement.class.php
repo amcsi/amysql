@@ -287,7 +287,7 @@ class AMysql_Statement {
 	protected function _getTablesStringByArray($tableArray) {
 		$tables = array ();
 		foreach ($tableArray as $alias => $tableName) {
-			$table = $this->escapeColumn($tableName, $alias);
+			$table = $this->escapeIdentifier($tableName, $alias);
 			$tables[] = $table;
 		}
 		return implode(', ', $tables);
@@ -300,7 +300,7 @@ class AMysql_Statement {
 	protected function _getColumnsStringByArray($columnArray) {
 		$columns = array ();
 		foreach ($columnArray as $alias => $columnName) {
-			$column = $this->escapeColumn($columnName, $alias);
+			$column = $this->escapeIdentifier($columnName, $alias);
 			$columns[] = $column;
 		}
 		return implode(', ', $columns);
@@ -343,7 +343,7 @@ class AMysql_Statement {
 	}
 
 	public function leftJoin($tableName, $as = null, $on = null) {
-		$sql = ' LEFT JOIN ' . $this->escapeTable($tableName, $as);
+		$sql = ' LEFT JOIN ' . $this->escapeIdentifier($tableName, $as);
 		$this->prepared .= $sql;
 		if ($on) {
 			$this->on($on);
@@ -358,8 +358,8 @@ class AMysql_Statement {
 		return $this;
 	}
 
-	public function escapeColumnSimple($columnName) {
-	    return AMysql::escapeColumnSimple($columnName);
+	public function escapeIdentifierSimple($columnName) {
+	    return AMysql::escapeIdentifierSimple($columnName);
     }
 
 	/**
@@ -367,16 +367,8 @@ class AMysql_Statement {
 	 * @param string $columnName Az oszlop neve.
 	 * @param string $as (opcionális) az oszlop átnevezése.          	
 	 **/
-	public function escapeColumn($columnName, $as = null) {
-	    return AMysql::escapeColumn($columnName, $as);
-    }
-    
-    public function escapeTable($tableName, $as = null) {
-		$ret = $this->amysql->escapeColumn($tableName);
-		if ($as and !is_int($as)) {
-			$ret .= ' ' . $as; 
-		}
-		return $ret;
+	public function escapeIdentifier($columnName, $as = null) {
+	    return AMysql::escapeIdentifier($columnName, $as);
     }
     
     public function appendPrepare($sql) {
@@ -416,7 +408,7 @@ class AMysql_Statement {
         }
         $sets = array ();
         foreach ($data as $columnName => $value) {
-			$columnName = $this->escapeColumnSimple($columnName);
+			$columnName = $this->escapeIdentifierSimple($columnName);
             $sets[] = "$columnName = " . $this->amysql->escape($value);
         }
         $setsString = join(', ', $sets);
@@ -454,7 +446,7 @@ class AMysql_Statement {
         }
         if (empty($data[0])) {
             foreach ($data as $columnName => $values) {
-                $cols[] = $this->escapeColumnSimple($columnName);
+                $cols[] = $this->escapeIdentifierSimple($columnName);
                 if (!is_array($values)) {
                     $values = array($values);
                 }
@@ -470,7 +462,7 @@ class AMysql_Statement {
 			$akeys = array_keys($data[0]);
 			$cols = array ();
 			foreach ($akeys as $col) {
-				$cols[] = $this->escapeColumnSimple($col);
+				$cols[] = $this->escapeIdentifierSimple($col);
 			}
 			
             foreach ($data as $row) {

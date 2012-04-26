@@ -6,9 +6,15 @@
  *
  * @todo mysql_select_db
  * @todo cleaning up the escape methods, so there would be one
- * 	for all tables and columns
+ * 	for all tables and identifiers
  * @todo try to make a new select class that works similarly like in Zend
- *   
+ * @todo Maybe remove automatic dot detection for identifier escaping.
+ * @todo Maybe make a simpler, shorter name for mysqlResource
+ * @todo Be able to construct this class with connection arguments to make
+ * 	a new connection.
+ * @todo AMysql_Select
+ * @todo Stricter fetch type management ('assoc', 'object', 'row')
+ *
  **/
 abstract class AMysql_Abstract {
 
@@ -21,123 +27,197 @@ abstract class AMysql_Abstract {
     public $query; // last used query string
     public $affectedRows; // last affected rows count
     public $throwExceptions = true; // whether to throw exceptions
-    
+
     /**
-	 * @todo Allow for making a new connection here
+     * @todo Allow for making a new connection here
      * @constructor
-     * @param resource $res A mysql kapcsolat resource-ja.
-     * 
-     **/                   
+     * @param resource $res The mysql connection resource.
+     *
+     **/
     public function __construct($res) {
         if ('mysql link' == get_resource_type($res)) {
             $this->mysqlResource = $res;
         }
-		else {
-			throw new RuntimeException('Resource given is not a mysql resource.', 0);
-		}
+        else {
+            throw new RuntimeException('Resource given is not a mysql resource.', 0);
+        }
     }
 
-	public static function escapeColumnSimple($column) {
-		return '`' . addcslashes($column, '`\\') . '`';
-	}
-    
     /**
-     * Backtickeket tesz az oszlop vagy táblanév köré
-     * 
-     **/          
-    protected static function _escapeColumn($column) {
-		$exploded = explode('.', $column);
-		$count = count($exploded);
-		$column = '`' . $exploded[$count-1] . '`';
-		if (1 < $count) {
-			$column = "`$exploded[0]`.$column";
-		}
-		$ret = $column;
+     * Does a simple identifier escape. It should be fail proof for that literal identifier.
+     *
+     * @param $identifier The identifier
+     *
+     * @return The escaped identifier.
+     **/
+    public static function escapeIdentifierSimple($identifier) {
+        return '`' . addcslashes($identifier, '`\\') . '`';
+    }
+
+    /**
+     * Escapes an identifier. If there's a dot in it, it is split
+     * into two identifiers, each escaped, and joined with a dot.
+     *
+     * @param $identifier The identifier
+     *
+     * @return The escaped identifier.
+     **/
+    protected static function _escapeIdentifier($identifier) {
+        $exploded = explode('.', $identifier);
+        $count = count($exploded);
+        $identifier = '`' . $exploded[$count-1] . '`';
+        if (1 < $count) {
+            $identifier = "`$exploded[0]`.$identifier";
+        }
+        $ret = $identifier;
         return $ret;
     }
-    
-    public static function escapeColumn($columnName, $as = null) {
-		$asString = '';
-		$escapeColumnName = true;
-		if ($as and !is_int($as)) {
-			$asString = ' AS ' . $as; 
-		}
-		else if (is_string($columnName) and (false !== strpos($columnName, ' AS '))) {
-			$exploded = explode(' AS ', $columnName);
-			$columnName = $exploded[0];
-			$asString = ' AS ' . $exploded[1];
-		}
-		if ($columnName instanceof AMysql_Expr) {
-            $ret = $columnName->__toString() . $asString;
+
+    /**
+     * Escapes an identifier, such as a column or table name.
+     * Includes functionality for making an AS syntax.
+     *
+     * @param string $identifierName The identifier name. If it has a dot in it,
+     * it'll automatically split the identifier name into the `tableName`.`columnName`
+     * syntax.
+     * @param string $as (Optional) adds an AS syntax. The value is the alias the
+     * identifier should have for the query.
+     *
+     * @todo Possibly change the functionality to remove the automatic dot detection,
+     * 	and ask for an array instead?
+     *
+     * e.g.
+     *  echo $amysql->escapeIdentifier('table.order', 'ot');
+     *  // `table`.`order` AS ot
+     **/
+    public static function escapeIdentifier($identifierName, $as = null) {
+        $asString = '';
+        $escapeIdentifierName = true;
+        if ($as and !is_int($as)) {
+            $asString = ' AS ' . $as;
+        }
+        else if (is_string($identifierName) and (false !== strpos($identifierName, ' AS '))) {
+            $exploded = explode(' AS ', $identifierName);
+            $identifierName = $exploded[0];
+            $asString = ' AS ' . $exploded[1];
+        }
+        if ($identifierName instanceof AMysql_Expr) {
+            $ret = $identifierName->__toString() . $asString;
         }
         else {
-		    $ret = self::_escapeColumn($columnName) . $asString;
+            $ret = self::_escapeIdentifier($identifierName) . $asString;
         }
-		return $ret;
+        return $ret;
     }
-    
-    public static function escapeTable($tableName, $as = null) {
-		$ret = self::_escapeColumn($tableName);
-		if ($as and !is_int($as)) {
-			$ret .= ' ' . $as; 
-		}
-		return $ret;
-    }
-    
+
+    /**
+     * Performs an InnoDB rollback.
+     *
+     * @todo Checks (such as for whether we have already started a
+     * transaction)
+     **/
     public function startTransaction() {
         return $this->query('START TRANSACTION');
     }
-    
+
+    /**
+     * Performs an InnoDB commit.
+     *
+     * @todo Checks
+     **/
     public function commit() {
         return $this->query('COMMIT');
     }
-    
+
+    /**
+     * Performs an InnoDB rollback.
+     *
+     * @todo Checks
+     **/
     public function rollback() {
         return $this->query('ROLLBACK');
     }
-    
+
     /**
-     * Végrehajt egy kérést.
-     * @param string $sql A kérés stringje.
-     * @return resource $result Az eredmény resource-ja.     
-     **/              
+     * Executes a query by an sql string and binds.
+     *
+     * @todo Variable params possibility for binds?
+     *
+     * @param string $sql The SQL string.
+     * @param array $binds The binds.
+     *
+     * @return AMysql_Statement
+     **/
     public function query($sql, array $binds = array ()) {
         $stmt = new AMysql_Statement($this);
         $result = $stmt->query($sql, $binds);
         $this->lastStatement = $stmt;
         return $stmt;
     }
-	
-	/**
-	 * Végrehajt egy kérést, amiből az első talált sor első oszlopának értékét adja
-	 * vissza rögtön.
-     * @param string $sql A kérés stringje.
-	 **/
-	public function getOne($sql, array $binds = array ()) {
+
+    /**
+     * Executes a query, and returns the first found row's first column's value.
+     * Throws a warning if no rows were found.
+     *
+     * @todo Variable params possibility for binds?
+     *
+     * @param string $sql The SQL string.
+     * @param array $binds The binds.
+     *
+     * @return string
+     **/
+    public function getOne($sql, array $binds = array ()) {
         $stmt = new AMysql_Statement($this);
         $stmt->query($sql, $binds);
-		return $stmt->result(0, 0);
-	}
-    
+        return $stmt->result(0, 0);
+    }
+
+    /**
+     * Prepares a mysql statement. It is to be executed.
+     *
+     * @param string $sql The SQL string.
+     *
+     * @return AMysql_Statement
+     **/
     public function prepare($sql) {
         $stmt = new AMysql_Statement($this);
         $stmt->prepare($sql);
         return $stmt;
     }
 
-	public function select() {
-		$stmt = $this->newStatement();
-		$args = func_get_args();
-		return call_user_func_array(array($stmt, 'select'), $args);
-	}
+    /**
+     * Starts building a new SELECT sql.
+     * USAGE OF THIS METHOD IS HIGHLY DISCOURAGED. IT IS BOUND TO CHANGE A LOT.
+     * Use prepared statements instead.
+     *
+     * @return AMysql_Statement
+     **/
+    public function select() {
+        $stmt = $this->newStatement();
+        $args = func_get_args();
+        return call_user_func_array(array($stmt, 'select'), $args);
+    }
 
-	public function newStatement() {
-		return new AMysql_Statement($this);
-	}
+    /**
+     * Creates a new AMysql_Statement instance and returns it.
+     *
+     * @return AMysql_Statement
+     **/
+    public function newStatement() {
+        return new AMysql_Statement($this);
+    }
 
-	/**
-	 * @return boolean Sikerült-e az update
-	 **/
+    /**
+     * Performs an instant UPDATE returning its success.
+     *
+     * @param string $tableName 	The table name.
+     * @param array $data 			The array of data changes. A one-dimensional array
+     * 								with keys as column names and values as their values.
+     * @param string $where			An SQL substring of the WHERE clause.
+     * @param array $binds			(Optional) The binds for the WHERE clause.
+     *
+     * @return boolean Whether the update was successful.
+     **/
     public function update($tableName, array $data, $where, $binds = null) {
         $stmt = new AMysql_Statement($this);
         $stmt->update($tableName, $data, $where);
@@ -145,60 +225,87 @@ abstract class AMysql_Abstract {
         return $result;
     }
 
-	/**
-	 * @return mixed a mysql_insert_id(), ha van auto increment, különben true.
-	 **/
+    /**
+     * Performs an instant INSERT.
+     *
+     * @param string $tableName 	The table name.
+     * @param array $data			A one or two-dimensional array.
+     * 								1D:
+     * 								an associative array of keys as column names and values
+     * 								as their values. This inserts one row.
+     * 								2D numeric:
+     * 								A numeric array where each value is an associative array
+     * 								with column-value pairs. Each outer, numeric value represents
+     * 								a row of data.
+     * 								2D associative:
+     * 								An associative array where the keys are the columns, the
+     * 								values are numerical arrays, where each value represents the
+     * 								value for the new row of that key.
+     *
+     * @return mixed The mysql_insert_id(), if the query succeeded and there exists a primary
+     * key. Otherwise the boolean of whether the insert was successful.
+     **/
     public function insert($tableName, array $data) {
         $stmt = new AMysql_Statement($this);
         $stmt->insert($tableName, $data);
-		$success = $stmt->execute();
-		if ($success) {
-			return $stmt->insertId ? $stmt->insertId : true;
-		}
-		else {
-			return false;
-		}
+        $success = $stmt->execute();
+        if ($success) {
+            return $stmt->insertId ? $stmt->insertId : true;
+        }
+        else {
+            return false;
+        }
     }
-    
-	/**
-	 * @return mixed a törölt sorok száma, ha sikerült, különben false
-	 **/
+
+    /**
+     * Performs an instant DELETE.
+     *
+     * @param string $tableName 	The table name.
+     * @param string $where			An SQL substring of the WHERE clause.
+     * @param array $binds			(Optional) The binds for the WHERE clause.
+     *
+     * @return resource|false The mysql resource if the delete was successful, otherwise false.
+     **/
     public function delete($tableName, $where, $binds = null) {
         $stmt = new AMysql_Statement($this);
         $stmt->delete($tableName, $where);
-        $stmt->execute($binds);
-        return $stmt->affectedRows();
+        $result = $stmt->execute($binds);
+        return $result;
     }
-    
-    
+
+
     /**
-     * Escape-el, és aposztrófok közé teszi az átadott értéket. Illetve típustól
-     * függően formáz.
-     * 
-     **/                   
+     * Escapes a value. The method depends on the passed value's type, but unless the passed type
+     * is an AMysql_Expr, the safety is almost guaranteed. Do not put apostrophes around bind marks!
+     * Those are handled by this escaping method.
+     *
+     * @todo Automatic AMysql_Expr(AMysql_Expr::COLUMN_IN) in case of an array?
+     *
+     * @param mixed The value to escape
+     *
+     **/
     public function escape($value) {
         $res = $this->mysqlResource;
         if ('mysql link' != get_resource_type($res)) {
-			throw new RuntimeException('Resource is not a mysql resource.', 0, $sql);
+            throw new RuntimeException('Resource is not a mysql resource.', 0, $sql);
         }
-        // string esetén escape-eljük a stringet, és aposztrófok közé tesszük
+        // In the case of a string, let's put it between apostrophes
         if (is_string($value)) {
             return "'" . mysql_real_escape_string($value, $res) . "'";
         }
-        // integer esetén csak visszaadjuk a számot
+        // If it's an int, place it there literally
         if (is_int($value)) {
             return $value;
         }
-        // null esetén idézőjelek nélkül a NULL kulcsszót adjuk vissza stringként
+        // If it's a NULL, use the literal string, NULL
         if (null === $value) {
             return 'NULL';
         }
-        // boolean esetén a TRUE vagy FALSE kulcsszót adjuk vissza stringként
+        // Literal TRUE or FALSE in case of a boolean
         if (is_bool($value)) {
             return $value ? 'TRUE' : 'FALSE';
         }
-        // AMysql_Expr esetén az objektum toString() metódusát hívva kapjuk
-        // meg a literális stringet
+        // In case of an AMysql_Expr, use its __toString() methods return value.
         if ($value instanceof AMysql_Expr) {
             return $value->__toString();
         }
