@@ -102,7 +102,7 @@ class AMysql_Statement {
                 }
                 foreach ($binds as $key => &$bind) {
                     $placeholder = $map[$key];
-                    $sql = str_replace($placeholder, $bind, $sql);
+                    $sql = str_replace($placeholder, $this->amysql->escape($bind), $sql);
                 }
             }
         }
