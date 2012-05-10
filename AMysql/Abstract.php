@@ -6,12 +6,12 @@
  *
  * @todo mysql_select_db
  * @todo cleaning up the escape methods, so there would be one
- * 	for all tables and identifiers
+ *  for all tables and identifiers
  * @todo try to make a new select class that works similarly like in Zend
  * @todo Maybe remove automatic dot detection for identifier escaping.
  * @todo Maybe make a simpler, shorter name for mysqlResource
  * @todo Be able to construct this class with connection arguments to make
- * 	a new connection.
+ *  a new connection.
  * @todo AMysql_Select
  * @todo Stricter fetch type management ('assoc', 'object', 'row')
  * @todo A method that returns the values of a single column for multiple rows,
@@ -219,10 +219,10 @@ abstract class AMysql_Abstract {
      * Performs an instant UPDATE returning its success.
      *
      * @param string $tableName 	The table name.
-     * @param array $data 			The array of data changes. A one-dimensional array
-     * 								with keys as column names and values as their values.
-     * @param string $where			An SQL substring of the WHERE clause.
-     * @param array $binds			(Optional) The binds for the WHERE clause.
+     * @param array $data 		The array of data changes. A one-dimensional array
+     * 					with keys as column names and values as their values.
+     * @param string $where		An SQL substring of the WHERE clause.
+     * @param array $binds		(Optional) The binds for the WHERE clause.
      *
      * @return boolean Whether the update was successful.
      **/
@@ -237,18 +237,18 @@ abstract class AMysql_Abstract {
      * Performs an instant INSERT.
      *
      * @param string $tableName 	The table name.
-     * @param array $data			A one or two-dimensional array.
-     * 								1D:
-     * 								an associative array of keys as column names and values
-     * 								as their values. This inserts one row.
-     * 								2D numeric:
-     * 								A numeric array where each value is an associative array
-     * 								with column-value pairs. Each outer, numeric value represents
-     * 								a row of data.
-     * 								2D associative:
-     * 								An associative array where the keys are the columns, the
-     * 								values are numerical arrays, where each value represents the
-     * 								value for the new row of that key.
+     * @param array $data		A one or two-dimensional array.
+     * 					1D:
+     * 					an associative array of keys as column names and values
+     * 					as their values. This inserts one row.
+     * 					2D numeric:
+     * 					A numeric array where each value is an associative array
+     * 					with column-value pairs. Each outer, numeric value represents
+     * 					a row of data.
+     * 					2D associative:
+     * 					An associative array where the keys are the columns, the
+     * 					values are numerical arrays, where each value represents the
+     * 					value for the new row of that key.
      *
      * @return mixed The mysql_insert_id(), if the query succeeded and there exists a primary
      * key. Otherwise the boolean of whether the insert was successful.
@@ -269,8 +269,8 @@ abstract class AMysql_Abstract {
      * Performs an instant DELETE.
      *
      * @param string $tableName 	The table name.
-     * @param string $where			An SQL substring of the WHERE clause.
-     * @param array $binds			(Optional) The binds for the WHERE clause.
+     * @param string $where		An SQL substring of the WHERE clause.
+     * @param array $binds		(Optional) The binds for the WHERE clause.
      *
      * @return resource|false The mysql resource if the delete was successful, otherwise false.
      **/
@@ -281,6 +281,19 @@ abstract class AMysql_Abstract {
         return $result;
     }
 
+    /**
+     * Returns an AMysql_Expr for using in prepared statements as values.
+     *
+     * @see AMysql_Expr
+     *
+     * @return AMysql_Expr
+     **/
+    public function expr(/* args */) {
+	$args = func_get_args();
+	$expr = new AMysql_Expr($this);
+	call_user_func_array(array ($expr, 'set'), $args);
+	return $expr;
+    }
 
     /**
      * Escapes a value. The method depends on the passed value's type, but unless the passed type
