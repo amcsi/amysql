@@ -41,6 +41,16 @@ class AMysql_Expr {
     const EXPR_COLUMN_IN = 1;
 
     /**
+     * Escapes wildcards for a LIKE statement.
+     * The second parameter has to be the string to escape, and
+     * the third is optional, and is the sprintf format of the string,
+     * where literal wildcards should appear. The default is %%%s%%,
+     * where the input of "something" will result in:
+     *	"'%something%' ESCAPE '='"
+     **/         
+    const ESCAPE_LIKE = 2;
+
+    /**
      * @constructor
      * This constructor accepts different parameters in different cases.
      * Before everything, if the first parameter is an AMysql instance, it
@@ -85,6 +95,17 @@ class AMysql_Expr {
 		    // If the array is empty, don't break the WHERE syntax
 		    $prepared = 0;
 		}
+		break;
+	    case self::ESCAPE_LIKE:
+		$format = '%%%s%%';
+		if (!empty($args[2])) {
+		    $format = $args[2];
+		}
+		$likeEscaped = AMysql::escapeLike($args[1]);
+		$formatted = sprintf($format, $likeEscaped);
+		$escaped = mysql_real_escape_string($formatted);
+		$prepared = "'$escaped'";
+		$prepared .= " ESCAPE '='";
 		break;
 	    default:
 		throw new Exception("No such expression type: `$args[0]`.");

@@ -296,6 +296,22 @@ abstract class AMysql_Abstract {
     }
 
     /**
+     * Escapes LIKE. The after the LIKE <string> syntax, you must place
+     * an ESCAPE statement with '=' or whatever you pass here as
+     * $escapeStr
+     *
+     * @param string $s The string to LIKE escape
+     * @param string $escapeChar (Opcionális) The escape character
+     **/
+    public static function escapeLike($s, $escapeStr = '=') {
+	return str_replace(
+	    array($escapeStr, '_', '%'), 
+	    array($escapeStr.$escapeStr, $escapeStr.'_', $escapeStr.'%'), 
+	    $s
+	);
+    }
+
+    /**
      * Escapes a value. The method depends on the passed value's type, but unless the passed type
      * is an AMysql_Expr, the safety is almost guaranteed. Do not put apostrophes around bind marks!
      * Those are handled by this escaping method.
