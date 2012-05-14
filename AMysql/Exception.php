@@ -2,7 +2,7 @@
 /**
  * Mysql kivétel osztály
  * @author Szerémi Attila 
- * @version 0.8
+ * @version 0.9
  **/ 
 class AMysql_Exception extends RuntimeException {
     

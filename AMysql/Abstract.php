@@ -2,11 +2,9 @@
 /**
  * Mysql abstraction which only uses mysql_* functions
  * @author Szerémi Attila
- * @version 0.8
+ * @version 0.9
  *
  * @todo mysql_select_db
- * @todo cleaning up the escape methods, so there would be one
- *  for all tables and identifiers
  * @todo try to make a new select class that works similarly like in Zend
  * @todo Maybe remove automatic dot detection for identifier escaping.
  * @todo Maybe make a simpler, shorter name for mysqlResource
@@ -14,14 +12,6 @@
  *  a new connection.
  * @todo AMysql_Select
  * @todo Stricter fetch type management ('assoc', 'object', 'row')
- * @todo A method that returns the values of a single column for multiple rows,
- *  as an array.
- * @todo A method that, with the first two given columns, returns a key-value
- *  pair array.
- * @todo A method that returns the value of the first column of the first row,
- *  if it exists, otherwise false.
- * @todo A method that returns the value of the first column of the first row
- *  as an integer if the value exists and is numeric, otherwise a 0.
  *
  **/
 abstract class AMysql_Abstract {
