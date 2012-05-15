@@ -7,7 +7,6 @@
  * @todo mysql_select_db
  * @todo try to make a new select class that works similarly like in Zend
  * @todo Maybe remove automatic dot detection for identifier escaping.
- * @todo Maybe make a simpler, shorter name for mysqlResource
  * @todo Be able to construct this class with connection arguments to make
  *  a new connection.
  * @todo AMysql_Select
@@ -18,7 +17,7 @@ abstract class AMysql_Abstract {
 
     public $insertId; // last insert id
     public $lastStatement; // last AMysql_Statement
-    public $mysqlResource = null; // mysql link
+    public $link = null; // mysql link
     public $error; // last error message
     public $errno; // last error number
     public $result; // last mysql result
@@ -34,7 +33,7 @@ abstract class AMysql_Abstract {
      **/
     public function __construct($res) {
         if ('mysql link' == get_resource_type($res)) {
-            $this->mysqlResource = $res;
+            $this->link = $res;
         }
         else {
             throw new RuntimeException('Resource given is not a mysql resource.', 0);
@@ -272,6 +271,21 @@ abstract class AMysql_Abstract {
     }
 
     /**
+     * If the last mysql query was a SELECT with the SQL_CALC_FOUND_ROWS
+     * options, this returns the number of found rows from that last
+     * query with LIMIT and OFFSET ignored.
+     * 
+     * @access public
+     * @return void
+     */
+    public function foundRows() {
+        $stmt = new AMysql_Statement($this);
+	$sql = 'SELECT FOUND_ROWS()';
+	$stmt->query($sql);
+	return $stmt->resultInt();
+    }
+
+    /**
      * Returns an AMysql_Expr for using in prepared statements as values.
      *
      * @see AMysql_Expr
@@ -312,7 +326,7 @@ abstract class AMysql_Abstract {
      *
      **/
     public function escape($value) {
-        $res = $this->mysqlResource;
+        $res = $this->link;
         if ('mysql link' != get_resource_type($res)) {
             throw new RuntimeException('Resource is not a mysql resource.', 0, $sql);
         }

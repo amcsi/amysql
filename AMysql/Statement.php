@@ -38,15 +38,20 @@ class AMysql_Statement {
     public $lastException = null;
     public $insertId;
 
-    public $mysqlResource;
+    public $link;
 
     public $beforeSql = '';
     public $prepared = '';
     public $binds = array();
 
+    const FETCH_ASSOC	= 'assoc';
+    const FETCH_OBJECT	= 'object';
+    const FETCH_ARRAY	= 'array';
+    const FETCH_ROW	= 'row';
+
     public function __construct(AMysql $amysql) {
 	$this->amysql = $amysql;
-	$this->mysqlResource = $amysql->mysqlResource;
+	$this->link = $amysql->link;
 	$this->throwExceptions = $this->amysql->throwExceptions;
     }
 
@@ -124,11 +129,11 @@ class AMysql_Statement {
 
     protected function _query($sql) {
 	$this->query = $sql; 
-	$res = $this->mysqlResource;
+	$res = $this->link;
 	if ('mysql link' != get_resource_type($res)) {
 	    throw new LogicException('Resource is not a mysql resource.', 0, $sql);
 	}
-	$result = mysql_query($sql, $this->mysqlResource);
+	$result = mysql_query($sql, $this->link);
 	$this->error = mysql_error($res);
 	$this->errno = mysql_errno($res);
 	$this->result = $result;
@@ -180,12 +185,35 @@ class AMysql_Statement {
     }
 
     public function fetchAll() {
-	if ('assoc' == $this->fetchMode) {
-	    return $this->fetchAllAssoc();
+	$ret = array ();
+	if (self::FETCH_ASSOC == $this->fetchMode) {
+	    $methodName = 'fetchAssoc';
+	}
+	else if (self::FETCH_OBJECT == $this->fetchMode) {
+	    $methodName = 'fetchObject';
+	}
+	else if (self::FETCH_ARRAY == $this->fetchMode) {
+	    $methodName = 'fetchArray';
+	}
+	else if (self::FETCH_ROW == $this->fetchMode) {
+	    $methodName = 'fetchRow';
 	}
 	else {
 	    throw new Exception("Unknown fetch mode: `$this->fetchMode`");
 	}
+	$ret = array();
+	$numRows = $this->numRows();
+	if (0 === $numRows) {
+	    return array ();
+	}
+	else if (false === $numRows) {
+	    return false;
+	}
+	mysql_data_seek($result, 0);
+	while (false !== ($row = $this->$methodName())) {
+	    $ret[] = $row;
+	}
+	return $ret;
     }
 
     public function fetch() {
@@ -198,6 +226,9 @@ class AMysql_Statement {
 	else if ('row' == $this->fetchMode) {
 	    return $this->fetchRow();
 	}
+	else if (self::FETCH_ARRAY == $this->fetchMode) {
+	    return $this->fetchArray();
+	}
 	else {
 	    throw new Exception("Unknown fetch mode: `$this->fetchMode`");
 	}
@@ -208,7 +239,21 @@ class AMysql_Statement {
 	return mysql_fetch_assoc($result);
     }
 
-    public function fetchAllAssoc() {
+    /**
+     * Fetches all rows and returns them as an array of associative arrays. The
+     * outer array is numerically indexed by default, but can be indexed by
+     * a field value.
+     * 
+     * @param integer|string|boolean $keyColumn	(Optional) If a string, the cell
+     *					of the given field will be the key for
+     *					its row, so the result will not be an array
+     *					numerically indexed from 0 in order. This
+     *					value can also be an integer, specifying
+     *					the index of the field with the key.
+     * @access public
+     * @return <Associative result array>[]
+     */
+    public function fetchAllAssoc($keyColumn = false) {
 	$result = $this->result;
 	$ret = array();
 	$numRows = $this->numRows();
@@ -219,8 +264,30 @@ class AMysql_Statement {
 	    return false;
 	}
 	mysql_data_seek($result, 0);
-	while (false !== ($row = $this->fetchAssoc())) {
-	    $ret[] = $row;
+	if (false === $keyColumn) {
+	    while (false !== ($row = $this->fetchAssoc())) {
+		$ret[] = $row;
+	    }
+	}
+	else {
+	    $row = $this->fetchAssoc();
+	    /**
+	     * Since we are using associative keys here, if we gave the key as an
+	     * int, we have to find out the associative version of the key.
+	     **/
+	    if (is_int($keyColumn)) {
+		$cnt = count($keyColumn);
+		reset($row);
+		for ($i = 0; $i < $cnt; $i++) {
+		    next($row);
+		}
+		$keyColumn = key($row);
+		reset($row);
+	    }
+	    $ret[$row[$keyColumn]] = $row;
+	    while ($row = $this->fetchAssoc()) {
+		$ret[$row[$keyColumn]] = $row;
+	    }
 	}
 	return $ret;
     }
@@ -610,7 +677,7 @@ class AMysql_Statement {
      * @return int     
      **/	     
     public function insertId() {
-	$ret = mysql_insert_id($this->mysqlResource);
+	$ret = mysql_insert_id($this->link);
 	return $ret;
     }
 
