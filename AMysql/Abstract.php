@@ -10,7 +10,6 @@
  * @todo Be able to construct this class with connection arguments to make
  *  a new connection.
  * @todo AMysql_Select
- * @todo Stricter fetch type management ('assoc', 'object', 'row')
  *
  **/
 abstract class AMysql_Abstract {

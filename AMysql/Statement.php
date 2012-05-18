@@ -33,7 +33,7 @@ class AMysql_Statement {
     public $results = array ();
     public $query;
     public $affectedRows;
-    public $fetchMode = 'assoc';
+    protected $_fetchMode = 'assoc';
     public $throwExceptions;
     public $lastException = null;
     public $insertId;
@@ -53,6 +53,19 @@ class AMysql_Statement {
 	$this->amysql = $amysql;
 	$this->link = $amysql->link;
 	$this->throwExceptions = $this->amysql->throwExceptions;
+    }
+
+    public function setFetchMode($fetchMode) {
+	static $fetchModes = array (
+	    self::FETCH_ASSOC, self::FETCH_OBJECT,
+	    self::FETCH_ARRAY, self::FETCH_ROW
+	);
+	if (in_array($fetchMode, $fetchModes)) {
+	    $this->fetchMode = $fetchMode;
+	}
+	else {
+	    throw new Exception("Unknown fetch mode: `$fetchMode`");
+	}
     }
 
     public function execute($binds = null) {
@@ -186,20 +199,20 @@ class AMysql_Statement {
 
     public function fetchAll() {
 	$ret = array ();
-	if (self::FETCH_ASSOC == $this->fetchMode) {
+	if (self::FETCH_ASSOC == $this->_fetchMode) {
 	    $methodName = 'fetchAssoc';
 	}
-	else if (self::FETCH_OBJECT == $this->fetchMode) {
+	else if (self::FETCH_OBJECT == $this->_fetchMode) {
 	    $methodName = 'fetchObject';
 	}
-	else if (self::FETCH_ARRAY == $this->fetchMode) {
+	else if (self::FETCH_ARRAY == $this->_fetchMode) {
 	    $methodName = 'fetchArray';
 	}
-	else if (self::FETCH_ROW == $this->fetchMode) {
+	else if (self::FETCH_ROW == $this->_fetchMode) {
 	    $methodName = 'fetchRow';
 	}
 	else {
-	    throw new Exception("Unknown fetch mode: `$this->fetchMode`");
+	    throw new Exception("Unknown fetch mode: `$this->_fetchMode`");
 	}
 	$ret = array();
 	$numRows = $this->numRows();
@@ -217,20 +230,20 @@ class AMysql_Statement {
     }
 
     public function fetch() {
-	if ('assoc' == $this->fetchMode) {
+	if ('assoc' == $this->_fetchMode) {
 	    return $this->fetchAssoc();
 	}
-	else if ('object' == $this->fetchMode) {
+	else if ('object' == $this->_fetchMode) {
 	    return $this->fetchObject();
 	}
-	else if ('row' == $this->fetchMode) {
+	else if ('row' == $this->_fetchMode) {
 	    return $this->fetchRow();
 	}
-	else if (self::FETCH_ARRAY == $this->fetchMode) {
+	else if (self::FETCH_ARRAY == $this->_fetchMode) {
 	    return $this->fetchArray();
 	}
 	else {
-	    throw new Exception("Unknown fetch mode: `$this->fetchMode`");
+	    throw new Exception("Unknown fetch mode: `$this->_fetchMode`");
 	}
     }
 
@@ -292,11 +305,21 @@ class AMysql_Statement {
 	return $ret;
     }
 
+    /**
+     * Fetches the next row with column names as numeric indices.
+     * 
+     * @return array
+     */
     public function fetchRow() {
 	$result = $this->result;
 	return mysql_fetch_row($result);
     }
 
+    /**
+     * Alias of $this->fetchRow()
+     * 
+     * @return array
+     */
     public function fetchNum() {
 	return $this->fetchRow();
     }
@@ -369,9 +392,23 @@ class AMysql_Statement {
      * @return mixed
      */
     public function resultNull($row = 0, $field = 0) {
+	return $this->resultDefault(null, $row, $field);
+    }
+
+    /**
+     * Returns the result of the given row and field, or the given value
+     * if the row doesn't exist
+     * 
+     * 
+     * @param mixed $default	The value to return if the field is not found.
+     * @param int $row		(Optional) The row number.
+     * @param int $field	(Optional) The field.
+     * @return mixed
+     */
+    public function resultDefault($default, $row = 0, $field = 0) {
 	$result = $this->result;
 	return $row < $this->numRows() ? mysql_result($result, $row, $field) :
-	    null;
+	    $default;
     }
 
     /**
@@ -687,6 +724,17 @@ class AMysql_Statement {
      **/         
     public function __destruct() {
 	$this->freeResults();
+    }
+
+    public function __set($name, $value) {
+	switch($name) {
+	case 'fetchMode':
+	    $this->setFetchMode($value);
+	    break;
+	default:
+	    throw new OutOfBoundsException("Invalid member: `$name` " .
+		"(target value was `$value`)");
+	}
     }
 }
 ?>
