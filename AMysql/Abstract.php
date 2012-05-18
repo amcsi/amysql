@@ -30,13 +30,53 @@ abstract class AMysql_Abstract {
      * @param resource $res The mysql connection resource.
      *
      **/
-    public function __construct($res) {
+    public function __construct($resOrHost = null, $username = null,
+	$password = null, $newLink = null, $clientFlags = 0) {
         if ('mysql link' == get_resource_type($res)) {
             $this->link = $res;
         }
+	else if(is_null($resOrHost) || is_string($resOrHost)) {
+	    $args = func_get_args();
+	    $res = call_user_func_array('mysql_connect', $args);
+	    if ($res) {
+		$this->link = $res;
+	    }
+	    else {
+		throw new AMysql_Exception(mysql_error(), mysql_errno(),
+		    '(connection to mysql)');
+	    }
+	}
         else {
             throw new RuntimeException('Resource given is not a mysql resource.', 0);
         }
+    }
+
+    public function selectDb($db) {
+	$result = mysql_select_db($db, $this->link);
+	if (!$result) {
+	    if ($this->throwExceptions) {
+		throw new AMysql_Exception(mysql_error($this->link),
+		    mysql_errno($this->link), 'USE ' . $db);
+	    }
+	    else {
+		trigger_error(mysql_error($this->link), E_USER_WARNING);
+	    }
+	}
+	return $this;
+    }
+
+    public function setCharset($charset) {
+	$result = mysql_set_charset($charset, $this->link);
+	if (!$result) {
+	    if ($this->throwExceptions) {
+		throw new AMysql_Exception(mysql_error($this->link),
+		    mysql_errno($this->link), "(setting charset)");
+	    }
+	    else {
+		trigger_error(mysql_error($this->link), E_USER_WARNING);
+	    }
+	}
+	return $this;
     }
 
     /**
