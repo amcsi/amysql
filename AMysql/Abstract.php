@@ -61,7 +61,9 @@ abstract class AMysql_Abstract {
     protected static function _escapeIdentifier($identifier) {
         $exploded = explode('.', $identifier);
         $count = count($exploded);
-        $identifier = '`' . $exploded[$count-1] . '`';
+	$identifier = $exploded[$count-1] == '*' ?
+	    '*' :
+	    '`' . $exploded[$count-1] . '`';
         if (1 < $count) {
             $identifier = "`$exploded[0]`.$identifier";
         }
@@ -73,13 +75,17 @@ abstract class AMysql_Abstract {
      * Escapes an identifier, such as a column or table name.
      * Includes functionality for making an AS syntax.
      *
-     * @param string $identifierName The identifier name. If it has a dot in it,
-     * it'll automatically split the identifier name into the `tableName`.`columnName`
+     * @param string $identifierName The identifier name. If it has a dot in 
+     * it,
+     * it'll automatically split the identifier name into the 
+     * `tableName`.`columnName`
      * syntax.
-     * @param string $as (Optional) adds an AS syntax. The value is the alias the
-     * identifier should have for the query.
+     * @param string $as (Optional) adds an AS syntax, but only, if it's
+     * a string. The value is the alias the identifier should have for
+     * the query.
      *
-     * @todo Possibly change the functionality to remove the automatic dot detection,
+     * @todo Possibly change the functionality to remove the automatic dot 
+     * detection,
      * 	and ask for an array instead?
      *
      * e.g.
@@ -87,23 +93,24 @@ abstract class AMysql_Abstract {
      *  // `table`.`order` AS ot
      **/
     public static function escapeIdentifier($identifierName, $as = null) {
-        $asString = '';
-        $escapeIdentifierName = true;
-        if ($as and !is_int($as)) {
-            $asString = ' AS ' . $as;
-        }
-        else if (is_string($identifierName) and (false !== strpos($identifierName, ' AS '))) {
-            $exploded = explode(' AS ', $identifierName);
-            $identifierName = $exploded[0];
-            $asString = ' AS ' . $exploded[1];
-        }
-        if ($identifierName instanceof AMysql_Expr) {
-            $ret = $identifierName->__toString() . $asString;
-        }
-        else {
-            $ret = self::_escapeIdentifier($identifierName) . $asString;
-        }
-        return $ret;
+	$asString = '';
+	$escapeIdentifierName = true;
+	if ($as and !is_numeric($as)) {
+	    $asString = ' AS ' . $as;
+	}
+	else if (is_string($identifierName) and (false !== 
+	    strpos($identifierName, ' AS '))) {
+	    $exploded = explode(' AS ', $identifierName);
+	    $identifierName = $exploded[0];
+	    $asString = ' AS ' . $exploded[1];
+	}
+	if ($identifierName instanceof AMysql_Expr) {
+	    $ret = $identifierName->__toString() . $asString;
+	}
+	else {
+	    $ret = self::_escapeIdentifier($identifierName) . $asString;
+	}
+	return $ret;
     }
 
     /**

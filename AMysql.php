@@ -10,6 +10,7 @@ require_once $dir . '/AMysql/Abstract.php';
 require_once $dir . '/AMysql/Exception.php';
 require_once $dir . '/AMysql/Expr.php';
 require_once $dir . '/AMysql/Statement.php';
+require_once $dir . '/AMysql/Select.php';
 
 class AMysql extends Amysql_Abstract 
 {
