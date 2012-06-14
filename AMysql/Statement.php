@@ -116,7 +116,12 @@ class AMysql_Statement {
 			$string .= chr(mt_rand(0, 255));
 		    }
 		    $map[$key] = $string;
-		    $sql = str_replace("$key", $string, $sql);
+		    if (127 < chr($key[0] || preg_match('/^\w$/', $key[0])) {
+			$key = ':' . $key;
+		    }
+		    $keyQuoted = preg_quote($key, '/');
+		    $pregReplacement = str_replace('\\', '\\\\', $string);
+		    $sql = preg_replace("/$keyQuoted([^\w\x80-\xff])|$keyQuoted$/m", "$pregReplacement\1", $sql);
 		}
 		foreach ($binds as $key => &$bind) {
 		    $placeholder = $map[$key];
