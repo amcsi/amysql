@@ -614,7 +614,8 @@ class AMysql_Statement {
 	 * Ezt beforeSql-el kell megoldani, különben az értékekben lévő
 	 * kérdőjelek bezavarnak.         
 	 **/		         
-	$beforeSql = "UPDATE `$tableName` SET $setsString WHERE ";
+	$tableSafe = AMysql::escapeIdentifier($tableName);
+	$beforeSql = "UPDATE $tableSafe SET $setsString WHERE ";
 	$this->prepare($where);
 	$this->beforeSql = $beforeSql;
 
@@ -679,7 +680,8 @@ class AMysql_Statement {
 	    $rowValueStrings[] = join(', ', $rowValues);
 	}
 	$valuesString = join('), (', $rowValueStrings);
-	$sql = "INSERT INTO `$tableName` ($columnsString) VALUES ($valuesString)";
+	$tableSafe = AMysql::escapeIdentifier($tableName);
+	$sql = "INSERT INTO $tableSafe ($columnsString) VALUES ($valuesString)";
 	$this->prepare($sql);
 	return $this;
     }
@@ -690,7 +692,8 @@ class AMysql_Statement {
      * @param string $where (Opcionális) A WHERE clause.          
      **/         
     public function delete($tableName, $where = null) {
-	$sql = "DELETE FROM `$tableName`";
+	$tableSafe = AMysql::escapeIdentifier($tableName);
+	$sql = "DELETE FROM $tableSafe";
 	$this->prepare($sql);
 	if ($where) {
 	    $this->where($where);
