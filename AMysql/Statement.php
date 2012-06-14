@@ -116,16 +116,20 @@ class AMysql_Statement {
 			$string .= chr(mt_rand(0, 255));
 		    }
 		    $map[$key] = $string;
-		    if (127 < chr($key[0] || preg_match('/^\w$/', $key[0])) {
+		    if (127 < ord($key[0]) || preg_match('/^\w$/', $key[0])) {
 			$key = ':' . $key;
 		    }
 		    $keyQuoted = preg_quote($key, '/');
 		    $pregReplacement = str_replace('\\', '\\\\', $string);
-		    $sql = preg_replace("/$keyQuoted([^\w\x80-\xff])|$keyQuoted$/m", "$pregReplacement\1", $sql);
+		    $pattern =
+			"/$keyQuoted([^\w\x80-\xff])|$keyQuoted$/m";
+		    $sql = preg_replace($pattern, "$pregReplacement\\1", $sql);
 		}
 		foreach ($binds as $key => &$bind) {
 		    $placeholder = $map[$key];
-		    $sql = str_replace($placeholder, $this->amysql->escape($bind), $sql);
+		    $sql = str_replace($placeholder,
+			$this->amysql->escape($bind), $sql
+		    );
 		}
 	    }
 	}
