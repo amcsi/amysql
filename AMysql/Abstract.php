@@ -207,8 +207,10 @@ abstract class AMysql_Abstract {
      * Performs an instant UPDATE returning its success.
      *
      * @param string $tableName 	The table name.
-     * @param array $data 		The array of data changes. A one-dimensional array
-     * 					with keys as column names and values as their values.
+     * @param array $data 		The array of data changes. A
+     *					    one-dimensional array
+     * 					with keys as column names and values
+     *					    as their values.
      * @param string $where		An SQL substring of the WHERE clause.
      * @param array $binds		(Optional) The binds for the WHERE clause.
      *
