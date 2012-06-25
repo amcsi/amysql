@@ -348,10 +348,6 @@ abstract class AMysql_Abstract {
         if ('mysql link' != get_resource_type($res)) {
             throw new RuntimeException('Resource is not a mysql resource.', 0, $sql);
         }
-        // In the case of a string, let's put it between apostrophes
-        if (is_string($value)) {
-            return "'" . mysql_real_escape_string($value, $res) . "'";
-        }
         // If it's an int, place it there literally
         if (is_int($value)) {
             return $value;
@@ -368,6 +364,9 @@ abstract class AMysql_Abstract {
         if ($value instanceof AMysql_Expr) {
             return $value->__toString();
         }
+	// In the case of a string or anything else, let's escape it and
+	// put it between apostrophes.
+	return "'" . mysql_real_escape_string($value, $res) . "'";
     }
 }
 ?>
