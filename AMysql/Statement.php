@@ -33,39 +33,29 @@ class AMysql_Statement {
     public $results = array ();
     public $query;
     public $affectedRows;
-    /**
-     * The fetch mode. Can be changed here or set at runtime with
-     * setFetchMode.
-     * 
-     * @var string
-     * @access protected
-     */
-    protected $_fetchMode = 'assoc';
     public $throwExceptions;
     public $lastException = null;
     public $insertId;
 
     public $link;
 
+    protected $_fetchMode;
+
     public $beforeSql = '';
     public $prepared = '';
     public $binds = array();
-
-    const FETCH_ASSOC	= 'assoc';
-    const FETCH_OBJECT	= 'object';
-    const FETCH_ARRAY	= 'array';
-    const FETCH_ROW	= 'row';
 
     public function __construct(AMysql $amysql) {
 	$this->amysql = $amysql;
 	$this->link = $amysql->link;
 	$this->throwExceptions = $this->amysql->throwExceptions;
+	$this->setFetchMode($amysql->getFetchMode());
     }
 
     public function setFetchMode($fetchMode) {
 	static $fetchModes = array (
-	    self::FETCH_ASSOC, self::FETCH_OBJECT,
-	    self::FETCH_ARRAY, self::FETCH_ROW
+	    AMysql::FETCH_ASSOC, AMysql::FETCH_OBJECT,
+	    AMysql::FETCH_ARRAY, AMysql::FETCH_ROW
 	);
 	if (in_array($fetchMode, $fetchModes)) {
 	    $this->fetchMode = $fetchMode;
@@ -254,16 +244,16 @@ class AMysql_Statement {
      **/         
     public function fetchAll() {
 	$ret = array ();
-	if (self::FETCH_ASSOC == $this->_fetchMode) {
+	if (AMysql::FETCH_ASSOC == $this->_fetchMode) {
 	    $methodName = 'fetchAssoc';
 	}
-	else if (self::FETCH_OBJECT == $this->_fetchMode) {
+	else if (AMysql::FETCH_OBJECT == $this->_fetchMode) {
 	    $methodName = 'fetchObject';
 	}
-	else if (self::FETCH_ARRAY == $this->_fetchMode) {
+	else if (AMysql::FETCH_ARRAY == $this->_fetchMode) {
 	    $methodName = 'fetchArray';
 	}
-	else if (self::FETCH_ROW == $this->_fetchMode) {
+	else if (AMysql::FETCH_ROW == $this->_fetchMode) {
 	    $methodName = 'fetchRow';
 	}
 	else {
@@ -301,7 +291,7 @@ class AMysql_Statement {
 	else if ('row' == $this->_fetchMode) {
 	    return $this->fetchRow();
 	}
-	else if (self::FETCH_ARRAY == $this->_fetchMode) {
+	else if (AMysql::FETCH_ARRAY == $this->_fetchMode) {
 	    return $this->fetchArray();
 	}
 	else {

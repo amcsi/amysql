@@ -23,6 +23,19 @@ abstract class AMysql_Abstract {
     public $query; // last used query string
     public $affectedRows; // last affected rows count
     public $throwExceptions = true; // whether to throw exceptions
+    /**
+     * The fetch mode. Can be changed here or set at runtime with
+     * setFetchMode.
+     * 
+     * @var string
+     * @access protected
+     */
+    protected $_fetchMode = self::FETCH_ASSOC;
+
+    const FETCH_ASSOC	= 'assoc';
+    const FETCH_OBJECT	= 'object';
+    const FETCH_ARRAY	= 'array';
+    const FETCH_ROW	= 'row';
 
     /**
      * @todo Allow for making a new connection here
@@ -37,6 +50,10 @@ abstract class AMysql_Abstract {
         else {
             throw new RuntimeException('Resource given is not a mysql resource.', 0);
         }
+    }
+
+    public function getFetchMode() {
+	return $this->_fetchMode;
     }
 
     /**
