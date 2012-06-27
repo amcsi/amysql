@@ -124,5 +124,66 @@ EOT;
 	);
 	$this->assertEquals($expected, $results);
     }
+
+    public function testPairUpColumnNames() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName");
+	$results = $stmt->pairUp('string', 'id');
+	$expected = array (
+	    '3' => '1',
+	    'blah' => '2'
+	);
+	$this->assertEquals($expected, $results);
+    }
+
+    public function testPairUpMixed() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName");
+	$results = $stmt->pairUp('string', 0);
+	$expected = array (
+	    '3' => '1',
+	    'blah' => '2'
+	);
+	$this->assertEquals($expected, $results);
+    }
+
+    public function testPairUpSame() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName");
+	$results = $stmt->pairUp(1, 1);
+	$expected = array (
+	    '3' => '3',
+	    'blah' => 'blah'
+	);
+	$this->assertEquals($expected, $results);
+    }
+
+    public function testFetchObject() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName");
+	$result = $stmt->fetchObject();
+	$this->assertEquals('1', $result->id);
+	$this->assertEquals('3', $result->string);
+    }
 }
 ?>
