@@ -38,15 +38,30 @@ abstract class AMysql_Abstract {
     const FETCH_ROW	= 'row';
 
     /**
-     * @todo Allow for making a new connection here
      * @constructor
-     * @param resource $res The mysql connection resource.
+     * @param resource|string $resOrHost    Either a valid mysql connection
+     *					    resource, or if you're connecting
+     *					    to mysql with this class, then
+     *					    pass the same parameters you would
+     *					    pass to mysql_connect.
      *
      **/
-    public function __construct($res) {
+    public function __construct($resOrHost = null, $username = null,
+	$password = null, $newLink = null, $clientFlags = 0) {
         if ('mysql link' == get_resource_type($res)) {
             $this->link = $res;
         }
+	else if(is_null($resOrHost) || is_string($resOrHost)) {
+	    $args = func_get_args();
+	    $res = call_user_func_array('mysql_connect', $args);
+	    if ($res) {
+		$this->link = $res;
+	    }
+	    else {
+		throw new AMysql_Exception(mysql_error(), mysql_errno(),
+		    '(connection to mysql)');
+	    }
+	}
         else {
             throw new RuntimeException('Resource given is not a mysql resource.', 0);
         }
@@ -54,6 +69,67 @@ abstract class AMysql_Abstract {
 
     public function getFetchMode() {
 	return $this->_fetchMode;
+    }
+
+    /**
+     * Selects the given database.
+     * 
+     * @param string $db 
+     * @return $this
+     */
+    public function selectDb($db) {
+	$result = mysql_select_db($db, $this->link);
+	if (!$result) {
+	    if ($this->throwExceptions) {
+		throw new AMysql_Exception(mysql_error($this->link),
+		    mysql_errno($this->link), 'USE ' . $db);
+	    }
+	    else {
+		trigger_error(mysql_error($this->link), E_USER_WARNING);
+	    }
+	}
+	return $this;
+    }
+
+    /**
+     * Changes the character set of the connection.
+     * 
+     * @param string $charset Example: utf8
+     * @return $this
+     */
+    public function setCharset($charset) {
+	$result = mysql_set_charset($charset, $this->link);
+	if (!$result) {
+	    if ($this->throwExceptions) {
+		throw new AMysql_Exception(mysql_error($this->link),
+		    mysql_errno($this->link), "(setting charset)");
+	    }
+	    else {
+		trigger_error(mysql_error($this->link), E_USER_WARNING);
+	    }
+	}
+	return $this;
+    }
+
+    /**
+     * Performs SET NAMES <charset> to change the character set. It may be
+     * enough to use $this->setCharset().
+     * 
+     * @param string $names Example: utf8
+     * @return $this
+     */
+    public function setNames($names) {
+	$result = mysql_query("SET NAMES $names", $this->link);
+	if (!$result) {
+	    if ($this->throwExceptions) {
+		throw new AMysql_Exception(mysql_error($this->link),
+		    mysql_errno($this->link), "(setting names)");
+	    }
+	    else {
+		trigger_error(mysql_error($this->link), E_USER_WARNING);
+	    }
+	}
+	return $this;
     }
 
     /**
@@ -305,6 +381,12 @@ abstract class AMysql_Abstract {
 
     /**
      * Returns an AMysql_Expr for using in prepared statements as values.
+     * See the AMysql_Expr class for details.
+     * To bind a literal value without apostrophes, here is an example of
+     * how you can execute a prepared statement with the help of placeholders:
+     *	$amysql->prepare('SELECT ? AS time')->execute(array (
+     *	    $amysql->expr('CURRENT_TIMESTAMP')
+     *	))
      *
      * @see AMysql_Expr
      *
