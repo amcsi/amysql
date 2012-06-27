@@ -13,5 +13,15 @@ set_include_path(
     . PATH_SEPARATOR . get_include_path()
 );
 
+$mysqlHost  = 'localhost';
+$mysqlUser  = 'amysql';
+$mysqlPass  = '';
+$mysqlDb    = 'amysql';
+
+define('AMYSQL_TEST_HOST', $mysqlHost);
+define('AMYSQL_TEST_USER', $mysqlUser);
+define('AMYSQL_TEST_PASS', $mysqlPass);
+define('AMYSQL_TEST_DB', $mysqlDb);
+
 require_once APPLICATION_PATH . '/AMysql.php';
 ?>

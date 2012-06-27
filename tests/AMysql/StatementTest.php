@@ -5,7 +5,8 @@ class StatementTest extends PHPUnit_Framework_TestCase {
     protected $_amysql;
 
     public function setUp() {
-	$conn = mysql_connect('localhost', 'amysql', '');
+	$conn = mysql_connect(AMYSQL_TEST_HOST, AMYSQL_TEST_USER, 
+	    AMYSQL_TEST_PASS);
 	$this->_conn = $conn;
 	$this->_amysql = new AMysql($conn);
     }

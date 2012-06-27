@@ -48,8 +48,10 @@ abstract class AMysql_Abstract {
      **/
     public function __construct($resOrHost = null, $username = null,
 	$password = null, $newLink = null, $clientFlags = 0) {
-        if ('mysql link' == get_resource_type($res)) {
-            $this->link = $res;
+	if (is_resource($resOrHost)
+	    &&
+	'mysql link' == get_resource_type($resOrHost)) {
+            $this->link = $resOrHost;
         }
 	else if(is_null($resOrHost) || is_string($resOrHost)) {
 	    $args = func_get_args();
