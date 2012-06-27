@@ -13,6 +13,9 @@ set_include_path(
     . PATH_SEPARATOR . get_include_path()
 );
 
+/**
+ * Make sure you have a mysql user and database preprepared for the tests
+ **/
 $mysqlHost  = 'localhost';
 $mysqlUser  = 'amysql';
 $mysqlPass  = '';

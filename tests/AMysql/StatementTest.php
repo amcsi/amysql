@@ -1,18 +1,28 @@
 <?php
 class StatementTest extends PHPUnit_Framework_TestCase {
 
-    protected $_conn;
     protected $_amysql;
 
+    public $tableName = 'abstracttest';
+
     public function setUp() {
-	$conn = mysql_connect(AMYSQL_TEST_HOST, AMYSQL_TEST_USER, 
-	    AMYSQL_TEST_PASS);
-	$this->_conn = $conn;
-	$this->_amysql = new AMysql($conn);
+	$this->_amysql = new AMysql(
+	    AMYSQL_TEST_HOST, AMYSQL_TEST_USER, AMYSQL_TEST_PASS);
+	$this->_amysql->selectDb(AMYSQL_TEST_DB);
+
+	$sql = <<<EOT
+CREATE TABLE IF NOT EXISTS `$this->tableName` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `string` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+EOT;
+	$this->_amysql->query($sql);
     }
 
     public function tearDown() {
-	mysql_close($this->_conn);
+	$this->_amysql->query("DROP TABLE `$this->tableName`");
+	$this->_amysql = null;
     }
 
     public function testNamedBinds1() {
@@ -96,6 +106,22 @@ class StatementTest extends PHPUnit_Framework_TestCase {
 	$expected = "'s1''s2'";
 	$stmt->binds = $binds;
 	$this->assertEquals($expected, $stmt->getSql());
+    }
+
+    public function testPairUp() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName");
+	$results = $stmt->pairUp();
+	$expected = array (
+	    '1' => '3',
+	    '2' => 'blah'
+	);
+	$this->assertEquals($expected, $results);
     }
 }
 ?>

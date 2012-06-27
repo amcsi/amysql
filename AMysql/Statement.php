@@ -415,7 +415,7 @@ class AMysql_Statement {
      */
     public function pairUp($keyColumn = 0, $valueColumn = 1) {
 	$ret = array ();
-	while ($row = $stmt->fetchArray()) {
+	while ($row = $this->fetchArray()) {
 	    $key = $row[$keyColumn];
 	    $ret[$key] = $row[$valueColumn];
 	}
@@ -433,7 +433,7 @@ class AMysql_Statement {
      */
     public function fetchAllColumn($column = 0) {
 	$ret = array ();
-	while ($row = $stmt->fetchArray()) {
+	while ($row = $this->fetchArray()) {
 	    $ret[] = $row[$column];
 	}
 	return $ret;
