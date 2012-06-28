@@ -264,6 +264,40 @@ abstract class AMysql_Abstract {
     }
 
     /**
+     * Like $this->getOne(), except returns a null when no result is found,
+     * without throwing an error.
+     *
+     * @param string $sql The SQL string.
+     * @param array $binds The binds.
+     *
+     * @see $this->getOne()
+     *
+     * @return string
+     **/
+    public function getOneNull($sql, array $binds = array ()) {
+        $stmt = new AMysql_Statement($this);
+        $stmt->query($sql, $binds);
+        return $stmt->resultNull(0, 0);
+    }
+
+    /**
+     * Like $this->getOne(), but casts the result to an int. No exception is
+     * thrown when there is no result.
+     *
+     * @param string $sql The SQL string.
+     * @param array $binds The binds.
+     *
+     * @see $this->getOne()
+     *
+     * @return string
+     **/
+    public function getOneInt($sql, array $binds = array ()) {
+        $stmt = new AMysql_Statement($this);
+        $stmt->query($sql, $binds);
+        return $stmt->resultInt(0, 0);
+    }
+
+    /**
      * Prepares a mysql statement. It is to be executed.
      *
      * @param string $sql The SQL string.

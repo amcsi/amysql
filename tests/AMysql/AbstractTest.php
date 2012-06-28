@@ -86,6 +86,79 @@ EOT;
 	);
 	$this->assertEquals($expected, $results);
     }
+
+    public function testGetOne() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$result = $this->_amysql->getOne("SELECT string FROM $this->tableName");
+	$this->assertEquals('3', $result);
+    }
+
+    public function testGetOneWarning() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$this->setExpectedException('PHPUnit_Framework_Error_Warning');
+	$result = $this->_amysql->getOne("SELECT string FROM $this->tableName
+	    WHERE id = '3'");
+    }
+
+    public function testGetOneInt() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$result = $this->_amysql->getOneInt("SELECT id FROM $this->tableName");
+	$this->assertSame(1, $result);
+	$this->assertNotSame('1', $result);
+    }
+
+    public function testGetOneInt2() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$result = $this->_amysql->getOneInt("SELECT id FROM $this->tableName
+	    WHERE id = '3'");
+	$this->assertSame(0, $result);
+    }
+
+    public function testGetOneInt3() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$result = $this->_amysql->getOneInt(
+	    "SELECT string FROM $this->tableName WHERE string = 'blah'"
+	);
+	$this->assertSame(0, $result);
+    }
+
+    public function testGetOneNull() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$result = $this->_amysql->getOneNull(
+	    "SELECT string FROM $this->tableName WHERE id = '3'"
+	);
+	$this->assertNull($result);
+    }
 }
 ?>
 
