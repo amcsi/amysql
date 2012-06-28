@@ -2,7 +2,7 @@
 /**
  * Mysql abstraction which only uses mysql_* functions
  * @author Szerémi Attila
- * @version 0.9.1.1
+ * @version 0.9.1.2
  *   
  **/
 $dir = dirname(realpath(__FILE__));
