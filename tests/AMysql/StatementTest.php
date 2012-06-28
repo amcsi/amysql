@@ -185,5 +185,71 @@ EOT;
 	$this->assertEquals('1', $result->id);
 	$this->assertEquals('3', $result->string);
     }
+
+    public function testFetchAllAssoc() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName");
+	$results = $stmt->fetchAllAssoc();
+	$expected = array (
+	    array (
+		'id' => '1',
+		'string' => '3'
+	    ),
+	    array (
+		'id' => '2',
+		'string' => 'blah'
+	    )
+	);
+	$this->assertEquals($expected, $results);
+    }
+
+    public function testFetchAllAssocIdColumn() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName");
+	$results = $stmt->fetchAllAssoc('id');
+	$expected = array (
+	    '1' => array (
+		'id' => '1',
+		'string' => '3'
+	    ),
+	    '2' => array (
+		'id' => '2',
+		'string' => 'blah'
+	    )
+	);
+	$this->assertEquals($expected, $results);
+    }
+
+    public function testFetchAllAssocIdColumn2() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName");
+	$results = $stmt->fetchAllAssoc(1);
+	$expected = array (
+	    '3' => array (
+		'id' => '1',
+		'string' => '3'
+	    ),
+	    'blah' => array (
+		'id' => '2',
+		'string' => 'blah'
+	    )
+	);
+	$this->assertEquals($expected, $results);
+    }
 }
 ?>
