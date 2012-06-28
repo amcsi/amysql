@@ -349,7 +349,7 @@ abstract class AMysql_Abstract {
         $stmt = new AMysql_Statement($this);
         $stmt->update($tableName, $data, $where);
         $result = $stmt->execute($binds);
-        return $result;
+        return $stmt->result;
     }
 
     /**
