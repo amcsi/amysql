@@ -400,6 +400,48 @@ class AMysql_Statement {
     }
 
     /**
+     * Returns the result of the given row and field, or the given value
+     * if the row doesn't exist
+     * 
+     * 
+     * @param mixed $default	The value to return if the field is not found.
+     * @param int $row		(Optional) The row number.
+     * @param int $field	(Optional) The field.
+     * @return mixed
+     */
+    public function resultDefault($default, $row = 0, $field = 0) {
+	$result = $this->result;
+	return $row < $this->numRows() ? mysql_result($result, $row, $field) :
+	    $default;
+    }
+
+    /**
+     * Returns the result of the given row and field, or null if the
+     * row doesn't exist
+     * 
+     * 
+     * @param int $row		(Optional) The row number.
+     * @param int $field	(Optional) The field.
+     * @return mixed
+     */
+
+    public function resultNull($row = 0, $field = 0) {
+	return $this->resultDefault(null, $row, $field);
+    }
+
+    /**
+     * Returns the result of the given row and field as an integer.
+     * 0, if that result doesn't exist.
+     * 
+     * @param int $row		(Optional) The row number.
+     * @param int $field	(Optional) The field.
+     * @return integer
+     */
+    public function resultInt($row = 0, $field = 0) {
+	return (int) $this->resultNull($row, $field);
+    }
+
+    /**
      * Returns an array of scalar values, where the keys are the values
      * of the key column specified, and the values are the values of the
      * value column specified.
