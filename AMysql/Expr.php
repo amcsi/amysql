@@ -8,7 +8,7 @@
  *
  * @author Szerémi Attila
  * @created 2011.06.10. 13:26:56  
- * @version 0.9.1
+ * @version 0.9.1.1
  **/ 
 class AMysql_Expr {
 
