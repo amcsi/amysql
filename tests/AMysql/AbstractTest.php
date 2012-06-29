@@ -159,6 +159,142 @@ EOT;
 	);
 	$this->assertNull($result);
     }
+
+    public function testUpdateMultipleByKey() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$data = array (
+	    1 => array (
+		'string' => 'foo'
+	    ),
+	    2 => array (
+		'string' => 'bar'
+	    )
+	);
+	$this->_amysql->updateMultipleByKey($this->tableName, $data, 'id');
+	$results = $this->_amysql->query("SELECT * FROM $this->tableName")
+	    ->fetchAllAssoc();
+	$expected = array (
+	    array (
+		'id' => '1',
+		'string' => 'foo'
+	    ),
+	    array (
+		'id' => '2',
+		'string' => 'bar'
+	    )
+	);
+	$this->assertEquals($expected, $results);
+    }
+
+    public function testUpdateMultipleByKeySameColumn() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$data = array (
+	    1 => array (
+		'id' => 3,
+		'string' => 'foo'
+	    ),
+	    2 => array (
+		'id' => 4,
+		'string' => 'bar'
+	    )
+	);
+	$this->_amysql->updateMultipleByKey($this->tableName, $data, 'id');
+	$results = $this->_amysql->query("SELECT * FROM $this->tableName")
+	    ->fetchAllAssoc();
+	$expected = array (
+	    array (
+		'id' => '1',
+		'string' => 'foo'
+	    ),
+	    array (
+		'id' => '2',
+		'string' => 'bar'
+	    )
+	);
+	$this->assertEquals($expected, $results);
+    }
+
+    public function testUpdateMultipleByKeySameColumn2() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$data = array (
+	    1 => array (
+		'id' => 3,
+		'string' => 'foo'
+	    ),
+	    2 => array (
+		'id' => 4,
+		'string' => 'bar'
+	    )
+	);
+	$success =
+	    $this->_amysql->updateMultipleByKey($this->tableName, $data, 'id',
+	    true);
+	$results = $this->_amysql->query("SELECT * FROM $this->tableName")
+	    ->fetchAllAssoc();
+	$expected = array (
+	    array (
+		'id' => '3',
+		'string' => 'foo'
+	    ),
+	    array (
+		'id' => '4',
+		'string' => 'bar'
+	    )
+	);
+	$this->assertTrue($success);
+	$this->assertEquals($expected, $results);
+    }
+
+    public function testUpdateMultipleByData() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$data = array (
+	    array (
+		'id' => 2,
+		'string' => 'foo'
+	    ),
+	    array (
+		'id' => 1,
+		'string' => 'bar'
+	    )
+	);
+	$success =
+	    $this->_amysql->updateMultipleByData($this->tableName, $data, 'id',
+	    true);
+	$results = $this->_amysql->query("SELECT * FROM $this->tableName")
+	    ->fetchAllAssoc();
+	$expected = array (
+	    array (
+		'id' => '1',
+		'string' => 'bar'
+	    ),
+	    array (
+		'id' => '2',
+		'string' => 'foo'
+	    )
+	);
+	$this->assertTrue($success);
+	$this->assertEquals($expected, $results);
+    }
 }
 ?>
 

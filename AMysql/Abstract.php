@@ -353,6 +353,80 @@ abstract class AMysql_Abstract {
     }
 
     /**
+     * Updates multiple rows.
+     *
+     * @param string $tableName 	The table name.
+     * @param array $data 		The array of data changes. A
+     *					    one-dimensional array
+     * 					with keys as column names and values
+     *					    as their values.
+     *					One of the keys should be the one
+     *					    with the value to search for for
+     *					    replacement.
+     * @param string $column		(Options) the name of the column and
+     *					    key to search for. The default is
+     *					    'id'.
+     * @return boolean
+     **/
+    public function updateMultipleByData(
+	$tableName, array $data, $column = 'id'
+    ) {
+	$successesNeeded = count($data);
+	$where = AMysql::escapeIdentifier($column) . " = ?";
+	foreach ($data as $row) {
+	    $by = $row[$column];
+	    unset($row[$column]);
+	    $stmt = new AMysql_Statement($this);
+	    $stmt->update($tableName, $row, $where)->execute(array ($by));
+	    if ($stmt->result) {
+		$successesNeeded--;
+	    }
+	}
+	return 0 === $successesNeeded;
+    }
+
+    /**
+     * Updates multiple rows. The values for the column to search for is the
+     * key of each row.
+     *
+     * @param string $tableName 	The table name.
+     * @param array $data 		The array of data changes. A
+     *					    one-dimensional array
+     * 					with keys as column names and values
+     *					    as their values.
+     *					Each data row must be under the key
+     *					    that is the same as the value of
+     *					    the column being searched for.
+     * @param string $column		(Options) the name of the column and
+     *					    key to search for. The default is
+     *					    'id'.
+     * @param string $updateSameColumn	(Options) If the column being searched
+     *					    for is within the a data row,
+     *					    if this is false, that key should
+     *					    be removed before updating the data.
+     *					    This is the default.
+     *
+     * @return boolean
+     **/
+    public function updateMultipleByKey(
+	$tableName, array $data, $column = 'id', $updateSameColumn = false
+    ) {
+	$successesNeeded = count($data);
+	$where = AMysql::escapeIdentifier($column) . " = ?";
+	foreach ($data as $by => $row) {
+	    if (!$updateSameColumn) {
+		unset($row[$column]);
+	    }
+	    $stmt = new AMysql_Statement($this);
+	    $stmt->update($tableName, $row, $where)->execute(array ($by));
+	    if ($stmt->result) {
+		$successesNeeded--;
+	    }
+	}
+	return 0 === $successesNeeded;
+    }
+
+    /**
      * Performs an instant INSERT.
      *
      * @param string $tableName 	The table name.
