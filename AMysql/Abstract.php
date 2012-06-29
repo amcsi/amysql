@@ -240,6 +240,9 @@ abstract class AMysql_Abstract {
      * @return AMysql_Statement
      **/
     public function query($sql, array $binds = array ()) {
+	if (!is_null($binds) && !is_array($binds)) {
+	    throw new InvalidArgumentException("\$binds should be an array.");
+	}
         $stmt = new AMysql_Statement($this);
         $result = $stmt->query($sql, $binds);
         $this->lastStatement = $stmt;
@@ -258,6 +261,9 @@ abstract class AMysql_Abstract {
      * @return string
      **/
     public function getOne($sql, array $binds = array ()) {
+	if (!is_null($binds) && !is_array($binds)) {
+	    throw new InvalidArgumentException("\$binds should be an array.");
+	}
         $stmt = new AMysql_Statement($this);
         $stmt->query($sql, $binds);
         return $stmt->result(0, 0);
@@ -275,6 +281,9 @@ abstract class AMysql_Abstract {
      * @return string
      **/
     public function getOneNull($sql, array $binds = array ()) {
+	if (!is_null($binds) && !is_array($binds)) {
+	    throw new InvalidArgumentException("\$binds should be an array.");
+	}
         $stmt = new AMysql_Statement($this);
         $stmt->query($sql, $binds);
         return $stmt->resultNull(0, 0);
@@ -292,6 +301,9 @@ abstract class AMysql_Abstract {
      * @return string
      **/
     public function getOneInt($sql, array $binds = array ()) {
+	if (!is_null($binds) && !is_array($binds)) {
+	    throw new InvalidArgumentException("\$binds should be an array.");
+	}
         $stmt = new AMysql_Statement($this);
         $stmt->query($sql, $binds);
         return $stmt->resultInt(0, 0);
@@ -346,6 +358,9 @@ abstract class AMysql_Abstract {
      * @return boolean Whether the update was successful.
      **/
     public function update($tableName, array $data, $where, $binds = null) {
+	if (!is_null($binds) && !is_array($binds)) {
+	    throw new InvalidArgumentException("\$binds should be an array.");
+	}
         $stmt = new AMysql_Statement($this);
         $stmt->update($tableName, $data, $where);
         $result = $stmt->execute($binds);
@@ -468,6 +483,9 @@ abstract class AMysql_Abstract {
      * @return resource|false The mysql resource if the delete was successful, otherwise false.
      **/
     public function delete($tableName, $where, $binds = null) {
+	if (!is_null($binds) && !is_array($binds)) {
+	    throw new InvalidArgumentException("\$binds should be an array.");
+	}
         $stmt = new AMysql_Statement($this);
         $stmt->delete($tableName, $where);
         $result = $stmt->execute($binds);

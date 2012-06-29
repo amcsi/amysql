@@ -160,6 +160,48 @@ EOT;
 	$this->assertNull($result);
     }
 
+    public function testUpdate() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$data = array (
+	    'string' => 'foo'
+	);
+	$this->_amysql->update($this->tableName, $data, 'id = ?',
+	    array ('1'));
+	$results = $this->_amysql->query("SELECT * FROM $this->tableName")
+	    ->fetchAllAssoc();
+	$expected = array (
+	    array (
+		'id' => '1',
+		'string' => 'foo'
+	    ),
+	    array (
+		'id' => '2',
+		'string' => 'blah'
+	    )
+	);
+	$this->assertEquals($expected, $results);
+    }
+
+    public function testUpdateNotArrayBinds() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$data = array (
+	    'string' => 'foo'
+	);
+	$this->setExpectedException('InvalidArgumentException');
+	$this->_amysql->update($this->tableName, $data, 'id = ?',
+	    '1');
+    }
+
     public function testUpdateMultipleByKey() {
 	$data = array (
 	    'string' => array (

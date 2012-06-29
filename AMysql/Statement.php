@@ -69,6 +69,9 @@ class AMysql_Statement {
 	if (is_array($binds)) {
 	    $this->binds = $binds;
 	}
+	else if (!is_null($binds)) {
+	    throw new InvalidArgumentException("\$binds should be an array.");
+	}
 	$sql = $this->getSql();
 	$result = $this->_query($sql);
 	return $this;
@@ -153,6 +156,9 @@ class AMysql_Statement {
     }
 
     public function query($sql, array $binds = array ()) {
+	if (!is_null($binds) && !is_array($binds)) {
+	    throw new InvalidArgumentException("\$binds should be an array.");
+	}
 	$this->prepare($sql);
 	$result = $this->execute($binds);
 	return $this;
