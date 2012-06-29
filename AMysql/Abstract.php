@@ -2,13 +2,12 @@
 /**
  * Mysql abstraction which only uses mysql_* functions
  * @author Szerémi Attila
- * @version 0.9.2
+ * @version 0.9.2.1
  *
- * @todo mysql_select_db
+ * For information on binding placeholders, @see AMysql_Statement::execute()
+ *
  * @todo try to make a new select class that works similarly like in Zend
  * @todo Maybe remove automatic dot detection for identifier escaping.
- * @todo Be able to construct this class with connection arguments to make
- *  a new connection.
  * @todo AMysql_Select
  *
  **/
@@ -23,6 +22,12 @@ abstract class AMysql_Abstract {
     public $query; // last used query string
     public $affectedRows; // last affected rows count
     public $throwExceptions = true; // whether to throw exceptions
+    /**
+     * Let AMysql_Statement::bindParam() and AMysql_Statement::bindValue()
+     * use indexes starting from 1 instead of 0 in case of unnamed placeholders.
+     * The same way PDO does it. The factory default is false.
+     **/
+    public $pdoIndexedBinding = false;
     /**
      * The fetch mode. Can be changed here or set at runtime with
      * setFetchMode.

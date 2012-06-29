@@ -23,7 +23,7 @@
  * TODO: a query() $this-t adjon vissza.
  *    
  * @author Szerémi Attila
- * @version 0.9.2
+ * @version 0.9.2.1
  **/ 
 class AMysql_Statement {
     public $amysql;
@@ -65,6 +65,39 @@ class AMysql_Statement {
 	}
     }
 
+    /**
+     * Executes a prepared statement, optionally accepting binds for replacing
+     * placeholders.
+     * 
+     * @param array $binds	(Optional) The binds for the placeholders. This
+     *				library supports names and unnames placeholders.
+     *				To use unnamed placeholders, use question marks
+     *				(?) as placeholders. A bind's key should be the
+     *				index of the question mark.
+     *				To use named placeholders, the placeholders
+     *				must start with a non-alphanumeric, non-128+
+     *				character. If the key starts with an
+     *				alphanumeric or 128+ character, the placeholder
+     *				that is searched to be replaced will be the
+     *				key prepended by a colon (:). Here are examples
+     *				for what keys will replace what placeholders
+     *				for the value:
+     *
+     *				:key: => :key:
+     *				:key => :key
+     *				key => :key
+     *				key: => :key:
+     *				!key => !key
+     *				élet => :élet
+     *
+     *				All values are escaped and are automatically
+     *				surrounded by apostrophes if needed. Do NOT
+     *				add apostrophes around the string values as
+     *				encapsulating for a mysql string.
+     *				@see AMysql::escape()
+     *
+     * @return $this
+     */
     public function execute($binds = null) {
 	if (is_array($binds)) {
 	    $this->binds = $binds;
@@ -689,6 +722,9 @@ class AMysql_Statement {
      * @return $this
      **/         
     public function bindValue($key, $val) {
+	if (is_numeric($key) && $this->amysql->pdoIndexedBinding) {
+	    $key--;
+	}
 	$this->binds[$key] = $val;
 	return $this;
     }
@@ -702,6 +738,9 @@ class AMysql_Statement {
      * @return $this
      */
     public function bindParam($key, &$val) {
+	if (is_numeric($key) && $this->amysql->pdoIndexedBinding) {
+	    $key--;
+	}
 	$this->binds[$key] = &$val;
 	return $this;
     }
