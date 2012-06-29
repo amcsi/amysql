@@ -23,7 +23,7 @@
  * TODO: a query() $this-t adjon vissza.
  *    
  * @author Szerémi Attila
- * @version 0.9.1.2
+ * @version 0.9.2
  **/ 
 class AMysql_Statement {
     public $amysql;

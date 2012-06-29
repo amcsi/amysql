@@ -2,7 +2,7 @@
 /**
  * Mysql abstraction which only uses mysql_* functions
  * @author Szerémi Attila
- * @version 0.9.1.2
+ * @version 0.9.2
  *
  * @todo mysql_select_db
  * @todo try to make a new select class that works similarly like in Zend
