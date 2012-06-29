@@ -1,4 +1,5 @@
-Usage <!--- vim: set tabstop=8 expandtab filetype=php : <?php -->
+<!--- vim: set tabstop=8 expandtab filetype=php : <?php -->
+Usage
 =
 
 Instantiating AMysql
