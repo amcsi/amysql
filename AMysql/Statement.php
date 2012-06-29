@@ -116,9 +116,18 @@ class AMysql_Statement {
 		$map = array();
 		foreach ($binds as $key => &$bind) {
 		    $string = '';
-		    for ($i = 0; $i < 5; $i++) {
-			$string .= chr(mt_rand(0, 255));
+		    do {
+			for ($i = 0; $i < 5; $i++) {
+			    $string .= chr(mt_rand(0, 255));
+			}
 		    }
+		    /**
+		     * For extra safety, make sure the generated string is not
+		     * found in the prepared sql string, and generate another
+		     * one in case of the opposite.
+		     **/
+		    while (false !== strpos($sql, $string));
+
 		    $map[$key] = $string;
 		    if (127 < ord($key[0]) || preg_match('/^\w$/', $key[0])) {
 			$key = ':' . $key;
