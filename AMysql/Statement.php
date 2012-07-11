@@ -1,10 +1,12 @@
 <?php
 /**
- * Az AMysql class-hoz tartozó Statement osztály, amelyben egy mysql
- * tranzakciót foglal magában. 
- * Nagyon egyszerű használat:
+ * The statement class belonging to the AMysql_Abstract class, where mysql
+ * queries are built and handled.
+ * Most methods here are chainable, and many common AMysql_Abstract methods
+ * return a new instance of this class.
+ * A simple use example:
  * 
- * $amysql = new AMysql($this->_engine->db->conn);
+ * $amysql = new AMysql($conn);
  * try { 
  *     $stmt = $amysql->query('SELECT * FROM cms_content');
  *     while ($row = $stmt->fetchAssoc()) {
@@ -12,18 +14,11 @@
  *     }
  * }
  * catch (AMysql_Exception $e) {
- *     echo
- *          "Mysql Hiba!\n" .
- *          "Hibakód: $e->code\n" .
- *          "Üzenet: $e->message\n" .
- *          "SQL query string: $e->query"   
- *      );
+ *     echo $e->getDetails();
  * }  
  *
- * TODO: a query() $this-t adjon vissza.
- *    
  * @author Szerémi Attila
- * @version 0.9.2.2
+ * @version 0.9.2.3
  **/ 
 class AMysql_Statement {
     public $amysql;
@@ -54,8 +49,8 @@ class AMysql_Statement {
 
     public function setFetchMode($fetchMode) {
 	static $fetchModes = array (
-	    AMysql::FETCH_ASSOC, AMysql::FETCH_OBJECT,
-	    AMysql::FETCH_ARRAY, AMysql::FETCH_ROW
+	    AMysql_Abstract::FETCH_ASSOC, AMysql_Abstract::FETCH_OBJECT,
+	    AMysql_Abstract::FETCH_ARRAY, AMysql_Abstract::FETCH_ROW
 	);
 	if (in_array($fetchMode, $fetchModes)) {
 	    $this->fetchMode = $fetchMode;
@@ -94,7 +89,7 @@ class AMysql_Statement {
      *				surrounded by apostrophes if needed. Do NOT
      *				add apostrophes around the string values as
      *				encapsulating for a mysql string.
-     *				@see AMysql::escape()
+     *				@see AMysql_Abstract::escape()
      *
      * @return $this
      */
@@ -303,16 +298,16 @@ class AMysql_Statement {
      **/         
     public function fetchAll() {
 	$ret = array ();
-	if (AMysql::FETCH_ASSOC == $this->_fetchMode) {
+	if (AMysql_Abstract::FETCH_ASSOC == $this->_fetchMode) {
 	    $methodName = 'fetchAssoc';
 	}
-	else if (AMysql::FETCH_OBJECT == $this->_fetchMode) {
+	else if (AMysql_Abstract::FETCH_OBJECT == $this->_fetchMode) {
 	    $methodName = 'fetchObject';
 	}
-	else if (AMysql::FETCH_ARRAY == $this->_fetchMode) {
+	else if (AMysql_Abstract::FETCH_ARRAY == $this->_fetchMode) {
 	    $methodName = 'fetchArray';
 	}
-	else if (AMysql::FETCH_ROW == $this->_fetchMode) {
+	else if (AMysql_Abstract::FETCH_ROW == $this->_fetchMode) {
 	    $methodName = 'fetchRow';
 	}
 	else {
@@ -350,7 +345,7 @@ class AMysql_Statement {
 	else if ('row' == $this->_fetchMode) {
 	    return $this->fetchRow();
 	}
-	else if (AMysql::FETCH_ARRAY == $this->_fetchMode) {
+	else if (AMysql_Abstract::FETCH_ARRAY == $this->_fetchMode) {
 	    return $this->fetchArray();
 	}
 	else {
@@ -567,17 +562,19 @@ class AMysql_Statement {
      * Do not use this method! It requires a lot of revision, and is subject
      * to change a lot.
      * 
-     * Egy SELECT utasítást kezdeményez úgy, hogy az épülendő sql utasítás
-     * SELECT-tel kezdődjön, és megjelölje azokat az oszlopneveket, amiket
-     * átadunk. 
-     * - Lehet egy tömbként is jelölni, ahol az érték a kijelölendő
-     * táblanév, és opcionálisan, ha a kulcs az nem szám, akkor az az AS
-     * szerinti átnevezés.
-     * - Lehet dinamikus paramétermennyiségként átadni ugyanazt, mint az
-     * efölöttinél, csak nem lehet AS-esen átnevezni a megjelölt táblaneveket.
+     * Begins a SELECT statement. To this method you can pass an array of
+     * column names, or column names as variable arguments. The column names
+     * will be listed after SELECT, so the prepared statement will look like:
+     *	SELECT `column1`, `column2`, `column3`
+     * In the case that those three columns were passed to this method
+     * (without the backticks).
+     * If you pass an array of columns instead of columns as dynamic parameters,
+     * and the array's keys are not numeric, the given column names will be
+     * aliased with "AS" to the key.
+     *
      * @return this                                   
      **/         
-    public function select() {
+    public function select(/* $params... */) {
 	$sql = 'SELECT ';
 	$arg0 = func_get_arg(0);
 	if (is_array($arg0)) {
@@ -627,9 +624,17 @@ class AMysql_Statement {
     }
 
     /**
-     * A FROM részbe tölt táblaneveket.
+     * Append FROM and a list of table names to the prepared sql string.
+     * This method accepts table names as an array or as dynamic arguments,
+     * and in case of the former, the table names will be aliased with "AS"
+     * to their key if it is not numeric.
+     *
+     * This method is experimental, not supported yet, and use of it is
+     * discouraged, because it may change a lot in the future.
+     *
+     * @return $this
      **/         
-    public function from() {
+    public function from(/* $params... */) {
 	$arg0 = func_get_arg(0);
 	if (is_array($arg0)) {
 	    $tablesString = $this->_getTablesStringByArray($arg0);
@@ -651,7 +656,14 @@ class AMysql_Statement {
     }
 
     /**
-     * A WHERE részbe tölt adatot
+     * Appends WHERE and a given string to the prepared sql string.
+     *
+     * This method is experimental, not supported yet, and use of it is
+     * discouraged, because it may change a lot in the future.
+     *
+     * @param string $where		The string that goes after WHERE
+     *
+     * @return $this;
      **/         
     public function where($where) {
 	$sql = ' WHERE ';
@@ -662,6 +674,19 @@ class AMysql_Statement {
 	return $this;
     }
 
+    /**
+     * Appends LEFT JOIN and a given table name, an optional AS and an
+     * optional ON to the prepared sql string.
+     *
+     * This method is experimental, not supported yet, and use of it is
+     * discouraged, because it may change a lot in the future.
+     *
+     * @param string $tableName		The table name to left join.
+     * @param string $as		(Optional) What to alias the table
+     * @param string $on		(Optional) The ON condition.
+     *
+     * @return $this;
+     **/         
     public function leftJoin($tableName, $as = null, $on = null) {
 	$sql = ' LEFT JOIN ' . $this->escapeIdentifier($tableName, $as);
 	$this->prepared .= $sql;
@@ -672,6 +697,16 @@ class AMysql_Statement {
 	return $this;
     }
 
+    /**
+     * Appends ON and a given string to the prepared sql string.
+     *
+     * This method is experimental, not supported yet, and use of it is
+     * discouraged, because it may change a lot in the future.
+     *
+     * @param string $on		The ON condition.
+     *
+     * @return $this;
+     **/
     public function on($on) {
 	$sql = ' ON ' . $on;
 	$this->prepared .= $sql;
@@ -679,14 +714,14 @@ class AMysql_Statement {
     }
 
     public function escapeIdentifierSimple($columnName) {
-	return AMysql::escapeIdentifierSimple($columnName);
+	return AMysql_Abstract::escapeIdentifierSimple($columnName);
     }
 
     /**
-     * @see AMysql::escapeIdentifier
+     * @see AMysql_Abstract::escapeIdentifier
      **/
     public function escapeIdentifier($columnName, $as = null) {
-	return AMysql::escapeIdentifier($columnName, $as);
+	return AMysql_Abstract::escapeIdentifier($columnName, $as);
     }
 
     /**
@@ -752,14 +787,14 @@ class AMysql_Statement {
 	if (is_numeric($key) && $this->amysql->pdoIndexedBinding) {
 	    $key--;
 	}
-	$this->binds[$key] = &$val;
+	$this->binds[$key] =& $val;
 	return $this;
     }
 
     /**
      * Prepares a mysql UPDATE unexecuted. By execution, have the placeholders
      * of the WHERE statement binded.
-     * It is rather recommended to use AMysql::update() instead, which
+     * It is rather recommended to use AMysql_Abstract::update() instead, which
      * lets you also bind the values in one call and it returns the success
      * of the query.
      *
@@ -788,7 +823,7 @@ class AMysql_Statement {
 	 * Ezt beforeSql-el kell megoldani, különben az értékekben lévő
 	 * kérdőjelek bezavarnak.         
 	 **/		         
-	$tableSafe = AMysql::escapeIdentifier($tableName);
+	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
 	$beforeSql = "UPDATE $tableSafe SET $setsString WHERE ";
 	$this->prepare($where);
 	$this->beforeSql = $beforeSql;
@@ -799,7 +834,7 @@ class AMysql_Statement {
     /**
      * Prepares a mysql INSERT unexecuted. After this, you should just
      * call $this->execute().
-     * It is rather recommended to use AMysql::insert() instead, which
+     * It is rather recommended to use AMysql_Abstract::insert() instead, which
      * returns the last inserted id already.
      *
      * @param string $tableName 	The table name.
@@ -864,7 +899,7 @@ class AMysql_Statement {
 	    $rowValueStrings[] = join(', ', $rowValues);
 	}
 	$valuesString = join('), (', $rowValueStrings);
-	$tableSafe = AMysql::escapeIdentifier($tableName);
+	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
 	$sql = "INSERT INTO $tableSafe ($columnsString) VALUES ($valuesString)";
 	$this->prepare($sql);
 	return $this;
@@ -873,19 +908,19 @@ class AMysql_Statement {
     /**
      * Prepares a mysql DELETE unexecuted. By execution, have the placeholders
      * of the WHERE statement binded.
-     * It is rather recommended to use AMysql::delete() instead, which
+     * It is rather recommended to use AMysql_Abstract::delete() instead, which
      * lets you also bind the values in one call and it returns the success
      * of the query.
      *
      * @param string $tableName 	The table name.
      * @param string $where		An SQL substring of the WHERE clause.
      *
-     * @see AMysql::delete()
+     * @see AMysql_Abstract::delete()
      *
      * @return $this
      **/         
     public function delete($tableName, $where) {
-	$tableSafe = AMysql::escapeIdentifier($tableName);
+	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
 	$sql = "DELETE FROM $tableSafe";
 	$this->prepare($sql);
 	if ($where) {

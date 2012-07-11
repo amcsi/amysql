@@ -1,37 +1,41 @@
 <?php
 /**
- * Mysql kivétel osztály
+ * MySQL exception class
  * @author Szerémi Attila 
- * @version 0.9.2.2
+ * @version 0.9.2.3
  **/ 
 class AMysql_Exception extends RuntimeException {
 
     /**
-     * @var string Query string, ami a mysql hibát okozta (ha van)
+     * @var string The query string mysql had a problem with (if there is one).
      **/         
     public $query;
 
     /**
-     * @var boolean Automatikusan triggereljen-e errort példányosításnál.
-     * Ezáltal, ha error-ok logolva vannak, akkor mindig logolva is lesznek
-     * a hibák.
-     * Ha -1, akkor úgy viselkedik, mint egy alap trigger_error, csak
-     * manuálisan. Ez akkor jó, ha a PHP scripteken belül
-     * set_error_handler() használva van, és átalakítja a hibakezelést.
+     * @var boolean Shall an error automatically be triggered on instantiation.
+     * With the help of this, if errors are being logged, then amysql
+     * exceptions will automatically be logged as well.
+     * This can also be set to -1. In that case, it manually logs the error
+     * with error_log(), and writes out the error if display_errors is on.
+     * This is for in the case that set_error_handler() is set, but isn't
+     * being used in a practical way enough.
      **/     	
     public $autoTriggerErrors = 1;
+
     /**
-     * @var int Az automatikus hiba szintje
+     * @var integer The level of the error to be triggered.
      **/     	
     public $errorLevel = E_USER_WARNING;
     /**
-     * @var Automatikusan logolja-e a hibákat. Ha az error triggerelés logol
-     * is egyben, nem logol mégegyszer feleslegesen.	 
+     * @var boolean Always log the messages. It will not log twice if
+     * trigger_error() is set here and the error_log directive is set.
      **/
     public $autoLog = false;
 
+    /**
+     * MySQL error message.
+     **/
     public $origMsg;
-
 
     public function __construct($msg, $errno, $query) {
         $this->query = $query;

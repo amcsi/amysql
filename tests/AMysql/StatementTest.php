@@ -271,6 +271,26 @@ EOT;
 	$this->assertEquals($expected, $results);
     }
 
+    public function testBindParam() {
+	$sql = " :a ";
+	$bind = 1;
+	$stmt = $this->_amysql->prepare($sql);
+	$stmt->bindParam('a', $bind);
+	$bind = 2;
+	$resultSql = $stmt->getSql();
+	$this->assertEquals(' 2 ', $resultSql);
+    }
+
+    public function testBindValue() {
+	$sql = " :a ";
+	$bind = 1;
+	$stmt = $this->_amysql->prepare($sql);
+	$stmt->bindValue('a', $bind);
+	$bind = 2;
+	$resultSql = $stmt->getSql();
+	$this->assertEquals(' 1 ', $resultSql);
+    }
+
     /**
      * 
      **/

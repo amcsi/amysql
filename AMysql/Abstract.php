@@ -2,7 +2,7 @@
 /**
  * Mysql abstraction which only uses mysql_* functions
  * @author Szerémi Attila
- * @version 0.9.2.2
+ * @version 0.9.2.3
  *
  * For information on binding placeholders, @see AMysql_Statement::execute()
  *
@@ -338,6 +338,8 @@ abstract class AMysql_Abstract {
      * USAGE OF THIS METHOD IS HIGHLY DISCOURAGED. IT IS BOUND TO CHANGE A LOT.
      * Use prepared statements instead.
      *
+     * @see AMysql_Statement::select()
+     *
      * @return AMysql_Statement
      **/
     public function select() {
@@ -398,7 +400,7 @@ abstract class AMysql_Abstract {
 	$tableName, array $data, $column = 'id'
     ) {
 	$successesNeeded = count($data);
-	$where = AMysql::escapeIdentifier($column) . " = ?";
+	$where = self::escapeIdentifier($column) . " = ?";
 	foreach ($data as $row) {
 	    $by = $row[$column];
 	    unset($row[$column]);
@@ -438,7 +440,7 @@ abstract class AMysql_Abstract {
 	$tableName, array $data, $column = 'id', $updateSameColumn = false
     ) {
 	$successesNeeded = count($data);
-	$where = AMysql::escapeIdentifier($column) . " = ?";
+	$where = self::escapeIdentifier($column) . " = ?";
 	foreach ($data as $by => $row) {
 	    if (!$updateSameColumn) {
 		unset($row[$column]);
