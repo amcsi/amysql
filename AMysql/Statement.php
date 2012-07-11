@@ -40,6 +40,8 @@ class AMysql_Statement {
     public $prepared = '';
     public $binds = array();
 
+    protected $_replacements;
+
     public function __construct(AMysql_Abstract $amysql) {
 	$this->amysql = $amysql;
 	$this->link = $amysql->link;
@@ -141,25 +143,36 @@ class AMysql_Statement {
 		}
 	    }
 	    else {
-		$patterns = array ();
+		$keysQuoted = array ();
 		$replacements = array ();
 		foreach ($binds as $key => &$bind) {
 		    if (127 < ord($key[0]) || preg_match('/^\w$/', $key[0])) {
 			$key = ':' . $key;
 		    }
 		    $keyQuoted = preg_quote($key, '/');
-		    $pattern =
-			"/$keyQuoted([^\w\x80-\xff])|$keyQuoted$/m";
-		    $bindSafe = $this->amysql->escape($bind);
-		    $pregReplacement = str_replace('\\', '\\\\', $bindSafe);
-		    $pregReplacement .= "\\1";
-		    $patterns[]		= $pattern;
-		    $replacements[]	= $pregReplacement;
+		    $keysQuoted[] = $keyQuoted;
+		    $replacements[$key] = $this->amysql->escape($bind);
 		}
-		$sql = preg_replace($patterns, $replacements, $sql);
+		$keysOr = join('|', $keysQuoted);
+		$pattern =
+		    "/($keysOr)([^\w\x80-\xff])|($keysOr)$/m";
+		$this->_replacements = $replacements;
+
+		$sql = preg_replace_callback($pattern,
+		    array ($this, '_replaceCallback'),
+		    $sql
+		);
 	    }
 	}
 	return $this->beforeSql . $sql;
+    }
+
+    protected function _replaceCallback($match) {
+	$key = $match[1] ? $match[1] : $match[3];
+	$replacement = array_key_exists($key, $this->_replacements) ?
+	    $this->_replacements[$key] :
+	    $key;
+	return $replacement . $match[2];
     }
 
     /**
