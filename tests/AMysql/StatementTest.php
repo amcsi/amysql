@@ -97,6 +97,22 @@ EOT;
 	$this->assertEquals($expected, $stmt->getSql());
     }
 
+    public function testAutoColon4() {
+	$sql = ":foo\n:bar :a:b :c :d";
+	$binds = array (
+	    'foo' => 's1',
+	    'bar' => 's2',
+	    'a' => 's3',
+	    'b' => 's4',
+	    'c' => 's5',
+	    'd' => ''
+	);
+	$stmt = $this->_amysql->prepare($sql);
+	$expected = "'s1'\n's2' 's3''s4' 's5' ''";
+	$stmt->binds = $binds;
+	$this->assertEquals($expected, $stmt->getSql());
+    }
+
     public function testNoAutoColon1() {
 	$sql = "@ékezet:árvíz:";
 	$binds = array (

@@ -148,18 +148,24 @@ class AMysql_Statement {
 	    else {
 		$map = array();
 		foreach ($binds as $key => &$bind) {
-		    $string = '';
 		    do {
+			$string = '';
 			for ($i = 0; $i < 5; $i++) {
-			    $string .= chr(mt_rand(0, 255));
+			    //$string .= chr(0);
+			    $string .= chr(mt_rand(0, 1));
+			}
+			//$string .= chr(0);
+			/**
+			 * For extra safety, make sure the generated string is
+			 * not found in the prepared sql string, and generate
+			 * another one in case of the opposite.
+			 **/
+			$tryAgain = false !== strpos($sql, $string);
+			if (!$tryAgain) {
+			    $tryAgain = in_array($string, $map);
 			}
 		    }
-		    /**
-		     * For extra safety, make sure the generated string is not
-		     * found in the prepared sql string, and generate another
-		     * one in case of the opposite.
-		     **/
-		    while (false !== strpos($sql, $string));
+		    while ($tryAgain);
 
 		    $map[$key] = $string;
 		    if (127 < ord($key[0]) || preg_match('/^\w$/', $key[0])) {
