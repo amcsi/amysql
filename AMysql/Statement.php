@@ -149,12 +149,17 @@ class AMysql_Statement {
 		$map = array();
 		foreach ($binds as $key => &$bind) {
 		    do {
+			/**
+			 * Generate a short, random string for making a
+			 * temporary placeholder. For safety, the random
+			 * string will consist of non-NUL characters, but
+			 * its last character will always be a NUL character
+			 **/
 			$string = '';
 			for ($i = 0; $i < 5; $i++) {
-			    //$string .= chr(0);
-			    $string .= chr(mt_rand(0, 1));
+			    $string .= chr(mt_rand(1, 255));
 			}
-			//$string .= chr(0);
+			$string .= chr(0);
 			/**
 			 * For extra safety, make sure the generated string is
 			 * not found in the prepared sql string, and generate

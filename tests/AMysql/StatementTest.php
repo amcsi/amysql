@@ -97,6 +97,9 @@ EOT;
 	$this->assertEquals($expected, $stmt->getSql());
     }
 
+    /**
+     * @dataProvider repeat20
+     **/
     public function testAutoColon4() {
 	$sql = ":foo\n:bar :a:b :c :d";
 	$binds = array (
@@ -266,6 +269,13 @@ EOT;
 	    )
 	);
 	$this->assertEquals($expected, $results);
+    }
+
+    /**
+     * 
+     **/
+    public function repeat20() {
+	return array_fill(0, 20, array ());
     }
 }
 ?>
