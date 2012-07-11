@@ -155,7 +155,7 @@ class AMysql_Statement {
 		}
 		$keysOr = join('|', $keysQuoted);
 		$pattern =
-		    "/($keysOr)(?![\w\x80-\xff])|($keysOr)$/m";
+		    "/($keysOr)(?![\w\x80-\xff])/m";
 		$this->_replacements = $replacements;
 
 		$sql = preg_replace_callback($pattern,
@@ -168,7 +168,7 @@ class AMysql_Statement {
     }
 
     protected function _replaceCallback($match) {
-	$key = $match[1];
+	$key = $match[0];
 	$replacement = array_key_exists($key, $this->_replacements) ?
 	    $this->_replacements[$key] :
 	    $key;
