@@ -40,7 +40,7 @@ class AMysql_Statement {
     public $prepared = '';
     public $binds = array();
 
-    public function __construct(AMysql $amysql) {
+    public function __construct(AMysql_Abstract $amysql) {
 	$this->amysql = $amysql;
 	$this->link = $amysql->link;
 	$this->throwExceptions = $this->amysql->throwExceptions;
