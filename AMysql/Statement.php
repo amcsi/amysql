@@ -141,48 +141,22 @@ class AMysql_Statement {
 		}
 	    }
 	    else {
-		$map = array();
+		$patterns = array ();
+		$replacements = array ();
 		foreach ($binds as $key => &$bind) {
-		    do {
-			/**
-			 * Generate a short, random string for making a
-			 * temporary placeholder. For safety, the random
-			 * string will consist of non-NUL characters, but
-			 * its last character will always be a NUL character
-			 **/
-			$string = '';
-			for ($i = 0; $i < 5; $i++) {
-			    $string .= chr(mt_rand(1, 255));
-			}
-			$string .= chr(0);
-			/**
-			 * For extra safety, make sure the generated string is
-			 * not found in the prepared sql string, and generate
-			 * another one in case of the opposite.
-			 **/
-			$tryAgain = false !== strpos($sql, $string);
-			if (!$tryAgain) {
-			    $tryAgain = in_array($string, $map);
-			}
-		    }
-		    while ($tryAgain);
-
-		    $map[$key] = $string;
 		    if (127 < ord($key[0]) || preg_match('/^\w$/', $key[0])) {
 			$key = ':' . $key;
 		    }
 		    $keyQuoted = preg_quote($key, '/');
-		    $pregReplacement = str_replace('\\', '\\\\', $string);
 		    $pattern =
 			"/$keyQuoted([^\w\x80-\xff])|$keyQuoted$/m";
-		    $sql = preg_replace($pattern, "$pregReplacement\\1", $sql);
+		    $bindSafe = $this->amysql->escape($bind);
+		    $pregReplacement = str_replace('\\', '\\\\', $bindSafe);
+		    $pregReplacement .= "\\1";
+		    $patterns[]		= $pattern;
+		    $replacements[]	= $pregReplacement;
 		}
-		foreach ($binds as $key => &$bind) {
-		    $placeholder = $map[$key];
-		    $sql = str_replace($placeholder,
-			$this->amysql->escape($bind), $sql
-		    );
-		}
+		$sql = preg_replace($patterns, $replacements, $sql);
 	    }
 	}
 	return $this->beforeSql . $sql;

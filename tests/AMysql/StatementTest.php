@@ -109,9 +109,6 @@ EOT;
 	$this->assertEquals($expected, $stmt->getSql());
     }
 
-    /**
-     * @dataProvider repeat20
-     **/
     public function testAutoColon4() {
 	$sql = ":foo\n:bar :a:b :c :d";
 	$binds = array (
