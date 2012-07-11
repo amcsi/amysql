@@ -2,7 +2,7 @@
 /**
  * Mysql abstraction which only uses mysql_* functions
  * @author Szerémi Attila
- * @version 0.9.2.1
+ * @version 0.9.2.2
  *
  * For information on binding placeholders, @see AMysql_Statement::execute()
  *
@@ -11,6 +11,12 @@
  * @todo AMysql_Select
  *
  **/
+
+$dir = dirname(realpath(__FILE__));
+require_once $dir . '/Exception.php';
+require_once $dir . '/Expr.php';
+require_once $dir . '/Statement.php';
+
 abstract class AMysql_Abstract {
 
     public $insertId; // last insert id
