@@ -61,6 +61,18 @@ EOT;
 	$this->assertEquals($expected, $stmt->getSql());
     }
 
+    public function testNamedBinds4() {
+	$sql = ":foo :bar";
+	$binds = array (
+	    'foo' => ':bar',
+	    'bar' => 'cheese'
+	);
+	$stmt = $this->_amysql->prepare($sql);
+	$expected = "':bar' 'cheese'";
+	$stmt->binds = $binds;
+	$this->assertEquals($expected, $stmt->getSql());
+    }
+
     public function testAutoColon1() {
 	$sql = ":foo :bar";
 	$binds = array (
