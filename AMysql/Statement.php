@@ -43,6 +43,7 @@ class AMysql_Statement {
     protected $_replacements;
 
     public function __construct(AMysql_Abstract $amysql) {
+	$amysql->lastStatement = $this;
 	$this->amysql = $amysql;
 	$this->link = $amysql->link;
 	$this->throwExceptions = $this->amysql->throwExceptions;

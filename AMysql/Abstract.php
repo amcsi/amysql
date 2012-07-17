@@ -256,7 +256,6 @@ abstract class AMysql_Abstract {
 	}
         $stmt = new AMysql_Statement($this);
         $result = $stmt->query($sql, $binds);
-        $this->lastStatement = $stmt;
         return $stmt;
     }
 
