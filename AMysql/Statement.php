@@ -35,6 +35,7 @@ class AMysql_Statement {
     public $link;
 
     protected $_fetchMode;
+    protected $_fetchModeExtraArgs = array ();
 
     public $beforeSql = '';
     public $prepared = '';
@@ -50,13 +51,16 @@ class AMysql_Statement {
 	$this->setFetchMode($amysql->getFetchMode());
     }
 
-    public function setFetchMode($fetchMode) {
+    public function setFetchMode($fetchMode/* [, extras [, extras...]]*/) {
 	static $fetchModes = array (
 	    AMysql_Abstract::FETCH_ASSOC, AMysql_Abstract::FETCH_OBJECT,
 	    AMysql_Abstract::FETCH_ARRAY, AMysql_Abstract::FETCH_ROW
 	);
+	$args = func_get_args();
+	$extraArgs = array_slice($args, 1);
 	if (in_array($fetchMode, $fetchModes)) {
-	    $this->fetchMode = $fetchMode;
+	    $this->_fetchMode = $fetchMode;
+	    $this->_fetchModeExtraArgs = $extraArgs;
 	}
 	else {
 	    throw new Exception("Unknown fetch mode: `$fetchMode`");
@@ -309,8 +313,10 @@ class AMysql_Statement {
 	else if (false === $numRows) {
 	    return false;
 	}
+	$extraArgs = $this->fetchModeExtraArgs;
+	$method = array ($this, $methodName);
 	mysql_data_seek($result, 0);
-	while (false !== ($row = $this->$methodName())) {
+	while (false !== ($row = call_user_func_array($method, $extraArgs))) {
 	    $ret[] = $row;
 	}
 	return $ret;
@@ -528,9 +534,16 @@ class AMysql_Statement {
      * 
      * @return object
      */
-    public function fetchObject() {
+    public function fetchObject(
+	$className = 'stdClass', array $params = null
+    ) {
 	$result = $this->result;
-	return mysql_fetch_object($result);
+	if ($params) {
+	    return mysql_fetch_object($result, $className, $params);
+	}
+	else {
+	    return mysql_fetch_object($result, $className);
+	}
     }
 
     /**
