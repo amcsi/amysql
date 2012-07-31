@@ -214,6 +214,26 @@ EOT;
 	$this->assertEquals('3', $result->string);
     }
 
+    public function testFetchObject2() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName");
+	$result = $stmt->fetchObject();
+	$this->assertInstanceOf('stdClass', $result);
+	$this->assertEquals(3, $result->string);
+	$result = $stmt->fetchObject('ArrayObject', 
+	    array (array (),
+		ArrayObject::ARRAY_AS_PROPS | ArrayObject::STD_PROP_LIST
+	    )
+	);
+	$this->assertInstanceOf('ArrayObject', $result);
+	$this->assertEquals('blah', $result->string);
+    }
+
     public function testFetchAllAssoc() {
 	$data = array (
 	    'string' => array (
@@ -298,6 +318,24 @@ EOT;
 	$bind = 2;
 	$resultSql = $stmt->getSql();
 	$this->assertEquals(' 1 ', $resultSql);
+    }
+
+    public function testSetFetchModeExtraArgs() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName");
+	$stmt->setFetchMode(AMysql_Abstract::FETCH_OBJECT, 'ArrayObject',
+	    array (array (),
+		ArrayObject::ARRAY_AS_PROPS | ArrayObject::STD_PROP_LIST
+	    )
+	);
+	$result = $stmt->fetch();
+	$this->assertInstanceOf('ArrayObject', $result);
+	$this->assertEquals('3', $result->string);
     }
 
     /**

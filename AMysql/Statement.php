@@ -313,7 +313,7 @@ class AMysql_Statement {
 	else if (false === $numRows) {
 	    return false;
 	}
-	$extraArgs = $this->fetchModeExtraArgs;
+	$extraArgs = $this->_fetchModeExtraArgs;
 	$method = array ($this, $methodName);
 	mysql_data_seek($result, 0);
 	while (false !== ($row = call_user_func_array($method, $extraArgs))) {
@@ -334,7 +334,9 @@ class AMysql_Statement {
 	    return $this->fetchAssoc();
 	}
 	else if ('object' == $this->_fetchMode) {
-	    return $this->fetchObject();
+	    $extraArgs = $this->_fetchModeExtraArgs;
+	    $method = array ($this, 'fetchObject');
+	    return call_user_func_array($method, $extraArgs);
 	}
 	else if ('row' == $this->_fetchMode) {
 	    return $this->fetchRow();
@@ -535,7 +537,7 @@ class AMysql_Statement {
      * @return object
      */
     public function fetchObject(
-	$className = 'stdClass', array $params = null
+	$className = 'stdClass', array $params = array ()
     ) {
 	$result = $this->result;
 	if ($params) {
