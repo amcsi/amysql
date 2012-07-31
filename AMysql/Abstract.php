@@ -486,6 +486,39 @@ abstract class AMysql_Abstract {
     }
 
     /**
+     * Performs an INSERT or an UPDATE; if the $value
+     * parameter is not falsy, an UPDATE is performed with the given column name
+     * and value, otherwise an insert. It is recommended that this is used for
+     * tables with a primary key, and use the primary key as the column to
+     * look at. Also, this would keep the return value consistent.
+     * 
+     * @param mixed $tableName		The table name to INSERT or UPDATE to
+     * @param mixed $data		The data to change
+     * @param mixed $columnName		The column to search by. It should be
+     *					a primary key.
+     * @param mixed $value		(Optional) The value to look for in
+     *					case you want
+     *					to UPDATE. Keep this at null, 0,
+     *					or anything else falsy for INSERT.
+     *
+     * @return integer			If the $value is not falsy, it returns
+     *					$value after UPDATING. Otherwise the
+     *					mysql_insert_id() of the newly
+     *					INSERTED row.
+     */
+    public function save($tableName, $data, $columnName, $value = null) {
+	if ($value) {
+	    $where = AMysql_Abstract::escapeIdentifier($columnName) . ' = ?';
+	    $this->update($tableName, $data, $where, array ($value));
+	    return $value;
+	}
+	else {
+	    $id = $this->insert($tableName, $data);
+	    return $id;
+	}
+    }
+
+    /**
      * Performs an instant DELETE.
      *
      * @param string $tableName 	The table name.
