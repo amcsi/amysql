@@ -71,11 +71,12 @@ class AMysql_Statement {
      * Executes a prepared statement, optionally accepting binds for replacing
      * placeholders.
      * 
-     * @param array $binds	(Optional) The binds for the placeholders. This
+     * @param mixed $binds	(Optional) The binds for the placeholders. This
      *				library supports names and unnames placeholders.
      *				To use unnamed placeholders, use question marks
      *				(?) as placeholders. A bind's key should be the
-     *				index of the question mark.
+     *				index of the question mark. If $binds is not
+     *				an array, it is casted to one.
      *				To use named placeholders, the placeholders
      *				must start with a non-alphanumeric, non-128+
      *				character. If the key starts with an
@@ -100,12 +101,9 @@ class AMysql_Statement {
      *
      * @return $this
      */
-    public function execute($binds = null) {
-	if (is_array($binds)) {
-	    $this->binds = $binds;
-	}
-	else if (!is_null($binds)) {
-	    throw new InvalidArgumentException("\$binds should be an array.");
+    public function execute($binds = array ()) {
+	if (1 <= func_num_args()) {
+	    $this->binds = (array) $binds;
 	}
 	$sql = $this->getSql();
 	$result = $this->_query($sql);
@@ -195,10 +193,7 @@ class AMysql_Statement {
 	return $this;
     }
 
-    public function query($sql, array $binds = array ()) {
-	if (!is_null($binds) && !is_array($binds)) {
-	    throw new InvalidArgumentException("\$binds should be an array.");
-	}
+    public function query($sql, $binds = array ()) {
 	$this->prepare($sql);
 	$result = $this->execute($binds);
 	return $this;

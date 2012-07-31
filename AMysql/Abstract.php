@@ -246,16 +246,13 @@ abstract class AMysql_Abstract {
      * @todo Variable params possibility for binds?
      *
      * @param string $sql The SQL string.
-     * @param array $binds The binds.
+     * @param mixed $binds The binds or a single bind.
      *
      * @return AMysql_Statement
      **/
-    public function query($sql, array $binds = array ()) {
-	if (!is_null($binds) && !is_array($binds)) {
-	    throw new InvalidArgumentException("\$binds should be an array.");
-	}
+    public function query($sql, $binds = array ()) {
         $stmt = new AMysql_Statement($this);
-        $result = $stmt->query($sql, $binds);
+        $result = $stmt->query($sql, (array) $binds);
         return $stmt;
     }
 
@@ -266,16 +263,13 @@ abstract class AMysql_Abstract {
      * @todo Variable params possibility for binds?
      *
      * @param string $sql The SQL string.
-     * @param array $binds The binds.
+     * @param mixed $binds The binds or a single bind.
      *
      * @return string
      **/
-    public function getOne($sql, array $binds = array ()) {
-	if (!is_null($binds) && !is_array($binds)) {
-	    throw new InvalidArgumentException("\$binds should be an array.");
-	}
+    public function getOne($sql, $binds = array ()) {
         $stmt = new AMysql_Statement($this);
-        $stmt->query($sql, $binds);
+        $stmt->query($sql, (array) $binds);
         return $stmt->result(0, 0);
     }
 
@@ -284,18 +278,15 @@ abstract class AMysql_Abstract {
      * without throwing an error.
      *
      * @param string $sql The SQL string.
-     * @param array $binds The binds.
+     * @param mixed $binds The binds or a single bind.
      *
      * @see $this->getOne()
      *
      * @return string
      **/
-    public function getOneNull($sql, array $binds = array ()) {
-	if (!is_null($binds) && !is_array($binds)) {
-	    throw new InvalidArgumentException("\$binds should be an array.");
-	}
+    public function getOneNull($sql, $binds = array ()) {
         $stmt = new AMysql_Statement($this);
-        $stmt->query($sql, $binds);
+        $stmt->query($sql, (array) $binds);
         return $stmt->resultNull(0, 0);
     }
 
@@ -304,18 +295,15 @@ abstract class AMysql_Abstract {
      * thrown when there is no result.
      *
      * @param string $sql The SQL string.
-     * @param array $binds The binds.
+     * @param mixed $binds The binds or a single bind.
      *
      * @see $this->getOne()
      *
      * @return string
      **/
-    public function getOneInt($sql, array $binds = array ()) {
-	if (!is_null($binds) && !is_array($binds)) {
-	    throw new InvalidArgumentException("\$binds should be an array.");
-	}
+    public function getOneInt($sql, $binds = array ()) {
         $stmt = new AMysql_Statement($this);
-        $stmt->query($sql, $binds);
+        $stmt->query($sql, (array) $binds);
         return $stmt->resultInt(0, 0);
     }
 
@@ -365,14 +353,11 @@ abstract class AMysql_Abstract {
      * 					with keys as column names and values
      *					    as their values.
      * @param string $where		An SQL substring of the WHERE clause.
-     * @param array $binds		(Optional) The binds for the WHERE clause.
+     * @param mixed $binds		(Optional) The binds or a single bind for the WHERE clause.
      *
      * @return boolean Whether the update was successful.
      **/
-    public function update($tableName, array $data, $where, $binds = null) {
-	if (!is_null($binds) && !is_array($binds)) {
-	    throw new InvalidArgumentException("\$binds should be an array.");
-	}
+    public function update($tableName, array $data, $where, $binds = array()) {
         $stmt = new AMysql_Statement($this);
         $stmt->update($tableName, $data, $where);
         $result = $stmt->execute($binds);
@@ -523,14 +508,11 @@ abstract class AMysql_Abstract {
      *
      * @param string $tableName 	The table name.
      * @param string $where		An SQL substring of the WHERE clause.
-     * @param array $binds		(Optional) The binds for the WHERE clause.
+     * @param mixed $binds		(Optional) The binds or a single bind for the WHERE clause.
      *
      * @return resource|false The mysql resource if the delete was successful, otherwise false.
      **/
-    public function delete($tableName, $where, $binds = null) {
-	if (!is_null($binds) && !is_array($binds)) {
-	    throw new InvalidArgumentException("\$binds should be an array.");
-	}
+    public function delete($tableName, $where, $binds = array ()) {
         $stmt = new AMysql_Statement($this);
         $stmt->delete($tableName, $where);
         $result = $stmt->execute($binds);

@@ -197,9 +197,11 @@ EOT;
 	$data = array (
 	    'string' => 'foo'
 	);
-	$this->setExpectedException('InvalidArgumentException');
-	$this->_amysql->update($this->tableName, $data, 'id = ?',
-	    '1');
+	$this->_amysql->update($this->tableName, $data, 'id = ?', '1');
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName WHERE
+	    id = ?", 1);
+	$result = $stmt->fetchAssoc();
+	$this->assertEquals('foo', $result['string']);
     }
 
     public function testUpdateMultipleByKey() {
