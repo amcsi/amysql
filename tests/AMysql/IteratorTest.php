@@ -65,6 +65,19 @@ EOT;
 	    $i++;
 	}
     }
+
+    public function testIterateNonSelect() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->lastStatement;
+	$this->setExpectedException('LogicException');
+	foreach ($stmt as $key => $value) {
+	}
+    }
 }
 ?>
 

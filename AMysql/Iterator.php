@@ -9,6 +9,10 @@ class AMysql_Iterator implements SeekableIterator, Countable
     protected $_resultIndex = 0;
 
     public function __construct(AMysql_Statement $stmt) {
+	if (!is_resource($stmt->result)) {
+	    throw new LogicException("Statement is not a SELECT statement. ".
+		"Unable to iterate. Query: " . $stmt->query);
+	}
 	$count = $stmt->numRows();
 	$this->_stmt = $stmt;
 	$this->_count = $count;
