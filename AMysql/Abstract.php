@@ -16,6 +16,7 @@ $dir = dirname(realpath(__FILE__));
 require_once $dir . '/Exception.php';
 require_once $dir . '/Expr.php';
 require_once $dir . '/Statement.php';
+require_once $dir . '/Iterator.php';
 
 abstract class AMysql_Abstract {
 

@@ -20,7 +20,7 @@
  * @author Szerémi Attila
  * @version 0.9.2.3
  **/ 
-class AMysql_Statement {
+class AMysql_Statement implements IteratorAggregate {
     public $amysql;
     public $error;
     public $errno;
@@ -49,6 +49,10 @@ class AMysql_Statement {
 	$this->link = $amysql->link;
 	$this->throwExceptions = $this->amysql->throwExceptions;
 	$this->setFetchMode($amysql->getFetchMode());
+    }
+
+    public function getIterator() {
+	return new AMysql_Iterator($this);
     }
 
     public function setFetchMode($fetchMode/* [, extras [, extras...]]*/) {
