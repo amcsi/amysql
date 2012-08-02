@@ -129,7 +129,7 @@ class AMysql_Statement implements IteratorAggregate {
 	if (!$prepared) {
 	    $prepared = $this->prepared;
 	}
-	return $this->beforeSql . $this->getBoundSql($prepared, $this->binds);
+	return $this->beforeSql . $this->quoteInto($prepared, $this->binds);
     }
 
     /**
@@ -139,11 +139,15 @@ class AMysql_Statement implements IteratorAggregate {
      * @see $this->getSql()
      * 
      * @param string $prepared 
-     * @param array $binds 
+     * @param mixed $binds		$binds are automatically type casted
+     *					to an array.
      * @return string
      */
-    public function getBoundSql($prepared, $binds) {
+    public function quoteInto($prepared, $binds) {
 	$sql = $prepared;
+	if (!is_array($binds)) {
+	    $binds = (array) $binds;
+	}
 	if (array_key_exists(0, $binds)) {
 	    $parts = explode('?', $sql);
 	    $sql = '';
