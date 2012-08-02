@@ -129,49 +129,60 @@ class AMysql_Statement implements IteratorAggregate {
 	if (!$prepared) {
 	    $prepared = $this->prepared;
 	}
-	$sql = $this->prepared;
-	$binds =& $this->binds;
-	if ($binds) {
-	    if (array_key_exists(0, $binds)) {
-		$parts = explode('?', $sql);
-		$sql = '';
-		if (count($parts)-1 == count($binds)) {
-		    foreach ($binds as &$bind) {
-			$sql .= array_shift($parts);
-			$sql .= $this->amysql->escape($bind);
-		    };
+	return $this->beforeSql . $this->getBoundSql($prepared, $this->binds);
+    }
+
+    /**
+     * Like $this->getSql(), but you must give the prepared statement, the
+     * binds, and $this->beforeSql is ignored.
+     *
+     * @see $this->getSql()
+     * 
+     * @param string $prepared 
+     * @param array $binds 
+     * @return string
+     */
+    public function getBoundSql($prepared, $binds) {
+	$sql = $prepared;
+	if (array_key_exists(0, $binds)) {
+	    $parts = explode('?', $sql);
+	    $sql = '';
+	    if (count($parts)-1 == count($binds)) {
+		foreach ($binds as &$bind) {
 		    $sql .= array_shift($parts);
-		}
-		else if (count($parts)-1 < count($binds)) {
-		    throw new RuntimeException('More binds than question marks!');
-		}
-		else {
-		    throw new RuntimeException('Fewer binds than question marks!');
-		}
+		    $sql .= $this->amysql->escape($bind);
+		};
+		$sql .= array_shift($parts);
+	    }
+	    else if (count($parts)-1 < count($binds)) {
+		throw new RuntimeException('More binds than question marks!');
 	    }
 	    else {
-		$keysQuoted = array ();
-		$replacements = array ();
-		foreach ($binds as $key => &$bind) {
-		    if (127 < ord($key[0]) || preg_match('/^\w$/', $key[0])) {
-			$key = ':' . $key;
-		    }
-		    $keyQuoted = preg_quote($key, '/');
-		    $keysQuoted[] = $keyQuoted;
-		    $replacements[$key] = $this->amysql->escape($bind);
-		}
-		$keysOr = join('|', $keysQuoted);
-		$pattern =
-		    "/($keysOr)(?![\w\x80-\xff])/m";
-		$this->_replacements = $replacements;
-
-		$sql = preg_replace_callback($pattern,
-		    array ($this, '_replaceCallback'),
-		    $sql
-		);
+		throw new RuntimeException('Fewer binds than question marks!');
 	    }
 	}
-	return $this->beforeSql . $sql;
+	else {
+	    $keysQuoted = array ();
+	    $replacements = array ();
+	    foreach ($binds as $key => &$bind) {
+		if (127 < ord($key[0]) || preg_match('/^\w$/', $key[0])) {
+		    $key = ':' . $key;
+		}
+		$keyQuoted = preg_quote($key, '/');
+		$keysQuoted[] = $keyQuoted;
+		$replacements[$key] = $this->amysql->escape($bind);
+	    }
+	    $keysOr = join('|', $keysQuoted);
+	    $pattern =
+		"/($keysOr)(?![\w\x80-\xff])/m";
+	    $this->_replacements = $replacements;
+
+	    $sql = preg_replace_callback($pattern,
+		array ($this, '_replaceCallback'),
+		$sql
+	    );
+	}
+	return $sql;
     }
 
     protected function _replaceCallback($match) {
