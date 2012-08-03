@@ -344,5 +344,34 @@ EOT;
     public function repeat20() {
 	return array_fill(0, 20, array ());
     }
+
+    public function testCount() {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	    array (
+		'string' => 'blah',
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName");
+	$this->assertEquals(2, count($stmt));
+    }
+
+    public function testCountNonSelect() {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	    array (
+		'string' => 'blah',
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->lastStatement;
+	$this->setExpectedException('LogicException');
+	count($stmt);
+    }
 }
 ?>

@@ -1,5 +1,5 @@
 <?php
-class AMysql_Iterator implements SeekableIterator, Countable
+class AMysql_Iterator implements SeekableIterator
 {
     
     protected $_stmt;
@@ -58,9 +58,5 @@ class AMysql_Iterator implements SeekableIterator, Countable
 	else {
 	    throw new OutOfBoundsException("Cannot seek to position `$index`.");
 	}
-    }
-
-    public function count() {
-	return $this->_count;
     }
 }

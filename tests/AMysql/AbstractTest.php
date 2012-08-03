@@ -339,6 +339,13 @@ EOT;
 	$this->assertTrue($success);
 	$this->assertEquals($expected, $results);
     }
+
+    /**
+     * 
+     **/
+    public function repeat100() {
+	return array_fill(0, 100, array ());
+    }
 }
 ?>
 

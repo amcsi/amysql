@@ -20,7 +20,7 @@
  * @author Szerémi Attila
  * @version 0.9.2.3
  **/ 
-class AMysql_Statement implements IteratorAggregate {
+class AMysql_Statement implements IteratorAggregate, Countable {
     public $amysql;
     public $error;
     public $errno;
@@ -993,6 +993,16 @@ class AMysql_Statement implements IteratorAggregate {
 	    throw new OutOfBoundsException("Invalid member: `$name` " .
 		"(target value was `$value`)");
 	}
+    }
+
+    public function count() {
+	if (!is_resource($this->result)) {
+	    $msg = "No SELECT result. ".
+		"Last query: " . $this->query;
+	    throw new LogicException ($msg);
+	}
+	$count = $this->numRows();
+	return $count;
     }
 }
 ?>
