@@ -1,8 +1,8 @@
-<?php
+<?php /* vim: set tabstop=8 expandtab : */
 /**
  * MySQL exception class
  * @author Szerémi Attila 
- * @version 0.9.2.3
+ * @version 0.9.2.4
  **/ 
 class AMysql_Exception extends RuntimeException {
 

@@ -1,4 +1,4 @@
-<?php
+<?php /* vim: set tabstop=8 expandtab : */
 /**
  * Class for making custom expressions for AMysql value binding.
  * This is what you should use to be able to add specific kinds
@@ -8,7 +8,7 @@
  *
  * @author Szerémi Attila
  * @created 2011.06.10. 13:26:56  
- * @version 0.9.2.3
+ * @version 0.9.2.4
  **/ 
 class AMysql_Expr {
 

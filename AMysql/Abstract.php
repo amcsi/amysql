@@ -1,8 +1,8 @@
-<?php
+<?php /* vim: set tabstop=8 expandtab : */
 /**
  * Mysql abstraction which only uses mysql_* functions
  * @author Szerémi Attila
- * @version 0.9.2.3
+ * @version 0.9.2.4
  *
  * For information on binding placeholders, @see AMysql_Statement::execute()
  *

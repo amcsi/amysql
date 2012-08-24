@@ -1,4 +1,4 @@
-<?php
+<?php /* vim: set tabstop=8 expandtab : */
 /**
  * The statement class belonging to the AMysql_Abstract class, where mysql
  * queries are built and handled.
@@ -18,7 +18,7 @@
  * }  
  *
  * @author Szerémi Attila
- * @version 0.9.2.3
+ * @version 0.9.2.4
  **/ 
 class AMysql_Statement implements IteratorAggregate, Countable {
     public $amysql;
@@ -303,6 +303,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @return array
      **/         
     public function fetchAll() {
+	$result = $this->result;
 	$ret = array ();
 	if (AMysql_Abstract::FETCH_ASSOC == $this->_fetchMode) {
 	    $methodName = 'fetchAssoc';
