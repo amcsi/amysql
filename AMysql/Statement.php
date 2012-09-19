@@ -399,7 +399,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	    return false;
 	}
 	mysql_data_seek($result, 0);
-	if (false === $keyColumn) {
+	if (false === $keyColumn || null === $keyColumn) {
 	    while (false !== ($row = $this->fetchAssoc())) {
 		$ret[] = $row;
 	    }
