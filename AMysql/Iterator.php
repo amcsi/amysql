@@ -2,6 +2,7 @@
 /**
  * AMysql_Statement's iterator class.
  *
+ * Visit https://github.com/amcsi/amysql
  * @author Szerémi Attila
  * @version 0.9.2.4
  **/

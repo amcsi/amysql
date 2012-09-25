@@ -17,6 +17,7 @@
  *     echo $e->getDetails();
  * }  
  *
+ * Visit https://github.com/amcsi/amysql
  * @author Szerémi Attila
  * @version 0.9.2.4
  **/ 

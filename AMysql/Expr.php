@@ -6,6 +6,7 @@
  * statements, such as being able to call mysql functions to
  * set values.
  *
+ * Visit https://github.com/amcsi/amysql
  * @author Szerémi Attila
  * @created 2011.06.10. 13:26:56  
  * @version 0.9.2.4
