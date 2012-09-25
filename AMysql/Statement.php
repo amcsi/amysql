@@ -553,6 +553,37 @@ class AMysql_Statement implements IteratorAggregate, Countable {
     }
 
     /**
+     * Fetches all rows and returns them as an array of columns containing an array
+     * of values.
+     * Works simalarly to fetchAllAssoc(), but with the resulting array transposed.
+     *
+     * Note: no phpunit tests have been written for this method yet.
+     *
+     * @todo phpunit tests
+     *
+     * @access public
+     * @return void
+     */
+    public function fetchAllColumns() {
+        $ret = array ();
+	$numRows = $this->numRows();
+        if (!$numRows) {
+            return $ret;
+        }
+        mysql_data_seek($this->result, 0);
+        $firstRow = $this->fetchAssoc();
+        foreach ($firstRow as $colName => $val) {
+            $ret[$colName] = array ($val);
+        }
+        while ($row = $this->fetchAssoc()) {
+            foreach ($row as $colName => $val) {
+                $ret[$row][$colName][] = $val;
+            }
+        }
+        return $ret;
+    }
+
+    /**
      * Fetches the next row as an object.
      * 
      * @return object
