@@ -541,6 +541,11 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      */
     public function fetchAllColumn($column = 0) {
 	$ret = array ();
+	$numRows = $this->numRows();
+        if (!$numRows) {
+            return $ret;
+        }
+        mysql_data_seek($this->result, 0);
 	while ($row = $this->fetchArray()) {
 	    $ret[] = $row[$column];
 	}
