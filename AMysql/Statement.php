@@ -897,7 +897,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	 **/		         
 	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
 	$beforeSql = "UPDATE $tableSafe SET $setsString WHERE ";
-	$this->prepare($where);
+	$this->prepare($this->buildWhere($where));
 	$this->beforeSql = $beforeSql;
 
 	return $this;
@@ -996,7 +996,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	$sql = "DELETE FROM $tableSafe";
 	$this->prepare($sql);
 	if ($where) {
-	    $this->where($where);
+	    $this->prepared .= ' WHERE ' . $this->buildWhere($where);
 	}
 	return $this;
     }
@@ -1029,6 +1029,34 @@ class AMysql_Statement implements IteratorAggregate, Countable {
     public function insertId() {
 	$ret = mysql_insert_id($this->link);
 	return $ret;
+    }
+
+    /**
+     * buildWhere 
+     * 
+     * @param mixed $where 
+     * @access public
+     * @return void
+     */
+    public function buildWhere($where) {
+	if (is_string($where)) {
+	    return $where;
+	}
+	else if (is_array($where)) {
+	    $wheres = array ();
+	    foreach ($where as $key => $value) {
+		if (is_numeric($key)) {
+		    $wheres[] = $value;
+		}
+		else {
+		    $wheres[] = $this->getBoundSql($key, (array) $value);
+		}
+	    }
+	}
+        else {
+            return '1';
+        }
+	return join (' AND ', $wheres);
     }
 
     /**
