@@ -472,6 +472,20 @@ abstract class AMysql_Abstract {
     }
 
     /**
+     * Performs an instant REPLACE.
+     *
+     * @see $this->insert()
+     *
+     * @return boolean Success.
+     **/
+    public function replace($tableName, array $data) {
+        $stmt = new AMysql_Statement($this);
+        $stmt->replace($tableName, $data);
+        $success = $stmt->execute();
+        return $success;
+    }
+
+    /**
      * Performs an INSERT or an UPDATE; if the $value
      * parameter is not falsy, an UPDATE is performed with the given column name
      * and value, otherwise an insert. It is recommended that this is used for
