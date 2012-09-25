@@ -400,7 +400,8 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	    return false;
 	}
 	mysql_data_seek($result, 0);
-	if (false === $keyColumn || null === $keyColumn) {
+        $keyColumnGiven = is_string($keyColumn) || is_int($keyColumn);
+	if (!$keyColumnGiven) {
 	    while (false !== ($row = $this->fetchAssoc())) {
 		$ret[] = $row;
 	    }
@@ -564,21 +565,37 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @access public
      * @return void
      */
-    public function fetchAllColumns() {
+    public function fetchAllColumns($keyColumn = false) {
         $ret = array ();
-	$numRows = $this->numRows();
+        $numRows = $this->numRows();
+        $keyColumnGiven = is_string($keyColumn) || is_int($keyColumn);
         if (!$numRows) {
+        }
+        /**
+         * If $keyColumn isn't given, let's build the returning array here to
+         * dodge unnecessary overhead.
+         **/
+        else if (!$keyColumnGiven) {
+            mysql_data_seek($this->result, 0);
+            $firstRow = $this->fetchAssoc();
+            foreach ($firstRow as $colName => $val) {
+                $ret[$colName] = array ($val);
+            }
+            while ($row = $this->fetchAssoc()) {
+                foreach ($row as $colName => $val) {
+                    $ret[$row][$colName][] = $val;
+                }
+            }
             return $ret;
         }
-        mysql_data_seek($this->result, 0);
-        $firstRow = $this->fetchAssoc();
-        foreach ($firstRow as $colName => $val) {
-            $ret[$colName] = array ($val);
-        }
-        while ($row = $this->fetchAssoc()) {
-            foreach ($row as $colName => $val) {
-                $ret[$row][$colName][] = $val;
-            }
+        /**
+         * Otherwise if $keyColumn is given, we have no other choice but to use
+         * $this->fetchAllAssoc($keyColumn) and transpose it.
+         **/
+        else {
+            $ret = AMysql_Abstract::transpose(
+                $this->fetchAllAssoc($keyColumn)
+            );
         }
         return $ret;
     }
