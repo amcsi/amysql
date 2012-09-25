@@ -608,5 +608,57 @@ abstract class AMysql_Abstract {
 	// put it between apostrophes.
 	return "'" . mysql_real_escape_string($value, $res) . "'";
     }
+
+    /**
+     * Transposes a 2 dimensional array.
+     * Every inner array must contain the same keys as the other inner arrays,
+     * otherwise unexpected results may occur.
+     *
+     * Example:
+     *   $input = array (
+     *       3 => array (
+     *           'col1' => 'bla',
+     *           'col2' => 'yo'
+     *       ),
+     *       9 => array (
+     *           'col1' => 'ney',
+     *           'col2' => 'lol'
+     *       )
+     *   );
+     *   $output = $amysql->transpose($input);
+     *
+     *   $output: array (
+     *       'col1' => array (
+     *           3 => 'bla',
+     *           9 => 'ney'
+     *       ),
+     *       'col2' => array (
+     *           3 => 'yo',
+     *           9 => 'lol'
+     *       )
+     *   );
+     *
+     * @param array $array The 2 dimensional array to transpose
+     * @return array
+     */
+    public static function transpose(array $array) {
+        $ret = array ();
+        if (!$array) {
+            return $ret;
+        }
+        foreach ($array as $key1 => $arraySub) {
+            if (!$ret) {
+                foreach ($arraySub as $key2 => $value) {
+                    $ret[$key2] = array ($key1 => $value);
+                }
+            }
+            else {
+                foreach ($arraySub as $key2 => $value) {
+                    $ret[$key2][$key1] = $value;
+                }
+            }
+        }
+        return $ret;
+    }
 }
 ?>

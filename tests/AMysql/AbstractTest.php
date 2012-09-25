@@ -340,6 +340,33 @@ EOT;
 	$this->assertEquals($expected, $results);
     }
 
+    public function testTranspose() {
+        $input = array (
+            3 => array (
+                'col1' => 'bla',
+                'col2' => 'yo'
+            ),
+            9 => array (
+                'col1' => 'ney',
+                'col2' => 'lol'
+            )
+        );
+
+        $expected = array (
+            'col1' => array (
+                3 => 'bla',
+                9 => 'ney'
+            ),
+            'col2' => array (
+                3 => 'yo',
+                9 => 'lol'
+            )
+        );
+
+        $result = AMysql_Abstract::transpose($input);
+        $this->assertEquals($expected, $result);
+    }
+
     /**
      * 
      **/
