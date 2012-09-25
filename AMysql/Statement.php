@@ -1055,7 +1055,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 		    $wheres[] = $value;
 		}
 		else {
-		    $wheres[] = $this->getBoundSql($key, (array) $value);
+		    $wheres[] = $this->quoteInto($key, (array) $value);
 		}
 	    }
 	}
