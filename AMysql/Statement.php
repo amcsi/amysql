@@ -992,6 +992,12 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @return $this
      **/         
     public function delete($tableName, $where) {
+        if (is_bool($where) || is_null($where)) {
+            $msg = "\$where must not be a boolean or null, otherwise " .
+                "a possible unwanted deletion of all rows would occur. Please pass " .
+                "'1' as the \$where parameter to delete all rows.";
+            throw new Exception ($msg);
+        }
 	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
 	$sql = "DELETE FROM $tableSafe";
 	$this->prepare($sql);
