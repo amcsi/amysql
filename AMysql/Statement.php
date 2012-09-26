@@ -864,75 +864,13 @@ class AMysql_Statement implements IteratorAggregate, Countable {
     }
 
     /**
-     * Prepares a mysql UPDATE unexecuted. By execution, have the placeholders
-     * of the WHERE statement binded.
-     * It is rather recommended to use AMysql_Abstract::update() instead, which
-     * lets you also bind the values in one call and it returns the success
-     * of the query.
+     * Builds a columns list with values as a string
      *
-     * @param string $tableName 	The table name.
-     * @param array $data 		The array of data changes. A
-     *					    one-dimensional array
-     * 					with keys as column names and values
-     *					    as their values.
-     * @param string $where		An SQL substring of the WHERE clause.
-     *
-     * @return $this
-     * @throws AMysql_Exception                
-     **/               
-    public function update($tableName, array $data, $where) {
-	if (!$data) {
-	    return false;
-	}
-	$sets = array ();
-	foreach ($data as $columnName => $value) {
-	    $columnName = $this->escapeIdentifierSimple($columnName);
-	    $sets[] = "$columnName = " . $this->amysql->escape($value);
-	}
-	$setsString = join(', ', $sets);
-
-	/**
-	 * Ezt beforeSql-el kell megoldani, különben az értékekben lévő
-	 * kérdőjelek bezavarnak.         
-	 **/		         
-	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
-	$beforeSql = "UPDATE $tableSafe SET $setsString WHERE ";
-	$this->prepare($where);
-	$this->beforeSql = $beforeSql;
-
-	return $this;
-    }
-
-    /**
-     * Prepares a mysql INSERT unexecuted. After this, you should just
-     * call $this->execute().
-     * It is rather recommended to use AMysql_Abstract::insert() instead, which
-     * returns the last inserted id already.
-     *
-     * @param string $tableName 	The table name.
-     * @param array $data		A one or two-dimensional array.
-     * 					1D:
-     * 					an associative array of keys as column names and values
-     * 					as their values. This inserts one row.
-     * 					2D numeric:
-     * 					A numeric array where each value is an associative array
-     * 					with column-value pairs. Each outer, numeric value represents
-     * 					a row of data.
-     * 					2D associative:
-     * 					An associative array where the keys are the columns, the
-     * 					values are numerical arrays, where each value represents the
-     * 					value for the new row of that key.
-     *
-     * @return $this
-     * @throws AMysql_Exception                              
-     **/     
-    public function insert($tableName, array $data) {
-	$cols = array ();
-	$vals = array();
-	$i = 0;
-	if (!$data) {
-	    return false;
-	}
+     * @param array $data @see $this->insertReplace()
+     * @return string
+     */
+    public function buildColumnsValues(array $data) {
+        $i = 0;
 	if (empty($data[0])) {
 	    foreach ($data as $columnName => $values) {
 		$cols[] = $this->escapeIdentifierSimple($columnName);
@@ -971,10 +909,106 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	    $rowValueStrings[] = join(', ', $rowValues);
 	}
 	$valuesString = join('), (', $rowValueStrings);
+        $columnsValuesString = "($columnsString) VALUES ($valuesString)";
+        return $columnsValuesString;
+    }
+
+    /**
+     * Puts together a string that is to be placed after a SET statement.
+     * i.e. column1 = 'value', int_col = 3
+     *
+     * @param array $data Keys are column names, values are the values unescaped
+     * @return string
+     */
+    public function buildSet(array $data) {
+	$sets = array ();
+	foreach ($data as $columnName => $value) {
+	    $columnName = $this->escapeIdentifierSimple($columnName);
+	    $sets[] = "$columnName = " . $this->amysql->escape($value);
+	}
+	$setsString = join(', ', $sets);
+        return $setsString;
+    }
+
+    /**
+     * Prepares a mysql UPDATE unexecuted. By execution, have the placeholders
+     * of the WHERE statement binded.
+     * It is rather recommended to use AMysql_Abstract::update() instead, which
+     * lets you also bind the values in one call and it returns the success
+     * of the query.
+     *
+     * @param string $tableName 	The table name.
+     * @param array $data 		The array of data changes. A
+     *					    one-dimensional array
+     * 					with keys as column names and values
+     *					    as their values.
+     * @param string $where		An SQL substring of the WHERE clause.
+     *
+     * @return $this
+     * @throws AMysql_Exception                
+     **/               
+    public function update($tableName, array $data, $where) {
+	if (!$data) {
+	    return false;
+	}
+        $setsString = $this->buildSet($data);
+
+	/**
+	 * Ezt beforeSql-el kell megoldani, különben az értékekben lévő
+	 * kérdőjelek bezavarnak.         
+	 **/		         
 	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
-	$sql = "INSERT INTO $tableSafe ($columnsString) VALUES ($valuesString)";
+	$beforeSql = "UPDATE $tableSafe SET $setsString WHERE ";
+	$this->prepare($where);
+	$this->beforeSql = $beforeSql;
+
+	return $this;
+    }
+
+    /**
+     * Prepares a mysql INSERT or REPLACE unexecuted. After this, you should just
+     * call $this->execute().
+     * It is rather recommended to use AMysql_Abstract::insert() instead, which
+     * returns the last inserted id already.
+     *
+     * @param string $type              "$type INTO..." (INSERT, INSERT IGNORE, REPLACE)
+     *                                  etc.
+     * @param string $tableName 	The table name.
+     * @param array $data		A one or two-dimensional array.
+     * 					1D:
+     * 					an associative array of keys as column names and values
+     * 					as their values. This inserts one row.
+     * 					2D numeric:
+     * 					A numeric array where each value is an associative array
+     * 					with column-value pairs. Each outer, numeric value represents
+     * 					a row of data.
+     * 					2D associative:
+     * 					An associative array where the keys are the columns, the
+     * 					values are numerical arrays, where each value represents the
+     * 					value for the new row of that key.
+     *
+     * @return $this
+     * @throws AMysql_Exception                              
+     **/     
+    public function insertReplace($type, $tableName, array $data) {
+	$cols = array ();
+	$vals = array();
+	if (!$data) {
+	    return false;
+	}
+	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
+        $columnsValues = $this->buildColumnsValues($data);
+	$sql = "$type INTO $tableSafe $columnsValues";
 	$this->prepare($sql);
 	return $this;
+    }
+
+    public function insert($tableName, array $data) {
+        return $this->insertReplace('INSERT', $tableName, $data);
+    }
+
+    public function replace($tableName, array $data) {
+        return $this->insertReplace('REPLACE', $tableName, $data);
     }
 
     /**
