@@ -2,10 +2,11 @@
 Installation
 =
 
-Copy files
+Copy files:
+
         AMysql.php
         AMysql/
 
 To /path/to/libs/ (Zend Framework style) or /path/to/libs/AMysql/ (subprojects separated)
 
-Then make sure AMysql.php is included.
+Then include AMysql.php or have AMysql.php be autoloadable.
