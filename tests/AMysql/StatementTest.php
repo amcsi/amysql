@@ -395,5 +395,56 @@ EOT;
 	$this->setExpectedException('LogicException');
 	count($stmt);
     }
+
+    public function fetchAllColumns() {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	    array (
+		'string' => 'blah',
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->lastStatement;
+        $sql = "SELECT * FROM $this->tableName";
+        $stmt = $this->amysql->query($sql);
+        $result = $stmt->fetchAllColumns();
+
+        $expected = array (
+            'id' => array ('1', '2'),
+            'string' => array ('3', 'blah')
+        );
+        $this->assertEquals($expected, $result);
+    }
+
+    public function fetchAllColumnsEmpty() {
+        $sql = "SELECT * FROM $this->tableName";
+        $stmt = $this->amysql->query($sql);
+        $result = $stmt->fetchAllColumns();
+        $this->assertEquals(array(), $result);
+    }
+
+    public function fetchAllColumnsNamed() {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	    array (
+		'string' => 'blah',
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->lastStatement;
+        $sql = "SELECT * FROM $this->tableName";
+        $stmt = $this->amysql->query($sql);
+        $result = $stmt->fetchAllColumns(1);
+
+        $expected = array (
+            'id' => array ('3' => '1', 'blah' => '2'),
+            'string' => array ('3' => '3', 'blah' => 'blah')
+        );
+        $this->assertEquals($expected, $result);
+    }
 }
 ?>
