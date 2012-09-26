@@ -396,7 +396,7 @@ EOT;
 	count($stmt);
     }
 
-    public function fetchAllColumns() {
+    public function testFetchAllColumns() {
 	$data = array (
 	    array (
 		'string' => 3
@@ -408,7 +408,7 @@ EOT;
 	$this->_amysql->insert($this->tableName, $data);
 	$stmt = $this->_amysql->lastStatement;
         $sql = "SELECT * FROM $this->tableName";
-        $stmt = $this->amysql->query($sql);
+        $stmt = $this->_amysql->query($sql);
         $result = $stmt->fetchAllColumns();
 
         $expected = array (
@@ -418,14 +418,14 @@ EOT;
         $this->assertEquals($expected, $result);
     }
 
-    public function fetchAllColumnsEmpty() {
+    public function testFetchAllColumnsEmpty() {
         $sql = "SELECT * FROM $this->tableName";
-        $stmt = $this->amysql->query($sql);
+        $stmt = $this->_amysql->query($sql);
         $result = $stmt->fetchAllColumns();
         $this->assertEquals(array(), $result);
     }
 
-    public function fetchAllColumnsNamed() {
+    public function testFetchAllColumnsNamed() {
 	$data = array (
 	    array (
 		'string' => 3
@@ -437,7 +437,7 @@ EOT;
 	$this->_amysql->insert($this->tableName, $data);
 	$stmt = $this->_amysql->lastStatement;
         $sql = "SELECT * FROM $this->tableName";
-        $stmt = $this->amysql->query($sql);
+        $stmt = $this->_amysql->query($sql);
         $result = $stmt->fetchAllColumns(1);
 
         $expected = array (
