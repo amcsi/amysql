@@ -367,6 +367,45 @@ EOT;
         $this->assertEquals($expected, $result);
     }
 
+    public function testReplace() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+        $this->_amysql->insert($this->tableName, $data);
+        $data = array (
+            array (
+                'id' => 2,
+                'string' => 'replaced1'
+            ),
+            array (
+                'id' => 4,
+                'string' => 'replaced2'
+            ),
+        );
+        $this->_amysql->replace($this->tableName, $data);
+
+        $result = $this->_amysql->query("SELECT * FROM $this->tableName")
+            ->fetchAllAssoc();
+
+        $expected = array (
+            array (
+                'id' => '1',
+                'string' => '3'
+            ),
+            array (
+                'id' => '2',
+                'string' => 'replaced1'
+            ),
+            array (
+                'id' => '4',
+                'string' => 'replaced2'
+            )
+        );
+        $this->assertEquals($expected, $result);
+    }
+
     /**
      * 
      **/
