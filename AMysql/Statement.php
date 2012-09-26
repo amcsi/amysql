@@ -583,7 +583,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
             }
             while ($row = $this->fetchAssoc()) {
                 foreach ($row as $colName => $val) {
-                    $ret[$row][$colName][] = $val;
+                    $ret[$colName][] = $val;
                 }
             }
             return $ret;
