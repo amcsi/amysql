@@ -4,7 +4,7 @@
  *
  * Visit https://github.com/amcsi/amysql
  * @author Szerémi Attila
- * @version 0.9.2.4
+ * @version 0.9.2.5
  *
  * For information on binding placeholders, @see AMysql_Statement::execute()
  *
