@@ -33,6 +33,13 @@ class AMysql_Statement implements IteratorAggregate, Countable {
     public $lastException = null;
     public $insertId;
 
+    /**
+     * Whether the time all the queries take should be recorded.
+     *
+     * @var boolean
+     */
+    public $profileQueries;
+
     public $link;
 
     protected $_fetchMode;
@@ -48,6 +55,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	$amysql->lastStatement = $this;
 	$this->amysql = $amysql;
 	$this->link = $amysql->link;
+        $this->profileQueries = $amysql->profileQueries;
 	$this->throwExceptions = $this->amysql->throwExceptions;
 	$this->setFetchMode($amysql->getFetchMode());
     }
@@ -227,7 +235,16 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 		'Resource is not a mysql resource.', 0, $sql
 	    );
 	}
-	$result = mysql_query($sql, $this->link);
+        $this->amysql->addQuery($sql);
+        if ($this->profileQueries) {
+            $startTime = microtime(true);
+            $result = mysql_query($sql, $this->link);
+            $duration = microtime(true) - $startTime;
+            $this->amysql->totalTime += $duration;
+        }
+        else {
+            $result = mysql_query($sql, $this->link);
+        }
 	$this->error = mysql_error($res);
 	$this->errno = mysql_errno($res);
 	$this->result = $result;

@@ -31,6 +31,17 @@ abstract class AMysql_Abstract {
     public $query; // last used query string
     public $affectedRows; // last affected rows count
     public $throwExceptions = true; // whether to throw exceptions
+    public $totalTime = 0.0;
+
+    /**
+     * Whether the time all the queries take should be recorded.
+     *
+     * @var boolean
+     */
+    public $profileQueries = false;
+
+    protected $_queries = array ();
+
     /**
      * Let AMysql_Statement::bindParam() and AMysql_Statement::bindValue()
      * use indexes starting from 1 instead of 0 in case of unnamed placeholders.
@@ -673,6 +684,10 @@ abstract class AMysql_Abstract {
             }
         }
         return $ret;
+    }
+
+    public function addQuery($query) {
+        $this->_queries[] = $query;
     }
 }
 ?>
