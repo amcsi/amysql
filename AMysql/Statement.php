@@ -159,13 +159,19 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 		};
 		$sql .= array_shift($parts);
 	    }
-	    else if (count($parts)-1 < count($binds)) {
-		throw new RuntimeException('More binds than question marks!');
-	    }
-	    else {
-		throw new RuntimeException('Fewer binds than question marks!');
-	    }
-	}
+            else if (count($parts)-1 < count($binds)) {
+                $msg = "More binds than question marks!\n";
+                $msg .= "Prepared query: `$prepared`\n";
+                $msg .= sprintf("Binds: %s\n", print_r($binds, true));
+                throw new RuntimeException($msg);
+            }
+            else {
+                $msg = "Fewer binds than question marks!\n";
+                $msg .= "Prepared query: `$prepared`\n";
+                $msg .= sprintf("Binds: %s\n", print_r($binds, true));
+                throw new RuntimeException($msg);
+            }
+        }
 	else {
 	    $keysQuoted = array ();
 	    $replacements = array ();
