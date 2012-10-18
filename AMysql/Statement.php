@@ -250,17 +250,16 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 		'Resource is not a mysql resource.', 0, $sql
 	    );
 	}
-        $this->amysql->addQuery($sql);
         if ($this->profileQueries) {
             $startTime = microtime(true);
             $result = mysql_query($sql, $this->link);
             $duration = microtime(true) - $startTime;
             $this->queryTime = $duration;
-            $this->amysql->totalTime += $duration;
         }
         else {
             $result = mysql_query($sql, $this->link);
         }
+        $this->amysql->addQuery($sql, $this->queryTime);
 	$this->error = mysql_error($res);
 	$this->errno = mysql_errno($res);
 	$this->result = $result;

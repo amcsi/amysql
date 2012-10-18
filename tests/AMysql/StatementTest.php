@@ -475,6 +475,8 @@ EOT;
             $this->_amysql->lastStatement->queryTime
         );
         $this->assertGreaterThan(0.0, $this->_amysql->lastStatement->queryTime);
+        $this->assertSame($this->_amysql->totalTime,
+            $this->_amysql->lastStatement->queryTime);
     }
 }
 ?>

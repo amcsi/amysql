@@ -47,8 +47,16 @@ abstract class AMysql_Abstract {
      * @var boolean
      */
     public $profileQueries = false;
+    /**
+     * Whether backtraces should be added to each array for getQueriesData(). If true,
+     * backtraces will be found under the 'backtrace' key.
+     *
+     * @var boolean
+     */
+    public $includeBacktrace = false;
 
     protected $_queries = array ();
+    protected $_queriesData = array ();
 
     /**
      * Let AMysql_Statement::bindParam() and AMysql_Statement::bindValue()
@@ -709,12 +717,41 @@ abstract class AMysql_Abstract {
         return $ret;
     }
 
-    public function addQuery($query) {
+    public function addQuery($query, $queryTime) {
         $this->_queries[] = $query;
+        $data = array (
+            'query' => $query,
+            'time' => $queryTime
+        );
+        if ($this->includeBacktrace) {
+            $opts = 0;
+            if (defined('DEBUG_BACKTRACE_IGNORE_ARGS')) {
+                $opts |= DEBUG_BACKTRACE_IGNORE_ARGS;
+            }
+            $data['backtrace'] = debug_backtrace($opts);
+        }
+        $this->_queriesData[] = $data;
+        if (is_numeric($queryTime)) {
+            $this->totalTime += $queryTime;
+        }
     }
 
     public function getQueries() {
         return $this->_queries;
+    }
+
+    /**
+     * Returns an arrays of profiled query data. Each value is an array that consists
+     * of:
+     *  - query - The SQL query performed
+     *  - time - The amount of seconds the query took (float)
+     *
+     * If profileQueries wss off at any query, its time value will be null.
+     * 
+     * @return array[]
+     */
+    public function getQueriesData() {
+        return $this->_queriesData;
     }
 }
 ?>
