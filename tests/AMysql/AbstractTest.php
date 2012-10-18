@@ -1,4 +1,4 @@
-<?php
+<?php // vim: set tabstop=8 softtabstop=4 expandtab :
 class AbstractTest extends PHPUnit_Framework_TestCase {
 
     protected $_conn;
@@ -220,6 +220,9 @@ EOT;
 	    )
 	);
 	$this->_amysql->updateMultipleByKey($this->tableName, $data, 'id');
+
+	$this->assertEquals(2, $this->_amysql->multipleAffectedRows);
+
 	$results = $this->_amysql->query("SELECT * FROM $this->tableName")
 	    ->fetchAllAssoc();
 	$expected = array (
@@ -233,6 +236,9 @@ EOT;
 	    )
 	);
 	$this->assertEquals($expected, $results);
+
+	$this->_amysql->updateMultipleByKey($this->tableName, $data, 'id');
+	$this->assertEquals(0, $this->_amysql->multipleAffectedRows);
     }
 
     public function testUpdateMultipleByKeySameColumn() {

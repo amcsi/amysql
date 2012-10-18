@@ -28,6 +28,13 @@ abstract class AMysql_Abstract {
     public $result; // last mysql result
     public $query; // last used query string
     public $affectedRows; // last affected rows count
+    /**
+     * Contains the number of total affected rows by the last multiple statement deploying
+     * method, such as updateMultipleByData and updateMultipleByKey
+     * 
+     * @var int
+     */
+    public $multipleAffectedRows;
     public $throwExceptions = true; // whether to throw exceptions
     /**
      * Let AMysql_Statement::bindParam() and AMysql_Statement::bindValue()
@@ -372,6 +379,8 @@ abstract class AMysql_Abstract {
 
     /**
      * Updates multiple rows.
+     * The number of total affected rows can be found in
+     * $this->multipleAffectedRows.
      *
      * @param string $tableName 	The table name.
      * @param array $data 		The array of data changes. A
@@ -391,21 +400,26 @@ abstract class AMysql_Abstract {
     ) {
 	$successesNeeded = count($data);
 	$where = self::escapeIdentifier($column) . " = ?";
+	$affectedRows = 0;
 	foreach ($data as $row) {
 	    $by = $row[$column];
 	    unset($row[$column]);
 	    $stmt = new AMysql_Statement($this);
 	    $stmt->update($tableName, $row, $where)->execute(array ($by));
+	    $affectedRows += $stmt->affectedRows;
 	    if ($stmt->result) {
 		$successesNeeded--;
 	    }
 	}
+	$this->multipleAffectedRows = $affectedRows;
 	return 0 === $successesNeeded;
     }
 
     /**
      * Updates multiple rows. The values for the column to search for is the
      * key of each row.
+     * The number of total affected rows can be found in
+     * $this->multipleAffectedRows.
      *
      * @param string $tableName 	The table name.
      * @param array $data 		The array of data changes. A
@@ -431,16 +445,19 @@ abstract class AMysql_Abstract {
     ) {
 	$successesNeeded = count($data);
 	$where = self::escapeIdentifier($column) . " = ?";
+	$affectedRows = 0;
 	foreach ($data as $by => $row) {
 	    if (!$updateSameColumn) {
 		unset($row[$column]);
 	    }
 	    $stmt = new AMysql_Statement($this);
 	    $stmt->update($tableName, $row, $where)->execute(array ($by));
+	    $affectedRows += $stmt->affectedRows;
 	    if ($stmt->result) {
 		$successesNeeded--;
 	    }
 	}
+	$this->multipleAffectedRows = $affectedRows;
 	return 0 === $successesNeeded;
     }
 
