@@ -10,7 +10,7 @@
  * @author Szerémi Attila
  * @created 2011.06.10. 13:26:56  
  * @license     MIT License; http://www.opensource.org/licenses/mit-license.php
- * @version 0.9.2.6
+ * @version 0.9.3
  **/ 
 class AMysql_Expr {
 

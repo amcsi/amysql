@@ -2,17 +2,16 @@
 /**
  * Mysql abstraction which only uses mysql_* functions
  *
- * Visit https://github.com/amcsi/amysql
- * @author Szerémi Attila
- * @license     MIT License; http://www.opensource.org/licenses/mit-license.php
- * @version 0.9.2.6
- *
  * For information on binding placeholders, @see AMysql_Statement::execute()
  *
  * @todo try to make a new select class that works similarly like in Zend
  * @todo Maybe remove automatic dot detection for identifier escaping.
  * @todo AMysql_Select
  *
+ * Visit https://github.com/amcsi/amysql
+ * @author Szerémi Attila
+ * @license     MIT License; http://www.opensource.org/licenses/mit-license.php
+ * @version 0.9.3
  **/
 
 $dir = dirname(realpath(__FILE__));
