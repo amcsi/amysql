@@ -419,6 +419,56 @@ EOT;
         $this->assertEquals($expected, $result);
     }
 
+    public function testNoProfiling () {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	    array (
+		'string' => 'blah',
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$this->assertSame(0.0, $this->_amysql->totalTime);
+    }
+
+    public function testProfiling () {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	    array (
+		'string' => 'blah',
+	    )
+	);
+        $this->_amysql->profileQueries = true;
+	$this->_amysql->insert($this->tableName, $data);
+        $this->assertInternalType('float', $this->_amysql->totalTime);
+	$this->assertGreaterThan(0.0, $this->_amysql->totalTime);
+    }
+
+    public function testProfiling2 () {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	    array (
+		'string' => 'blah',
+	    )
+	);
+        $this->_amysql->profileQueries = true;
+        $this->_amysql->includeBacktrace = true;
+
+	$this->_amysql->insert($this->tableName, $data);
+        $totalTimeSoFar = $this->_amysql->totalTime;
+        $this->assertInternalType('float', $this->_amysql->totalTime);
+        $this->assertGreaterThan(0.0, $this->_amysql->totalTime);
+
+	$this->_amysql->insert($this->tableName, $data);
+        $this->assertInternalType('float', $this->_amysql->totalTime);
+	$this->assertGreaterThan($totalTimeSoFar, $this->_amysql->totalTime);
+    }
+
     /**
      * 
      **/

@@ -34,6 +34,13 @@ class AMysql_Statement implements IteratorAggregate, Countable {
     public $lastException = null;
     public $insertId;
 
+    /**
+     * Whether the time all the queries take should be recorded.
+     *
+     * @var boolean
+     */
+    public $profileQueries;
+
     public $link;
 
     protected $_fetchMode;
@@ -47,10 +54,19 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 
     protected $_replacements;
 
+    /**
+     * The time in took in seconds with microseconds to perform the query.
+     * It is automatically filled only when $profileQueries is set to true.
+     * 
+     * @var float
+     */
+    public $queryTime;
+
     public function __construct(AMysql_Abstract $amysql) {
 	$amysql->lastStatement = $this;
 	$this->amysql = $amysql;
 	$this->link = $amysql->link;
+        $this->profileQueries = $amysql->profileQueries;
 	$this->throwExceptions = $this->amysql->throwExceptions;
 	$this->setFetchMode($amysql->getFetchMode());
     }
@@ -242,7 +258,16 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 		"Resource is not a mysql resource.\nQuery: $sql"
 	    );
 	}
-	$result = mysql_query($sql, $this->link);
+        if ($this->profileQueries) {
+            $startTime = microtime(true);
+            $result = mysql_query($sql, $this->link);
+            $duration = microtime(true) - $startTime;
+            $this->queryTime = $duration;
+        }
+        else {
+            $result = mysql_query($sql, $this->link);
+        }
+        $this->amysql->addQuery($sql, $this->queryTime);
 	$this->error = mysql_error($res);
 	$this->errno = mysql_errno($res);
 	$this->result = $result;
