@@ -26,6 +26,14 @@ EOT;
 	$this->_amysql = null;
     }
 
+    public function testDoubleExecute() {
+        $sql = "SELECT * FROM $this->tableName";
+        $stmt = $this->_amysql->prepare($sql);
+        $stmt->execute();
+	$this->setExpectedException('LogicException');
+        $stmt->execute();
+    }
+
     public function testNamedBinds1() {
 	$sql = ":foo: :bar:";
 	$binds = array (

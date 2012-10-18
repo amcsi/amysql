@@ -43,6 +43,8 @@ class AMysql_Statement implements IteratorAggregate, Countable {
     public $prepared = '';
     public $binds = array();
 
+    protected $_executed = false; // whether this statement has been executed yet.
+
     protected $_replacements;
 
     public function __construct(AMysql_Abstract $amysql) {
@@ -227,11 +229,17 @@ class AMysql_Statement implements IteratorAggregate, Countable {
     }
 
     protected function _query($sql) {
+        if ($this->_executed) {
+	    throw new LogicException(
+		"This statement has already been executed.\nQuery: $sql"
+	    );
+        }
+        $this->_executed = true;
 	$this->query = $sql; 
 	$res = $this->link;
 	if ('mysql link' != get_resource_type($res)) {
 	    throw new LogicException(
-		'Resource is not a mysql resource.', 0, $sql
+		"Resource is not a mysql resource.\nQuery: $sql"
 	    );
 	}
 	$result = mysql_query($sql, $this->link);
