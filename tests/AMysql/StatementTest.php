@@ -446,5 +446,35 @@ EOT;
         );
         $this->assertEquals($expected, $result);
     }
+
+    public function testNoProfiling() {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	    array (
+		'string' => 'blah',
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+        $this->assertNull($this->_amysql->lastStatement->queryTime);
+    }
+
+    public function testProfiling() {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	    array (
+		'string' => 'blah',
+	    )
+	);
+        $this->_amysql->profileQueries = true;
+        $this->_amysql->insert($this->tableName, $data);
+        $this->assertInternalType('float', 
+            $this->_amysql->lastStatement->queryTime
+        );
+        $this->assertGreaterThan(0.0, $this->_amysql->lastStatement->queryTime);
+    }
 }
 ?>

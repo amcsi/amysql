@@ -712,5 +712,9 @@ abstract class AMysql_Abstract {
     public function addQuery($query) {
         $this->_queries[] = $query;
     }
+
+    public function getQueries() {
+        return $this->_queries;
+    }
 }
 ?>

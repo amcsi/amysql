@@ -52,6 +52,14 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 
     protected $_replacements;
 
+    /**
+     * The time in took in seconds with microseconds to perform the query.
+     * It is automatically filled only when $profileQueries is set to true.
+     * 
+     * @var float
+     */
+    public $queryTime;
+
     public function __construct(AMysql_Abstract $amysql) {
 	$amysql->lastStatement = $this;
 	$this->amysql = $amysql;
@@ -247,6 +255,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
             $startTime = microtime(true);
             $result = mysql_query($sql, $this->link);
             $duration = microtime(true) - $startTime;
+            $this->queryTime = $duration;
             $this->amysql->totalTime += $duration;
         }
         else {
