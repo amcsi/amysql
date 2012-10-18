@@ -19,7 +19,8 @@
  *
  * Visit https://github.com/amcsi/amysql
  * @author Szerémi Attila
- * @version 0.9.2.5
+ * @license     MIT License; http://www.opensource.org/licenses/mit-license.php
+ * @version 0.9.2.6
  **/ 
 class AMysql_Statement implements IteratorAggregate, Countable {
     public $amysql;
