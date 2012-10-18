@@ -1,4 +1,4 @@
-<?php
+<?php /* vim: set tabstop=8 expandtab : */
 class StatementTest extends PHPUnit_Framework_TestCase {
 
     protected $_amysql;
@@ -256,6 +256,28 @@ EOT;
 	$this->assertEquals($expected, $results);
     }
 
+    public function testFetchAllDefault() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName");
+	$results = $stmt->fetchAll();
+	$expected = array (
+	    array (
+		'id' => '1',
+		'string' => '3'
+	    ),
+	    array (
+		'id' => '2',
+		'string' => 'blah'
+	    )
+	);
+	$this->assertEquals($expected, $results);
+    }
+
     public function testFetchAllAssocIdColumn() {
 	$data = array (
 	    'string' => array (
@@ -372,6 +394,57 @@ EOT;
 	$stmt = $this->_amysql->lastStatement;
 	$this->setExpectedException('LogicException');
 	count($stmt);
+    }
+
+    public function testFetchAllColumns() {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	    array (
+		'string' => 'blah',
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->lastStatement;
+        $sql = "SELECT * FROM $this->tableName";
+        $stmt = $this->_amysql->query($sql);
+        $result = $stmt->fetchAllColumns();
+
+        $expected = array (
+            'id' => array ('1', '2'),
+            'string' => array ('3', 'blah')
+        );
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testFetchAllColumnsEmpty() {
+        $sql = "SELECT * FROM $this->tableName";
+        $stmt = $this->_amysql->query($sql);
+        $result = $stmt->fetchAllColumns();
+        $this->assertEquals(array(), $result);
+    }
+
+    public function testFetchAllColumnsNamed() {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	    array (
+		'string' => 'blah',
+	    )
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->lastStatement;
+        $sql = "SELECT * FROM $this->tableName";
+        $stmt = $this->_amysql->query($sql);
+        $result = $stmt->fetchAllColumns(1);
+
+        $expected = array (
+            'id' => array ('3' => '1', 'blah' => '2'),
+            'string' => array ('3' => '3', 'blah' => 'blah')
+        );
+        $this->assertEquals($expected, $result);
     }
 }
 ?>

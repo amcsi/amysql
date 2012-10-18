@@ -1,4 +1,4 @@
-<?php
+<?php /* vim: set tabstop=8 expandtab : */
 /**
  * The statement class belonging to the AMysql_Abstract class, where mysql
  * queries are built and handled.
@@ -17,8 +17,9 @@
  *     echo $e->getDetails();
  * }  
  *
+ * Visit https://github.com/amcsi/amysql
  * @author Szerémi Attila
- * @version 0.9.2.3
+ * @version 0.9.2.5
  **/ 
 class AMysql_Statement implements IteratorAggregate, Countable {
     public $amysql;
@@ -158,13 +159,19 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 		};
 		$sql .= array_shift($parts);
 	    }
-	    else if (count($parts)-1 < count($binds)) {
-		throw new RuntimeException('More binds than question marks!');
-	    }
-	    else {
-		throw new RuntimeException('Fewer binds than question marks!');
-	    }
-	}
+            else if (count($parts)-1 < count($binds)) {
+                $msg = "More binds than question marks!\n";
+                $msg .= "Prepared query: `$prepared`\n";
+                $msg .= sprintf("Binds: %s\n", print_r($binds, true));
+                throw new RuntimeException($msg);
+            }
+            else {
+                $msg = "Fewer binds than question marks!\n";
+                $msg .= "Prepared query: `$prepared`\n";
+                $msg .= sprintf("Binds: %s\n", print_r($binds, true));
+                throw new RuntimeException($msg);
+            }
+        }
 	else {
 	    $keysQuoted = array ();
 	    $replacements = array ();
@@ -303,6 +310,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @return array
      **/         
     public function fetchAll() {
+	$result = $this->result;
 	$ret = array ();
 	if (AMysql_Abstract::FETCH_ASSOC == $this->_fetchMode) {
 	    $methodName = 'fetchAssoc';
@@ -398,7 +406,8 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	    return false;
 	}
 	mysql_data_seek($result, 0);
-	if (false === $keyColumn) {
+        $keyColumnGiven = is_string($keyColumn) || is_int($keyColumn);
+	if (!$keyColumnGiven) {
 	    while (false !== ($row = $this->fetchAssoc())) {
 		$ret[] = $row;
 	    }
@@ -539,10 +548,62 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      */
     public function fetchAllColumn($column = 0) {
 	$ret = array ();
+	$numRows = $this->numRows();
+        if (!$numRows) {
+            return $ret;
+        }
+        mysql_data_seek($this->result, 0);
 	while ($row = $this->fetchArray()) {
 	    $ret[] = $row[$column];
 	}
 	return $ret;
+    }
+
+    /**
+     * Fetches all rows and returns them as an array of columns containing an array
+     * of values.
+     * Works simalarly to fetchAllAssoc(), but with the resulting array transposed.
+     *
+     * Note: no phpunit tests have been written for this method yet.
+     *
+     * @todo phpunit tests
+     *
+     * @access public
+     * @return void
+     */
+    public function fetchAllColumns($keyColumn = false) {
+        $ret = array ();
+        $numRows = $this->numRows();
+        $keyColumnGiven = is_string($keyColumn) || is_int($keyColumn);
+        if (!$numRows) {
+        }
+        /**
+         * If $keyColumn isn't given, let's build the returning array here to
+         * dodge unnecessary overhead.
+         **/
+        else if (!$keyColumnGiven) {
+            mysql_data_seek($this->result, 0);
+            $firstRow = $this->fetchAssoc();
+            foreach ($firstRow as $colName => $val) {
+                $ret[$colName] = array ($val);
+            }
+            while ($row = $this->fetchAssoc()) {
+                foreach ($row as $colName => $val) {
+                    $ret[$colName][] = $val;
+                }
+            }
+            return $ret;
+        }
+        /**
+         * Otherwise if $keyColumn is given, we have no other choice but to use
+         * $this->fetchAllAssoc($keyColumn) and transpose it.
+         **/
+        else {
+            $ret = AMysql_Abstract::transpose(
+                $this->fetchAllAssoc($keyColumn)
+            );
+        }
+        return $ret;
     }
 
     /**
@@ -809,75 +870,13 @@ class AMysql_Statement implements IteratorAggregate, Countable {
     }
 
     /**
-     * Prepares a mysql UPDATE unexecuted. By execution, have the placeholders
-     * of the WHERE statement binded.
-     * It is rather recommended to use AMysql_Abstract::update() instead, which
-     * lets you also bind the values in one call and it returns the success
-     * of the query.
+     * Builds a columns list with values as a string
      *
-     * @param string $tableName 	The table name.
-     * @param array $data 		The array of data changes. A
-     *					    one-dimensional array
-     * 					with keys as column names and values
-     *					    as their values.
-     * @param string $where		An SQL substring of the WHERE clause.
-     *
-     * @return $this
-     * @throws AMysql_Exception                
-     **/               
-    public function update($tableName, array $data, $where) {
-	if (!$data) {
-	    return false;
-	}
-	$sets = array ();
-	foreach ($data as $columnName => $value) {
-	    $columnName = $this->escapeIdentifierSimple($columnName);
-	    $sets[] = "$columnName = " . $this->amysql->escape($value);
-	}
-	$setsString = join(', ', $sets);
-
-	/**
-	 * Ezt beforeSql-el kell megoldani, különben az értékekben lévő
-	 * kérdőjelek bezavarnak.         
-	 **/		         
-	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
-	$beforeSql = "UPDATE $tableSafe SET $setsString WHERE ";
-	$this->prepare($where);
-	$this->beforeSql = $beforeSql;
-
-	return $this;
-    }
-
-    /**
-     * Prepares a mysql INSERT unexecuted. After this, you should just
-     * call $this->execute().
-     * It is rather recommended to use AMysql_Abstract::insert() instead, which
-     * returns the last inserted id already.
-     *
-     * @param string $tableName 	The table name.
-     * @param array $data		A one or two-dimensional array.
-     * 					1D:
-     * 					an associative array of keys as column names and values
-     * 					as their values. This inserts one row.
-     * 					2D numeric:
-     * 					A numeric array where each value is an associative array
-     * 					with column-value pairs. Each outer, numeric value represents
-     * 					a row of data.
-     * 					2D associative:
-     * 					An associative array where the keys are the columns, the
-     * 					values are numerical arrays, where each value represents the
-     * 					value for the new row of that key.
-     *
-     * @return $this
-     * @throws AMysql_Exception                              
-     **/     
-    public function insert($tableName, array $data) {
-	$cols = array ();
-	$vals = array();
-	$i = 0;
-	if (!$data) {
-	    return false;
-	}
+     * @param array $data @see $this->insertReplace()
+     * @return string
+     */
+    public function buildColumnsValues(array $data) {
+        $i = 0;
 	if (empty($data[0])) {
 	    foreach ($data as $columnName => $values) {
 		$cols[] = $this->escapeIdentifierSimple($columnName);
@@ -916,10 +915,106 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	    $rowValueStrings[] = join(', ', $rowValues);
 	}
 	$valuesString = join('), (', $rowValueStrings);
+        $columnsValuesString = "($columnsString) VALUES ($valuesString)";
+        return $columnsValuesString;
+    }
+
+    /**
+     * Puts together a string that is to be placed after a SET statement.
+     * i.e. column1 = 'value', int_col = 3
+     *
+     * @param array $data Keys are column names, values are the values unescaped
+     * @return string
+     */
+    public function buildSet(array $data) {
+	$sets = array ();
+	foreach ($data as $columnName => $value) {
+	    $columnName = $this->escapeIdentifierSimple($columnName);
+	    $sets[] = "$columnName = " . $this->amysql->escape($value);
+	}
+	$setsString = join(', ', $sets);
+        return $setsString;
+    }
+
+    /**
+     * Prepares a mysql UPDATE unexecuted. By execution, have the placeholders
+     * of the WHERE statement binded.
+     * It is rather recommended to use AMysql_Abstract::update() instead, which
+     * lets you also bind the values in one call and it returns the success
+     * of the query.
+     *
+     * @param string $tableName 	The table name.
+     * @param array $data 		The array of data changes. A
+     *					    one-dimensional array
+     * 					with keys as column names and values
+     *					    as their values.
+     * @param string $where		An SQL substring of the WHERE clause.
+     *
+     * @return $this
+     * @throws AMysql_Exception                
+     **/               
+    public function update($tableName, array $data, $where) {
+	if (!$data) {
+	    return false;
+	}
+        $setsString = $this->buildSet($data);
+
+	/**
+	 * Ezt beforeSql-el kell megoldani, különben az értékekben lévő
+	 * kérdőjelek bezavarnak.         
+	 **/		         
 	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
-	$sql = "INSERT INTO $tableSafe ($columnsString) VALUES ($valuesString)";
+	$beforeSql = "UPDATE $tableSafe SET $setsString WHERE ";
+	$this->prepare($where);
+	$this->beforeSql = $beforeSql;
+
+	return $this;
+    }
+
+    /**
+     * Prepares a mysql INSERT or REPLACE unexecuted. After this, you should just
+     * call $this->execute().
+     * It is rather recommended to use AMysql_Abstract::insert() instead, which
+     * returns the last inserted id already.
+     *
+     * @param string $type              "$type INTO..." (INSERT, INSERT IGNORE, REPLACE)
+     *                                  etc.
+     * @param string $tableName 	The table name.
+     * @param array $data		A one or two-dimensional array.
+     * 					1D:
+     * 					an associative array of keys as column names and values
+     * 					as their values. This inserts one row.
+     * 					2D numeric:
+     * 					A numeric array where each value is an associative array
+     * 					with column-value pairs. Each outer, numeric value represents
+     * 					a row of data.
+     * 					2D associative:
+     * 					An associative array where the keys are the columns, the
+     * 					values are numerical arrays, where each value represents the
+     * 					value for the new row of that key.
+     *
+     * @return $this
+     * @throws AMysql_Exception                              
+     **/     
+    public function insertReplace($type, $tableName, array $data) {
+	$cols = array ();
+	$vals = array();
+	if (!$data) {
+	    return false;
+	}
+	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
+        $columnsValues = $this->buildColumnsValues($data);
+	$sql = "$type INTO $tableSafe $columnsValues";
 	$this->prepare($sql);
 	return $this;
+    }
+
+    public function insert($tableName, array $data) {
+        return $this->insertReplace('INSERT', $tableName, $data);
+    }
+
+    public function replace($tableName, array $data) {
+        return $this->insertReplace('REPLACE', $tableName, $data);
     }
 
     /**

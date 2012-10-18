@@ -1,4 +1,4 @@
-<?php
+<?php /* vim: set tabstop=8 expandtab : */
 class IteratorTest extends PHPUnit_Framework_TestCase {
 
     protected $_conn;

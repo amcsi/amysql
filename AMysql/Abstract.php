@@ -1,8 +1,10 @@
-<?php
+<?php /* vim: set tabstop=8 expandtab : */
 /**
  * Mysql abstraction which only uses mysql_* functions
+ *
+ * Visit https://github.com/amcsi/amysql
  * @author Szerémi Attila
- * @version 0.9.2.3
+ * @version 0.9.2.5
  *
  * For information on binding placeholders, @see AMysql_Statement::execute()
  *
@@ -494,6 +496,20 @@ abstract class AMysql_Abstract {
     }
 
     /**
+     * Performs an instant REPLACE.
+     *
+     * @see $this->insert()
+     *
+     * @return boolean Success.
+     **/
+    public function replace($tableName, array $data) {
+        $stmt = new AMysql_Statement($this);
+        $stmt->replace($tableName, $data);
+        $success = $stmt->execute();
+        return $success;
+    }
+
+    /**
      * Performs an INSERT or an UPDATE; if the $value
      * parameter is not falsy, an UPDATE is performed with the given column name
      * and value, otherwise an insert. It is recommended that this is used for
@@ -627,6 +643,58 @@ abstract class AMysql_Abstract {
 	// In the case of a string or anything else, let's escape it and
 	// put it between apostrophes.
 	return "'" . mysql_real_escape_string($value, $res) . "'";
+    }
+
+    /**
+     * Transposes a 2 dimensional array.
+     * Every inner array must contain the same keys as the other inner arrays,
+     * otherwise unexpected results may occur.
+     *
+     * Example:
+     *   $input = array (
+     *       3 => array (
+     *           'col1' => 'bla',
+     *           'col2' => 'yo'
+     *       ),
+     *       9 => array (
+     *           'col1' => 'ney',
+     *           'col2' => 'lol'
+     *       )
+     *   );
+     *   $output = $amysql->transpose($input);
+     *
+     *   $output: array (
+     *       'col1' => array (
+     *           3 => 'bla',
+     *           9 => 'ney'
+     *       ),
+     *       'col2' => array (
+     *           3 => 'yo',
+     *           9 => 'lol'
+     *       )
+     *   );
+     *
+     * @param array $array The 2 dimensional array to transpose
+     * @return array
+     */
+    public static function transpose(array $array) {
+        $ret = array ();
+        if (!$array) {
+            return $ret;
+        }
+        foreach ($array as $key1 => $arraySub) {
+            if (!$ret) {
+                foreach ($arraySub as $key2 => $value) {
+                    $ret[$key2] = array ($key1 => $value);
+                }
+            }
+            else {
+                foreach ($arraySub as $key2 => $value) {
+                    $ret[$key2][$key1] = $value;
+                }
+            }
+        }
+        return $ret;
     }
 }
 ?>

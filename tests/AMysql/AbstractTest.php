@@ -1,4 +1,4 @@
-<?php // vim: set tabstop=8 softtabstop=4 expandtab :
+<?php /* vim: set tabstop=8 expandtab : */
 class AbstractTest extends PHPUnit_Framework_TestCase {
 
     protected $_conn;
@@ -344,6 +344,72 @@ EOT;
 	);
 	$this->assertTrue($success);
 	$this->assertEquals($expected, $results);
+    }
+
+    public function testTranspose() {
+        $input = array (
+            3 => array (
+                'col1' => 'bla',
+                'col2' => 'yo'
+            ),
+            9 => array (
+                'col1' => 'ney',
+                'col2' => 'lol'
+            )
+        );
+
+        $expected = array (
+            'col1' => array (
+                3 => 'bla',
+                9 => 'ney'
+            ),
+            'col2' => array (
+                3 => 'yo',
+                9 => 'lol'
+            )
+        );
+
+        $result = AMysql_Abstract::transpose($input);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testReplace() {
+	$data = array (
+	    'string' => array (
+		3, 'blah'
+	    )
+	);
+        $this->_amysql->insert($this->tableName, $data);
+        $data = array (
+            array (
+                'id' => 2,
+                'string' => 'replaced1'
+            ),
+            array (
+                'id' => 4,
+                'string' => 'replaced2'
+            ),
+        );
+        $this->_amysql->replace($this->tableName, $data);
+
+        $result = $this->_amysql->query("SELECT * FROM $this->tableName")
+            ->fetchAllAssoc();
+
+        $expected = array (
+            array (
+                'id' => '1',
+                'string' => '3'
+            ),
+            array (
+                'id' => '2',
+                'string' => 'replaced1'
+            ),
+            array (
+                'id' => '4',
+                'string' => 'replaced2'
+            )
+        );
+        $this->assertEquals($expected, $result);
     }
 
     /**
