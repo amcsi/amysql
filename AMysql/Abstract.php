@@ -112,6 +112,11 @@ abstract class AMysql_Abstract {
      * @return $this
      */
     public function setCharset($charset) {
+	if (!function_exists('mysql_set_charset')) {
+	    function mysql_set_charset($charset, $link = null) {
+		return mysql_query("SET CHARACTER SET '$charset'", $link);
+	    }
+	}
 	$result = mysql_set_charset($charset, $this->link);
 	if (!$result) {
 	    if ($this->throwExceptions) {
