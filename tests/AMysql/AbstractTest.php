@@ -220,6 +220,9 @@ EOT;
 	    )
 	);
 	$this->_amysql->updateMultipleByKey($this->tableName, $data, 'id');
+
+	$this->assertEquals(2, $this->_amysql->multipleAffectedRows);
+
 	$results = $this->_amysql->query("SELECT * FROM $this->tableName")
 	    ->fetchAllAssoc();
 	$expected = array (
@@ -233,6 +236,9 @@ EOT;
 	    )
 	);
 	$this->assertEquals($expected, $results);
+
+	$this->_amysql->updateMultipleByKey($this->tableName, $data, 'id');
+	$this->assertEquals(0, $this->_amysql->multipleAffectedRows);
     }
 
     public function testUpdateMultipleByKeySameColumn() {
@@ -338,6 +344,13 @@ EOT;
 	);
 	$this->assertTrue($success);
 	$this->assertEquals($expected, $results);
+
+	$this->assertEquals(2, $this->_amysql->multipleAffectedRows);
+        $data[1]['string'] = 'bar2';
+	$success =
+	    $this->_amysql->updateMultipleByData($this->tableName, $data, 'id',
+	    true);
+	$this->assertEquals(1, $this->_amysql->multipleAffectedRows);
     }
 
     public function testTranspose() {

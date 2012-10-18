@@ -4,7 +4,8 @@
  *
  * Visit https://github.com/amcsi/amysql
  * @author Szerémi Attila
- * @version 0.9.2.5
+ * @license     MIT License; http://www.opensource.org/licenses/mit-license.php
+ * @version 0.9.2.6
  *
  * For information on binding placeholders, @see AMysql_Statement::execute()
  *
@@ -30,6 +31,13 @@ abstract class AMysql_Abstract {
     public $result; // last mysql result
     public $query; // last used query string
     public $affectedRows; // last affected rows count
+    /**
+     * Contains the number of total affected rows by the last multiple statement deploying
+     * method, such as updateMultipleByData and updateMultipleByKey
+     * 
+     * @var int
+     */
+    public $multipleAffectedRows;
     public $throwExceptions = true; // whether to throw exceptions
     public $totalTime = 0.0;
 
@@ -125,6 +133,11 @@ abstract class AMysql_Abstract {
      * @return $this
      */
     public function setCharset($charset) {
+	if (!function_exists('mysql_set_charset')) {
+	    function mysql_set_charset($charset, $link = null) {
+		return mysql_query("SET CHARACTER SET '$charset'", $link);
+	    }
+	}
 	$result = mysql_set_charset($charset, $this->link);
 	if (!$result) {
 	    if ($this->throwExceptions) {
@@ -380,6 +393,8 @@ abstract class AMysql_Abstract {
 
     /**
      * Updates multiple rows.
+     * The number of total affected rows can be found in
+     * $this->multipleAffectedRows.
      *
      * @param string $tableName 	The table name.
      * @param array $data 		The array of data changes. A
@@ -399,21 +414,26 @@ abstract class AMysql_Abstract {
     ) {
 	$successesNeeded = count($data);
 	$where = self::escapeIdentifier($column) . " = ?";
+	$affectedRows = 0;
 	foreach ($data as $row) {
 	    $by = $row[$column];
 	    unset($row[$column]);
 	    $stmt = new AMysql_Statement($this);
 	    $stmt->update($tableName, $row, $where)->execute(array ($by));
+	    $affectedRows += $stmt->affectedRows;
 	    if ($stmt->result) {
 		$successesNeeded--;
 	    }
 	}
+	$this->multipleAffectedRows = $affectedRows;
 	return 0 === $successesNeeded;
     }
 
     /**
      * Updates multiple rows. The values for the column to search for is the
      * key of each row.
+     * The number of total affected rows can be found in
+     * $this->multipleAffectedRows.
      *
      * @param string $tableName 	The table name.
      * @param array $data 		The array of data changes. A
@@ -439,16 +459,19 @@ abstract class AMysql_Abstract {
     ) {
 	$successesNeeded = count($data);
 	$where = self::escapeIdentifier($column) . " = ?";
+	$affectedRows = 0;
 	foreach ($data as $by => $row) {
 	    if (!$updateSameColumn) {
 		unset($row[$column]);
 	    }
 	    $stmt = new AMysql_Statement($this);
 	    $stmt->update($tableName, $row, $where)->execute(array ($by));
+	    $affectedRows += $stmt->affectedRows;
 	    if ($stmt->result) {
 		$successesNeeded--;
 	    }
 	}
+	$this->multipleAffectedRows = $affectedRows;
 	return 0 === $successesNeeded;
     }
 
