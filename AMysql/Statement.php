@@ -127,7 +127,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      */
     public function execute($binds = array ()) {
 	if (1 <= func_num_args()) {
-	    $this->binds = (array) $binds;
+	    $this->binds = is_array($binds) ? $binds : array ($binds);
 	}
 	$sql = $this->getSql();
 	$result = $this->_query($sql);
@@ -166,7 +166,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
     public function quoteInto($prepared, $binds) {
 	$sql = $prepared;
 	if (!is_array($binds)) {
-	    $binds = (array) $binds;
+	    $binds = is_array($binds) ? $binds : array ($binds);
 	}
 	if (array_key_exists(0, $binds)) {
 	    $parts = explode('?', $sql);
