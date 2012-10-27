@@ -286,7 +286,7 @@ abstract class AMysql_Abstract {
      **/
     public function query($sql, $binds = array ()) {
         $stmt = new AMysql_Statement($this);
-        $result = $stmt->query($sql, is_array($binds) ? $binds : array ($binds));
+        $result = $stmt->query($sql, $binds);
         return $stmt;
     }
 
@@ -303,7 +303,7 @@ abstract class AMysql_Abstract {
      **/
     public function getOne($sql, $binds = array ()) {
         $stmt = new AMysql_Statement($this);
-        $stmt->query($sql, is_array($binds) ? $binds : array ($binds));
+        $stmt->query($sql, $binds);
         return $stmt->result(0, 0);
     }
 
@@ -320,7 +320,7 @@ abstract class AMysql_Abstract {
      **/
     public function getOneNull($sql, $binds = array ()) {
         $stmt = new AMysql_Statement($this);
-        $stmt->query($sql, is_array($binds) ? $binds : array ($binds));
+        $stmt->query($sql, $binds);
         return $stmt->resultNull(0, 0);
     }
 
@@ -337,7 +337,7 @@ abstract class AMysql_Abstract {
      **/
     public function getOneInt($sql, $binds = array ()) {
         $stmt = new AMysql_Statement($this);
-        $stmt->query($sql, is_array($binds) ? $binds : array ($binds));
+        $stmt->query($sql, $binds);
         return $stmt->resultInt(0, 0);
     }
 
