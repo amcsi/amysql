@@ -90,6 +90,9 @@ class AMysql_Expr {
 	    case self::EXPR_COLUMN_IN:
 		$prepared = '';
 		if ($args[2]) {
+                    foreach ($args[2] as &$val) {
+                        $val = $this->amysql->escape($val);
+                    }
 		    $prepared = AMysql::escapeIdentifier($args[1]) . ' IN 
 			(' . join(', ', $args[2]) . ') ';
 		}
