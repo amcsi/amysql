@@ -168,6 +168,9 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	if (!is_array($binds)) {
 	    $binds = is_array($binds) ? $binds : array ($binds);
 	}
+        if (!$binds) {
+            return $sql;
+        }
 	if (array_key_exists(0, $binds)) {
 	    $parts = explode('?', $sql);
 	    $sql = '';
