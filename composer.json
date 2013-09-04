@@ -1,0 +1,28 @@
+{
+    "name": "amcsi/amysql",
+    "description": "Database abstraction library",
+    "keywords": ["database", "mysql"],
+    "homepage": "https://github.com/amcsi/amysql",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Attila Szeremi",
+            "email": "amcsi@mailbox.hu",
+            "homepage": "http://stackoverflow.com/users/1381550/szeremi-attila",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "amcsi@mailbox.hu",
+        "issues": "https://github.com/amcsi/amysql/issues",
+        "source": "https://github.com/amcsi/amysql"
+    },
+    "require": {
+        "php": ">=5.2.4"
+    },
+    "autoload": {
+        "psr-0": {
+            "AMysql\\": ""
+        }
+    }
+}
