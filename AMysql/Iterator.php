@@ -3,9 +3,8 @@
  * AMysql_Statement's iterator class.
  *
  * Visit https://github.com/amcsi/amysql
- * @author Szerémi Attila
+ * @author      Szerémi Attila
  * @license     MIT License; http://www.opensource.org/licenses/mit-license.php
- * @version 0.9.3
  **/
 class AMysql_Iterator implements SeekableIterator
 {

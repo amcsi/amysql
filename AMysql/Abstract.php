@@ -9,9 +9,8 @@
  * @todo AMysql_Select
  *
  * Visit https://github.com/amcsi/amysql
- * @author Szerémi Attila
+ * @author      Szerémi Attila
  * @license     MIT License; http://www.opensource.org/licenses/mit-license.php
- * @version 0.9.3
  **/
 
 $dir = dirname(realpath(__FILE__));
