@@ -90,7 +90,7 @@ abstract class AMysql_Abstract {
         $resOrHost = null, $username = null,
         $password = null, $newLink = null, $clientFlags = 0) 
     {
-        static $mysqliAvailable = null;
+        static $useMysqli = null;
 
         if (
             is_resource($resOrHost) &&
@@ -104,11 +104,12 @@ abstract class AMysql_Abstract {
             $this->linkType = 'mysqli';
         }
         else if(is_null($resOrHost) || is_string($resOrHost)) {
-            if (!isset($mysqliAvailable)) {
-                $mysqliAvailable = class_exists('Mysqli', false);
+            if (!isset($useMysqli)) {
+                // use mysqli if available and PHP is at least of version 5.3.0 (required)
+                $useMysqli = class_exists('Mysqli', false) && function_exists('mysqli_stmt_get_result');
             }
             $args = func_get_args();
-            $linkType = $mysqliAvailable ? 'mysqli' : 'mysql';
+            $linkType = $useMysqli ? 'mysqli' : 'mysql';
             $funcName = "{$linkType}_connect";
             $this->linkType = $linkType;
             $res = call_user_func_array($funcName, $args);
