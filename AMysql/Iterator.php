@@ -16,13 +16,14 @@ class AMysql_Iterator implements SeekableIterator
     protected $_resultIndex = 0;
 
     public function __construct(AMysql_Statement $stmt) {
-	if (!is_resource($stmt->result)) {
-	    throw new LogicException("Statement is not a SELECT statement. ".
-		"Unable to iterate. Query: " . $stmt->query);
-	}
-	$count = $stmt->numRows();
-	$this->_stmt = $stmt;
-	$this->_count = $count;
+        $isValidSelectResult = $stmt->result instanceof Mysqli_Result || is_resource($stmt->result);
+        if (!$isValidSelectResult) {
+            throw new LogicException("Statement is not a SELECT statement. ".
+                "Unable to iterate. Query: " . $stmt->query);
+        }
+        $count = $stmt->numRows();
+        $this->_stmt = $stmt;
+        $this->_count = $count;
     }
 
     public function current() {
@@ -57,8 +58,9 @@ class AMysql_Iterator implements SeekableIterator
     }
 
     public function seek($index) {
+        $isMysqli = 'mysqli' == $this->_stmt->linkType;
 	if (0 <= $index && $index < $this->_count) {
-	    mysql_data_seek($this->_stmt->result, $index);
+            $isMysqli ? $this->_stmt->result->data_seek($index) : mysql_data_seek($this->_stmt->result, $index);
 	    $this->_resultIndex = $index;
 	    $this->_currentIndex = $index;
 	}

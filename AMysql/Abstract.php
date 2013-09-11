@@ -24,6 +24,7 @@ abstract class AMysql_Abstract {
     public $insertId; // last insert id
     public $lastStatement; // last AMysql_Statement
     public $link = null; // mysql link
+    public $linkType; // mysql or mysqli
     public $error; // last error message
     public $errno; // last error number
     public $result; // last mysql result
@@ -85,24 +86,46 @@ abstract class AMysql_Abstract {
      *					    pass to mysql_connect.
      *
      **/
-    public function __construct($resOrHost = null, $username = null,
-	$password = null, $newLink = null, $clientFlags = 0) {
-	if (is_resource($resOrHost)
-	    &&
-	'mysql link' == get_resource_type($resOrHost)) {
+    public function __construct(
+        $resOrHost = null, $username = null,
+        $password = null, $newLink = null, $clientFlags = 0) 
+    {
+        static $mysqliAvailable = null;
+
+        if (
+            is_resource($resOrHost) &&
+            'mysql link' == get_resource_type($resOrHost)) 
+        {
             $this->link = $resOrHost;
+            $this->linkType = 'mysql';
         }
-	else if(is_null($resOrHost) || is_string($resOrHost)) {
-	    $args = func_get_args();
-	    $res = call_user_func_array('mysql_connect', $args);
-	    if ($res) {
-		$this->link = $res;
-	    }
-	    else {
-		throw new AMysql_Exception(mysql_error(), mysql_errno(),
-		    '(connection to mysql)');
-	    }
-	}
+        else if ($resOrHost instanceof Mysqli) {
+            $this->link = $resOrHost;
+            $this->linkType = 'mysqli';
+        }
+        else if(is_null($resOrHost) || is_string($resOrHost)) {
+            if (!isset($mysqliAvailable)) {
+                $mysqliAvailable = class_exists('Mysqli', false);
+            }
+            $args = func_get_args();
+            $linkType = $mysqliAvailable ? 'mysqli' : 'mysql';
+            $funcName = "{$linkType}_connect";
+            $this->linkType = $linkType;
+            $res = call_user_func_array($funcName, $args);
+            if ($res) {
+                $this->link = $res;
+            }
+            else {
+                if ('mysqli' == $linkType) {
+                    throw new AMysql_Exception(mysqli_connect_error(), mysqli_connect_errno(),
+                        '(connection to mysql)');
+                }
+                else {
+                    throw new AMysql_Exception(mysql_error(), mysql_errno(),
+                        '(connection to mysql)');
+                }
+            }
+        }
         else {
             throw new RuntimeException('Resource given is not a mysql resource.', 0);
         }
@@ -119,14 +142,16 @@ abstract class AMysql_Abstract {
      * @return $this
      */
     public function selectDb($db) {
-	$result = mysql_select_db($db, $this->link);
+        $isMysqli = 'mysqli' == $this->linkType;
+	$result = $isMysqli ? $this->link->select_db($db) : mysql_select_db($db, $this->link);
 	if (!$result) {
+            $error = $isMysqli ? $this->link->error : mysql_error($this->link);
+            $errno = $isMysqli ? $this->link->errno : mysql_errno($this->link);
 	    if ($this->throwExceptions) {
-		throw new AMysql_Exception(mysql_error($this->link),
-		    mysql_errno($this->link), 'USE ' . $db);
+                throw new AMysql_Exception($error, $errno, 'USE ' . $db);
 	    }
 	    else {
-		trigger_error(mysql_error($this->link), E_USER_WARNING);
+                trigger_error($error, E_USER_WARNING);
 	    }
 	}
 	return $this;
@@ -139,19 +164,26 @@ abstract class AMysql_Abstract {
      * @return $this
      */
     public function setCharset($charset) {
-	if (!function_exists('mysql_set_charset')) {
-	    function mysql_set_charset($charset, $link = null) {
-		return mysql_query("SET CHARACTER SET '$charset'", $link);
-	    }
-	}
-	$result = mysql_set_charset($charset, $this->link);
+        $isMysqli = 'mysqli' == $this->linkType;
+        if ($isMysqli) {
+            $result = $this->link->set_charset($charset);
+        }
+        else {
+            if (!function_exists('mysql_set_charset')) {
+                function mysql_set_charset($charset, $link = null) {
+                    return mysql_query("SET CHARACTER SET '$charset'", $link);
+                }
+            }
+            $result = mysql_set_charset($charset, $this->link);
+        }
 	if (!$result) {
+            $error = $isMysqli ? $this->link->error : mysql_error($this->link);
+            $errno = $isMysqli ? $this->link->errno : mysql_errno($this->link);
 	    if ($this->throwExceptions) {
-		throw new AMysql_Exception(mysql_error($this->link),
-		    mysql_errno($this->link), "(setting charset)");
+		throw new AMysql_Exception($error, $errno, "(setting charset)");
 	    }
 	    else {
-		trigger_error(mysql_error($this->link), E_USER_WARNING);
+		trigger_error($error, E_USER_WARNING);
 	    }
 	}
 	return $this;
@@ -165,17 +197,8 @@ abstract class AMysql_Abstract {
      * @return $this
      */
     public function setNames($names) {
-	$result = mysql_query("SET NAMES $names", $this->link);
-	if (!$result) {
-	    if ($this->throwExceptions) {
-		throw new AMysql_Exception(mysql_error($this->link),
-		    mysql_errno($this->link), "(setting names)");
-	    }
-	    else {
-		trigger_error(mysql_error($this->link), E_USER_WARNING);
-	    }
-	}
-	return $this;
+        $stmt = $this->query("SET NAMES $names");
+        return $this;
     }
 
     /**
@@ -639,9 +662,11 @@ abstract class AMysql_Abstract {
      **/
     public function escape($value) {
         $res = $this->link;
-        if ('mysql link' != get_resource_type($res)) {
+        $isValidLink = $res instanceof Mysqli || 'mysql link' == get_resource_type($res);
+        if (!$isValidLink) {
             throw new RuntimeException('Resource is not a mysql resource.', 0, $sql);
         }
+        $isMysqli = 'mysqli' == $this->linkType;
         // If it's an int, place it there literally
         if (is_int($value)) {
             return $value;
@@ -660,7 +685,10 @@ abstract class AMysql_Abstract {
         }
 	// In the case of a string or anything else, let's escape it and
 	// put it between apostrophes.
-	return "'" . mysql_real_escape_string($value, $res) . "'";
+        return "'" .
+            ($isMysqli ? $this->link->real_escape_string($value) : mysql_real_escape_string($value, $res)) .
+            "'"
+        ;
     }
 
     /**

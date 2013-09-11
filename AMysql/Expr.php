@@ -107,7 +107,17 @@ class AMysql_Expr {
 		}
 		$likeEscaped = AMysql::escapeLike($args[1]);
 		$formatted = sprintf($format, $likeEscaped);
-		$escaped = mysql_real_escape_string($formatted);
+                if ($this->amysql) {
+                    if ('mysqli' == $this->amysql->linkType) {
+                        $escaped = $this->amysql->link->real_escape_string($formatted);
+                    }
+                    else {
+                        $escaped = mysql_real_escape_string($formatted, $this->amysql->link);
+                    }
+                }
+                else {
+                    $escaped = mysql_real_escape_string($formatted);
+                }
 		$prepared = "'$escaped'";
 		$prepared .= " ESCAPE '='";
 		break;

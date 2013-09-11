@@ -29,6 +29,24 @@ EOT;
     public function createTable() {
     }
 
+    public function testInsertSingleRow() {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName");
+	$results = $stmt->fetchAllAssoc();
+	$expected = array (
+	    array (
+		'id' => '1',
+		'string' => '3'
+	    ),
+	);
+	$this->assertEquals($expected, $results);
+    }
+
     /**
      * Inserting to the database with indices as the outer array and
      * columns as the inner.
