@@ -1,4 +1,4 @@
-<?php
+<?php /* vim: set tabstop=8 expandtab : */
 /**
  * Class for making custom expressions for AMysql value binding.
  * This is what you should use to be able to add specific kinds
@@ -6,9 +6,10 @@
  * statements, such as being able to call mysql functions to
  * set values.
  *
+ * Visit https://github.com/amcsi/amysql
  * @author Szerémi Attila
  * @created 2011.06.10. 13:26:56  
- * @version 0.9
+ * @license     MIT License; http://www.opensource.org/licenses/mit-license.php
  **/ 
 class AMysql_Expr {
 
@@ -88,6 +89,9 @@ class AMysql_Expr {
 	    case self::EXPR_COLUMN_IN:
 		$prepared = '';
 		if ($args[2]) {
+                    foreach ($args[2] as &$val) {
+                        $val = $this->amysql->escape($val);
+                    }
 		    $prepared = AMysql::escapeIdentifier($args[1]) . ' IN 
 			(' . join(', ', $args[2]) . ') ';
 		}
@@ -103,7 +107,17 @@ class AMysql_Expr {
 		}
 		$likeEscaped = AMysql::escapeLike($args[1]);
 		$formatted = sprintf($format, $likeEscaped);
-		$escaped = mysql_real_escape_string($formatted);
+                if ($this->amysql) {
+                    if ('mysqli' == $this->amysql->linkType) {
+                        $escaped = $this->amysql->link->real_escape_string($formatted);
+                    }
+                    else {
+                        $escaped = mysql_real_escape_string($formatted, $this->amysql->link);
+                    }
+                }
+                else {
+                    $escaped = mysql_real_escape_string($formatted);
+                }
 		$prepared = "'$escaped'";
 		$prepared .= " ESCAPE '='";
 		break;

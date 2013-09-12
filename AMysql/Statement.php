@@ -1,10 +1,12 @@
-<?php
+<?php /* vim: set tabstop=8 expandtab : */
 /**
- * Az AMysql class-hoz tartozó Statement osztály, amelyben egy mysql
- * tranzakciót foglal magában. 
- * Nagyon egyszerű használat:
+ * The statement class belonging to the AMysql_Abstract class, where mysql
+ * queries are built and handled.
+ * Most methods here are chainable, and many common AMysql_Abstract methods
+ * return a new instance of this class.
+ * A simple use example:
  * 
- * $amysql = new AMysql($this->_engine->db->conn);
+ * $amysql = new AMysql($conn);
  * try { 
  *     $stmt = $amysql->query('SELECT * FROM cms_content');
  *     while ($row = $stmt->fetchAssoc()) {
@@ -12,20 +14,14 @@
  *     }
  * }
  * catch (AMysql_Exception $e) {
- *     echo
- *          "Mysql Hiba!\n" .
- *          "Hibakód: $e->code\n" .
- *          "Üzenet: $e->message\n" .
- *          "SQL query string: $e->query"   
- *      );
+ *     echo $e->getDetails();
  * }  
  *
- * TODO: a query() $this-t adjon vissza.
- *    
- * @author Szerémi Attila
- * @version 0.9
+ * Visit https://github.com/amcsi/amysql
+ * @author      Szerémi Attila
+ * @license     MIT License; http://www.opensource.org/licenses/mit-license.php
  **/ 
-class AMysql_Statement {
+class AMysql_Statement implements IteratorAggregate, Countable {
     public $amysql;
     public $error;
     public $errno;
@@ -33,44 +29,106 @@ class AMysql_Statement {
     public $results = array ();
     public $query;
     public $affectedRows;
-    protected $_fetchMode = 'assoc';
     public $throwExceptions;
     public $lastException = null;
     public $insertId;
 
+    /**
+     * Whether the time all the queries take should be recorded.
+     *
+     * @var boolean
+     */
+    public $profileQueries;
+
     public $link;
+    public $linkType;
+
+    protected $_fetchMode;
+    protected $_fetchModeExtraArgs = array ();
 
     public $beforeSql = '';
     public $prepared = '';
     public $binds = array();
 
-    const FETCH_ASSOC	= 'assoc';
-    const FETCH_OBJECT	= 'object';
-    const FETCH_ARRAY	= 'array';
-    const FETCH_ROW	= 'row';
+    protected $_executed = false; // whether this statement has been executed yet.
 
-    public function __construct(AMysql $amysql) {
+    protected $_replacements;
+
+    /**
+     * The time in took in seconds with microseconds to perform the query.
+     * It is automatically filled only when $profileQueries is set to true.
+     * 
+     * @var float
+     */
+    public $queryTime;
+
+    public function __construct(AMysql_Abstract $amysql) {
+	$amysql->lastStatement = $this;
 	$this->amysql = $amysql;
 	$this->link = $amysql->link;
+        $this->linkType = $amysql->linkType;
+        $this->profileQueries = $amysql->profileQueries;
 	$this->throwExceptions = $this->amysql->throwExceptions;
+	$this->setFetchMode($amysql->getFetchMode());
     }
 
-    public function setFetchMode($fetchMode) {
+    public function getIterator() {
+	return new AMysql_Iterator($this);
+    }
+
+    public function setFetchMode($fetchMode/* [, extras [, extras...]]*/) {
 	static $fetchModes = array (
-	    self::FETCH_ASSOC, self::FETCH_OBJECT,
-	    self::FETCH_ARRAY, self::FETCH_ROW
+	    AMysql_Abstract::FETCH_ASSOC, AMysql_Abstract::FETCH_OBJECT,
+	    AMysql_Abstract::FETCH_ARRAY, AMysql_Abstract::FETCH_ROW
 	);
+	$args = func_get_args();
+	$extraArgs = array_slice($args, 1);
 	if (in_array($fetchMode, $fetchModes)) {
-	    $this->fetchMode = $fetchMode;
+	    $this->_fetchMode = $fetchMode;
+	    $this->_fetchModeExtraArgs = $extraArgs;
 	}
 	else {
 	    throw new Exception("Unknown fetch mode: `$fetchMode`");
 	}
     }
 
-    public function execute($binds = null) {
-	if (is_array($binds)) {
-	    $this->binds = $binds;
+    /**
+     * Executes a prepared statement, optionally accepting binds for replacing
+     * placeholders.
+     * 
+     * @param mixed $binds	(Optional) The binds for the placeholders. This
+     *				library supports names and unnames placeholders.
+     *				To use unnamed placeholders, use question marks
+     *				(?) as placeholders. A bind's key should be the
+     *				index of the question mark. If $binds is not
+     *				an array, it is casted to one.
+     *				To use named placeholders, the placeholders
+     *				must start with a non-alphanumeric, non-128+
+     *				character. If the key starts with an
+     *				alphanumeric or 128+ character, the placeholder
+     *				that is searched to be replaced will be the
+     *				key prepended by a colon (:). Here are examples
+     *				for what keys will replace what placeholders
+     *				for the value:
+     *
+     *				:key: => :key:
+     *				:key => :key
+     *				key => :key
+     *				key: => :key:
+     *				!key => !key
+     *				élet => :élet
+     *
+     *				All values are escaped and are automatically
+     *				surrounded by apostrophes if needed. Do NOT
+     *				add apostrophes around the string values as
+     *				encapsulating for a mysql string.
+     *				@see AMysql_Abstract::escape()
+     *
+     * @return $this
+     */
+    public function execute($binds = array ()) {
+	if (1 <= func_num_args()) {
+	    $this->binds = is_array($binds) ? $binds : array ($binds);
 	}
 	$sql = $this->getSql();
 	$result = $this->_query($sql);
@@ -78,55 +136,105 @@ class AMysql_Statement {
     }
 
     /**
-     * A különböző metódusok (prepare, select, insert stb.) által épített
-     * előkészített sql query string, és a bind-oló metódusok (bindParam,
-     * bindValue) által visszaadja az éppeni sql stringet, ami ténylegesen
-     * létrejön execute()-nál.
+     * The sql string built up by the different preparing methods (prepare,
+     * select, insert etc.) is returned, having the placeholders being
+     * replaced by their binded values. You can debug what the final SQL
+     * string would be by calling this method.
+     *
+     * @param string $prepared	(Optional) Use this prepared string
+     *					instead of the one set.
+     *
      * @author Szerémi Attila               
      **/         
     public function getSql($prepared = null) {
 	if (!$prepared) {
 	    $prepared = $this->prepared;
 	}
-	$sql = $this->prepared;
-	$binds =& $this->binds;
-	if ($binds) {
-	    if (array_key_exists(0, $binds)) {
-		$parts = explode('?', $sql);
-		$sql = '';
-		if (count($parts)-1 == count($binds)) {
-		    foreach ($binds as &$bind) {
-			$sql .= array_shift($parts);
-			$sql .= $this->amysql->escape($bind);
-		    };
-		    $sql .= array_shift($parts);
-		}
-		else if (count($parts)-1 < count($binds)) {
-		    throw new RuntimeException('More binds than question marks!');
-		}
-		else {
-		    throw new RuntimeException('Fewer binds than question marks!');
-		}
-	    }
-	    else {
-		$map = array();
-		foreach ($binds as $key => &$bind) {
-		    $string = '';
-		    for ($i = 0; $i < 5; $i++) {
-			$string .= chr(mt_rand(0, 255));
-		    }
-		    $map[$key] = $string;
-		    $sql = str_replace("$key", $string, $sql);
-		}
-		foreach ($binds as $key => &$bind) {
-		    $placeholder = $map[$key];
-		    $sql = str_replace($placeholder, $this->amysql->escape($bind), $sql);
-		}
-	    }
-	}
-	return $this->beforeSql . $sql;
+	return $this->beforeSql . $this->quoteInto($prepared, $this->binds);
     }
 
+    /**
+     * Like $this->getSql(), but you must give the prepared statement, the
+     * binds, and $this->beforeSql is ignored.
+     *
+     * @see $this->getSql()
+     * 
+     * @param string $prepared 
+     * @param mixed $binds		$binds are automatically type casted
+     *					to an array.
+     * @return string
+     */
+    public function quoteInto($prepared, $binds) {
+	$sql = $prepared;
+	if (!is_array($binds)) {
+	    $binds = is_array($binds) ? $binds : array ($binds);
+	}
+        if (!$binds) {
+            return $sql;
+        }
+	if (array_key_exists(0, $binds)) {
+	    $parts = explode('?', $sql);
+	    $sql = '';
+	    if (count($parts)-1 == count($binds)) {
+		foreach ($binds as &$bind) {
+		    $sql .= array_shift($parts);
+		    $sql .= $this->amysql->escape($bind);
+		};
+		$sql .= array_shift($parts);
+	    }
+            else if (count($parts)-1 < count($binds)) {
+                $msg = "More binds than question marks!\n";
+                $msg .= "Prepared query: `$prepared`\n";
+                $msg .= sprintf("Binds: %s\n", print_r($binds, true));
+                throw new RuntimeException($msg);
+            }
+            else {
+                $msg = "Fewer binds than question marks!\n";
+                $msg .= "Prepared query: `$prepared`\n";
+                $msg .= sprintf("Binds: %s\n", print_r($binds, true));
+                throw new RuntimeException($msg);
+            }
+        }
+	else {
+	    $keysQuoted = array ();
+	    $replacements = array ();
+	    foreach ($binds as $key => &$bind) {
+		if (127 < ord($key[0]) || preg_match('/^\w$/', $key[0])) {
+		    $key = ':' . $key;
+		}
+		$keyQuoted = preg_quote($key, '/');
+		$keysQuoted[] = $keyQuoted;
+		$replacements[$key] = $this->amysql->escape($bind);
+	    }
+	    $keysOr = join('|', $keysQuoted);
+	    $pattern =
+		"/($keysOr)(?![\w\x80-\xff])/m";
+	    $this->_replacements = $replacements;
+
+	    $sql = preg_replace_callback($pattern,
+		array ($this, '_replaceCallback'),
+		$sql
+	    );
+	}
+	return $sql;
+    }
+
+    protected function _replaceCallback($match) {
+	$key = $match[0];
+	$replacement = array_key_exists($key, $this->_replacements) ?
+	    $this->_replacements[$key] :
+	    $key;
+	return $replacement;
+    }
+
+    /**
+     * Prepares an SQL string for binding and execution. Use of this
+     * method is not recommended externally. Use the AMysql class's
+     * prepare method instead which returns a new AMysql_Statement instance.
+     * 
+     * @param string $sql The SQL string to prepare.
+     * @return $this
+     */
     public function prepare($sql) {
 	$this->beforeSql = '';
 	$this->prepared = $sql;
@@ -134,26 +242,72 @@ class AMysql_Statement {
 	return $this;
     }
 
-    public function query($sql, array $binds = array ()) {
+    public function query($sql, $binds = array ()) {
 	$this->prepare($sql);
 	$result = $this->execute($binds);
 	return $this;
     }
 
     protected function _query($sql) {
+        if ($this->_executed) {
+	    throw new LogicException(
+		"This statement has already been executed.\nQuery: $sql"
+	    );
+        }
+        $isMysqli = 'mysqli' == $this->linkType;
+        $link = $this->link;
+        $this->_executed = true;
 	$this->query = $sql; 
-	$res = $this->link;
-	if ('mysql link' != get_resource_type($res)) {
-	    throw new LogicException('Resource is not a mysql resource.', 0, $sql);
+	if (!$isMysqli && 'mysql link' != get_resource_type($link)) {
+	    throw new LogicException(
+		"Resource is not a mysql resource.\nQuery: $sql"
+	    );
 	}
-	$result = mysql_query($sql, $this->link);
-	$this->error = mysql_error($res);
-	$this->errno = mysql_errno($res);
+        if ($this->profileQueries) {
+            $startTime = microtime(true);
+            if ($isMysqli) {
+                $stmt = $link->prepare($sql);
+                $success = $stmt->execute();
+            }
+            else {
+                $result = mysql_query($sql, $link);
+            }
+            $duration = microtime(true) - $startTime;
+            $this->queryTime = $duration;
+        }
+        else {
+            if ($isMysqli) {
+                $stmt = $link->prepare($sql);
+                $success = $stmt->execute();
+            }
+            else {
+                $result = mysql_query($sql, $link);
+            }
+        }
+        $this->amysql->addQuery($sql, $this->queryTime);
+        $this->error = $isMysqli ? $link->error : mysql_error($link);
+        $this->errno = $isMysqli ? $link->errno : mysql_errno($link);
+        if ($isMysqli) {
+            $this->affectedRows = $stmt->affected_rows;
+            $this->insertId = $stmt->insert_id;
+            $result = $stmt->get_result();
+            if (!$result && $success) {
+                /**
+                 * In mysqli, result_metadata will return a falsy value
+                 * even for successful SELECT queries, so for compatibility
+                 * let's set the result to true if it isn't an object (is false),
+                 * but the query was successful.
+                 */
+                $result = true;
+            }
+        }
+        else {
+            $this->affectedRows = mysql_affected_rows($link);
+            $this->insertId = mysql_insert_id($link);
+        }
 	$this->result = $result;
-	$this->results[] = $result;
-	$this->affectedRows = mysql_affected_rows($res);
+        $this->results[] = $result;
 	$this->amysql->affectedRows = $this->affectedRows;
-	$this->insertId = mysql_insert_id($res);
 	$this->amysql->insertId = $this->insertId;
 	if (false === $result) {
 	    try {
@@ -173,42 +327,68 @@ class AMysql_Statement {
 	return $this;
     }
 
+    /**
+     * Executes START TRANSACTION (Not supported in all db formats).
+     *
+     * @return $this
+     */
     public function startTransaction() {
 	return $this->_query('START TRANSACTION');
     }
 
+    /**
+     * Executes COMMIT (Not supported in all db formats).
+     *
+     * @return $this
+     */
     public function commit() {
 	return $this->_query('COMMIT');
     }
 
+    /**
+     * Executes ROLLBACK (Not supported in all db formats).
+     *
+     * @return $this
+     */
     public function rollback() {
 	return $this->_query('ROLLBACK');
     }
 
     /**
-     * Fölszabadítja a resultok memóriafoglalásukat.
+     * Frees the mysql result resource.
+     *
+     * @return $this
      **/         
     public function freeResults() {
 	foreach ($this->results as $result) {
 	    if (is_resource($result)) {
-		mysql_free_result($result);
+		'mysqli' == $this->linkType ? $result->free() : mysql_free_result($result);
 	    }
 	}
 	return $this;
     }
 
+    /**
+     * Returns all the results with each row in the format of that specified
+     * by the fetch mode.
+     * 
+     * @see $this->setFetchMode()
+     *
+     * @return array
+     **/         
     public function fetchAll() {
+	$result = $this->result;
 	$ret = array ();
-	if (self::FETCH_ASSOC == $this->_fetchMode) {
+	if (AMysql_Abstract::FETCH_ASSOC == $this->_fetchMode) {
 	    $methodName = 'fetchAssoc';
 	}
-	else if (self::FETCH_OBJECT == $this->_fetchMode) {
+	else if (AMysql_Abstract::FETCH_OBJECT == $this->_fetchMode) {
 	    $methodName = 'fetchObject';
 	}
-	else if (self::FETCH_ARRAY == $this->_fetchMode) {
+	else if (AMysql_Abstract::FETCH_ARRAY == $this->_fetchMode) {
 	    $methodName = 'fetchArray';
 	}
-	else if (self::FETCH_ROW == $this->_fetchMode) {
+	else if (AMysql_Abstract::FETCH_ROW == $this->_fetchMode) {
 	    $methodName = 'fetchRow';
 	}
 	else {
@@ -222,24 +402,35 @@ class AMysql_Statement {
 	else if (false === $numRows) {
 	    return false;
 	}
-	mysql_data_seek($result, 0);
-	while (false !== ($row = $this->$methodName())) {
+	$extraArgs = $this->_fetchModeExtraArgs;
+	$method = array ($this, $methodName);
+        $result instanceof Mysqli_Result ? $result->data_seek(0) : mysql_data_seek($result, 0);
+	while (false !== ($row = call_user_func_array($method, $extraArgs))) {
 	    $ret[] = $row;
 	}
 	return $ret;
     }
 
+    /**
+     * Returns one row in the format specified by the fetch mode.
+     *
+     * @see $this->setFetchMode()
+     * 
+     * @return array
+     */
     public function fetch() {
 	if ('assoc' == $this->_fetchMode) {
 	    return $this->fetchAssoc();
 	}
 	else if ('object' == $this->_fetchMode) {
-	    return $this->fetchObject();
+	    $extraArgs = $this->_fetchModeExtraArgs;
+	    $method = array ($this, 'fetchObject');
+	    return call_user_func_array($method, $extraArgs);
 	}
 	else if ('row' == $this->_fetchMode) {
 	    return $this->fetchRow();
 	}
-	else if (self::FETCH_ARRAY == $this->_fetchMode) {
+	else if (AMysql_Abstract::FETCH_ARRAY == $this->_fetchMode) {
 	    return $this->fetchArray();
 	}
 	else {
@@ -247,9 +438,14 @@ class AMysql_Statement {
 	}
     }
 
+    /**
+     * Fetches one row with column names as the keys.
+     * 
+     * @return array|false
+     */
     public function fetchAssoc() {
 	$result = $this->result;
-	return mysql_fetch_assoc($result);
+	return 'mysqli' == $this->linkType ? $result->fetch_assoc() : mysql_fetch_assoc($result);
     }
 
     /**
@@ -276,9 +472,10 @@ class AMysql_Statement {
 	else if (false === $numRows) {
 	    return false;
 	}
-	mysql_data_seek($result, 0);
-	if (false === $keyColumn) {
-	    while (false !== ($row = $this->fetchAssoc())) {
+        $result instanceof Mysqli_Result ? $result->data_seek(0) : mysql_data_seek($result, 0);
+        $keyColumnGiven = is_string($keyColumn) || is_int($keyColumn);
+	if (!$keyColumnGiven) {
+	    while (false !== ($row = $this->fetchAssoc()) && isset($row)) {
 		$ret[] = $row;
 	    }
 	}
@@ -298,10 +495,10 @@ class AMysql_Statement {
 		reset($row);
 	    }
 	    $ret[$row[$keyColumn]] = $row;
-	    while ($row = $this->fetchAssoc()) {
-		$ret[$row[$keyColumn]] = $row;
+            while ($row = $this->fetchAssoc()) {
+                $ret[$row[$keyColumn]] = $row;
 	    }
-	}
+        }
 	return $ret;
     }
 
@@ -312,7 +509,7 @@ class AMysql_Statement {
      */
     public function fetchRow() {
 	$result = $this->result;
-	return mysql_fetch_row($result);
+	return 'mysqli' == $this->linkType ? $result->fetch_row() : mysql_fetch_row($result);
     }
 
     /**
@@ -325,8 +522,9 @@ class AMysql_Statement {
     }
 
     public function fetchArray() {
-	$result = $this->result;
-	return mysql_fetch_array($result, MYSQL_BOTH);
+        $result = $this->result;
+        $isMysqli = 'mysqli' == $this->linkType;
+	return $isMysqli ? $result->fetch_array(MYSQLI_BOTH) : mysql_fetch_array($result, MYSQL_BOTH);
     }
 
     /**
@@ -334,12 +532,74 @@ class AMysql_Statement {
      * if the result on the given row and column does not exist.
      * 
      * @param int $row		(Optional) The row number.
-     * @param int $field	(Optional) The field.
+     * @param mixed $field	(Optional) The field number or name.
      * @return mixed
      */
     public function result($row = 0, $field = 0) {
-	$result = $this->result;
+        $result = $this->result;
+        if ('mysqli' == $this->linkType) {
+            if ($result->num_rows <= $row) {
+                // mysql_result compatibility, sort of...
+                trigger_error("Unable to jump to row $row", E_WARNING);
+                return false;
+            }
+            /**
+             * @todo optimize
+             **/
+            $result->data_seek($row);
+            $array = $result->fetch_array(MYSQLI_BOTH);
+            if (!array_key_exists($field, $array)) {
+                // mysql_result compatibility, sort of...
+                trigger_error("Unable to access field `$field` of row $row", E_WARNING);
+                return false;
+            }
+            $ret = $array[$field];
+            $result->data_seek(0);
+            return $ret;
+        }
 	return mysql_result($result, $row, $field);
+    }
+
+    /**
+     * Returns the result of the given row and field, or the given value
+     * if the row doesn't exist
+     * 
+     * 
+     * @param mixed $default	The value to return if the field is not found.
+     * @param int $row		(Optional) The row number.
+     * @param int $field	(Optional) The field.
+     * @return mixed
+     */
+    public function resultDefault($default, $row = 0, $field = 0) {
+	$result = $this->result;
+	return $row < $this->numRows() ? $this->result($row, $field) :
+	    $default;
+    }
+
+    /**
+     * Returns the result of the given row and field, or null if the
+     * row doesn't exist
+     * 
+     * 
+     * @param int $row		(Optional) The row number.
+     * @param int $field	(Optional) The field.
+     * @return mixed
+     */
+
+    public function resultNull($row = 0, $field = 0) {
+	return $this->resultDefault(null, $row, $field);
+    }
+
+    /**
+     * Returns the result of the given row and field as an integer.
+     * 0, if that result doesn't exist.
+     * 
+     * @param int $row		(Optional) The row number.
+     * @param int $field	(Optional) The field.
+     * @return integer
+     */
+    public function resultInt($row = 0, $field = 0) {
+	return (int) $this->resultNull($row, $field);
     }
 
     /**
@@ -358,7 +618,7 @@ class AMysql_Statement {
      */
     public function pairUp($keyColumn = 0, $valueColumn = 1) {
 	$ret = array ();
-	while ($row = $stmt->fetchArray()) {
+	while ($row = $this->fetchArray()) {
 	    $key = $row[$keyColumn];
 	    $ret[$key] = $row[$valueColumn];
 	}
@@ -376,81 +636,122 @@ class AMysql_Statement {
      */
     public function fetchAllColumn($column = 0) {
 	$ret = array ();
-	while ($row = $stmt->fetchArray()) {
+	$numRows = $this->numRows();
+        if (!$numRows) {
+            return $ret;
+        }
+        'mysqli' == $this->linkType ? $result->data_seek(0) : mysql_data_seek($result, 0);
+	while ($row = $this->fetchArray()) {
 	    $ret[] = $row[$column];
 	}
 	return $ret;
     }
 
     /**
-     * Returns the result of the given row and field, or null if the
-     * row doesn't exist
-     * 
-     * 
-     * @param int $row		(Optional) The row number.
-     * @param int $field	(Optional) The field.
-     * @return mixed
+     * Fetches all rows and returns them as an array of columns containing an array
+     * of values.
+     * Works simalarly to fetchAllAssoc(), but with the resulting array transposed.
+     *
+     * Note: no phpunit tests have been written for this method yet.
+     *
+     * @todo phpunit tests
+     *
+     * @access public
+     * @return void
      */
-    public function resultNull($row = 0, $field = 0) {
-	return $this->resultDefault(null, $row, $field);
+    public function fetchAllColumns($keyColumn = false) {
+        $ret = array ();
+        $numRows = $this->numRows();
+        $keyColumnGiven = is_string($keyColumn) || is_int($keyColumn);
+        if (!$numRows) {
+        }
+        /**
+         * If $keyColumn isn't given, let's build the returning array here to
+         * dodge unnecessary overhead.
+         **/
+        else if (!$keyColumnGiven) {
+            $result = $this->result;
+            $result instanceof Mysqli_Result ? $result->data_seek(0) : mysql_data_seek($result, 0);
+            $firstRow = $this->fetchAssoc();
+            foreach ($firstRow as $colName => $val) {
+                $ret[$colName] = array ($val);
+            }
+            while ($row = $this->fetchAssoc()) {
+                foreach ($row as $colName => $val) {
+                    $ret[$colName][] = $val;
+                }
+            }
+            return $ret;
+        }
+        /**
+         * Otherwise if $keyColumn is given, we have no other choice but to use
+         * $this->fetchAllAssoc($keyColumn) and transpose it.
+         **/
+        else {
+            $ret = AMysql_Abstract::transpose(
+                $this->fetchAllAssoc($keyColumn)
+            );
+        }
+        return $ret;
     }
 
     /**
-     * Returns the result of the given row and field, or the given value
-     * if the row doesn't exist
+     * Fetches the next row as an object.
      * 
-     * 
-     * @param mixed $default	The value to return if the field is not found.
-     * @param int $row		(Optional) The row number.
-     * @param int $field	(Optional) The field.
-     * @return mixed
+     * @return object
      */
-    public function resultDefault($default, $row = 0, $field = 0) {
-	$result = $this->result;
-	return $row < $this->numRows() ? mysql_result($result, $row, $field) :
-	    $default;
+    public function fetchObject(
+	$className = 'stdClass', array $params = array ()
+    ) {
+        $result = $this->result;
+        $isMysqli = 'mysqli' == $this->linkType;
+	if ($params) {
+            return $isMysqli ?
+                $result->fetch_object($className, $params) :
+                mysql_fetch_object($result, $className, $params)
+            ;
+	}
+	else {
+	    return $isMysqli ?
+                $result->fetch_object($className) :
+                mysql_fetch_object($result, $className)
+            ;
+	}
     }
 
     /**
-     * Returns the result of the given row and field as an integer.
-     * 0, if that result doesn't exist.
+     * Returns the number of affected rows.
      * 
-     * @param int $row		(Optional) The row number.
-     * @param int $field	(Optional) The field.
      * @return integer
      */
-    public function resultInt($row = 0, $field = 0) {
-	return (int) $this->resultNull($row, $field);
-    }
-
-    public function fetchObject() {
-	$result = $this->result;
-	return mysql_fetch_object($result);
-    }
-
     public function affectedRows() {
 	return $this->affectedRows;
     }
 
     public function numRows() {
-	return mysql_num_rows($this->result);
+        if ('mysqli' == $this->linkType) {
+            return $this->result instanceof Mysqli_Result ? $this->result->num_rows : false;
+        }
+        return mysql_num_rows($this->result);
     }
 
     /**
      * Do not use this method! It requires a lot of revision, and is subject
      * to change a lot.
      * 
-     * Egy SELECT utasítást kezdeményez úgy, hogy az épülendő sql utasítás
-     * SELECT-tel kezdődjön, és megjelölje azokat az oszlopneveket, amiket
-     * átadunk. 
-     * - Lehet egy tömbként is jelölni, ahol az érték a kijelölendő
-     * táblanév, és opcionálisan, ha a kulcs az nem szám, akkor az az AS
-     * szerinti átnevezés.
-     * - Lehet dinamikus paramétermennyiségként átadni ugyanazt, mint az
-     * efölöttinél, csak nem lehet AS-esen átnevezni a megjelölt táblaneveket.
+     * Begins a SELECT statement. To this method you can pass an array of
+     * column names, or column names as variable arguments. The column names
+     * will be listed after SELECT, so the prepared statement will look like:
+     *	SELECT `column1`, `column2`, `column3`
+     * In the case that those three columns were passed to this method
+     * (without the backticks).
+     * If you pass an array of columns instead of columns as dynamic parameters,
+     * and the array's keys are not numeric, the given column names will be
+     * aliased with "AS" to the key.
+     *
      * @return this                                   
      **/         
-    public function select() {
+    public function select(/* $params... */) {
 	$sql = 'SELECT ';
 	$arg0 = func_get_arg(0);
 	if (is_array($arg0)) {
@@ -481,6 +782,11 @@ class AMysql_Statement {
 	return implode(', ', $tables);
     }
 
+    /**
+     * Throws an AMysqlException for the last mysql error.
+     * 
+     * @throws AMysql_Exception
+     */
     public function throwException() {
 	throw new AMysql_Exception($this->error, $this->errno, $this->query);
     }
@@ -495,9 +801,17 @@ class AMysql_Statement {
     }
 
     /**
-     * A FROM részbe tölt táblaneveket.
+     * Append FROM and a list of table names to the prepared sql string.
+     * This method accepts table names as an array or as dynamic arguments,
+     * and in case of the former, the table names will be aliased with "AS"
+     * to their key if it is not numeric.
+     *
+     * This method is experimental, not supported yet, and use of it is
+     * discouraged, because it may change a lot in the future.
+     *
+     * @return $this
      **/         
-    public function from() {
+    public function from(/* $params... */) {
 	$arg0 = func_get_arg(0);
 	if (is_array($arg0)) {
 	    $tablesString = $this->_getTablesStringByArray($arg0);
@@ -519,7 +833,14 @@ class AMysql_Statement {
     }
 
     /**
-     * A WHERE részbe tölt adatot
+     * Appends WHERE and a given string to the prepared sql string.
+     *
+     * This method is experimental, not supported yet, and use of it is
+     * discouraged, because it may change a lot in the future.
+     *
+     * @param string $where		The string that goes after WHERE
+     *
+     * @return $this;
      **/         
     public function where($where) {
 	$sql = ' WHERE ';
@@ -530,6 +851,19 @@ class AMysql_Statement {
 	return $this;
     }
 
+    /**
+     * Appends LEFT JOIN and a given table name, an optional AS and an
+     * optional ON to the prepared sql string.
+     *
+     * This method is experimental, not supported yet, and use of it is
+     * discouraged, because it may change a lot in the future.
+     *
+     * @param string $tableName		The table name to left join.
+     * @param string $as		(Optional) What to alias the table
+     * @param string $on		(Optional) The ON condition.
+     *
+     * @return $this;
+     **/         
     public function leftJoin($tableName, $as = null, $on = null) {
 	$sql = ' LEFT JOIN ' . $this->escapeIdentifier($tableName, $as);
 	$this->prepared .= $sql;
@@ -540,6 +874,16 @@ class AMysql_Statement {
 	return $this;
     }
 
+    /**
+     * Appends ON and a given string to the prepared sql string.
+     *
+     * This method is experimental, not supported yet, and use of it is
+     * discouraged, because it may change a lot in the future.
+     *
+     * @param string $on		The ON condition.
+     *
+     * @return $this;
+     **/
     public function on($on) {
 	$sql = ' ON ' . $on;
 	$this->prepared .= $sql;
@@ -547,95 +891,97 @@ class AMysql_Statement {
     }
 
     public function escapeIdentifierSimple($columnName) {
-	return AMysql::escapeIdentifierSimple($columnName);
+	return AMysql_Abstract::escapeIdentifierSimple($columnName);
     }
 
     /**
-     * Egy oszlopnevet escape-el.
-     * @param string $columnName Az oszlop neve.
-     * @param string $as (opcionális) az oszlop átnevezése.          	
+     * @see AMysql_Abstract::escapeIdentifier
      **/
     public function escapeIdentifier($columnName, $as = null) {
-	return AMysql::escapeIdentifier($columnName, $as);
+	return AMysql_Abstract::escapeIdentifier($columnName, $as);
     }
 
+    /**
+     * Appends a string to the prepared string.
+     *
+     * @param string $sql The string to append.
+     * @return $this
+     **/
     public function appendPrepare($sql) {
 	$this->prepared .= $sql;
 	return $this;
     }
 
     /**
-     * Bindol egy értéket a preparált sql stringhez.
-     * @param mixed $key Ha string, akkor az adott stringet cseréli majd ki
-     * az értékre, különben, ha integer, akkor          
+     * Binds a value to the sql string.
+     *
+     * @param mixed $key	    If an integer, then the given index
+     *				    question mark will be replaced.
+     *				    If a string, then then, if it starts
+     *				    with an alphanumberic or 128+ ascii
+     *				    character, then a colon plus the string
+     *				    given will be replaced, otherwise the
+     *				    given string literally will be replaced.
+     *				    Example: if the string is
+     *				    foo
+     *				    then :foo will be replaced.
+     *				    if the string is
+     *				    !foo
+     *				    then !foo will be replaced
+     *				    if the string is
+     *				    :foo:
+     *				    then :foo: will be replaced.
+     *				    Note: don't worry about keys that have a
+     *				    common beginning. If foo and fool are set,
+     *				    :fool will not be replaced with the value
+     *				    given for foo.
+     *
+     * @param mixed $val	    Bind this value for replacing the mark
+     *				    defined by $key. The value is escaped
+     *				    depeding on its type, apostrophes included,
+     *				    so do not add apostrophes in your
+     *				    prepared sqls.
+     *
+     * @return $this
      **/         
     public function bindValue($key, $val) {
+	if (is_numeric($key) && $this->amysql->pdoIndexedBinding) {
+	    $key--;
+	}
 	$this->binds[$key] = $val;
 	return $this;
     }
 
+    /**
+     * The same as $this->bindValue(), except that $val is binded by
+     * reference, meaning its value is extracted on execute.
+     *
+     * @see $this->bindValue()
+     *
+     * @return $this
+     */
     public function bindParam($key, &$val) {
-	$this->binds[$key] = &$val;
+	if (is_numeric($key) && $this->amysql->pdoIndexedBinding) {
+	    $key--;
+	}
+	$this->binds[$key] =& $val;
 	return $this;
     }
 
     /**
-     * UPDATE-et végez egy táblanév, egy adat tömb és egy WHERE szöveg alapján.
-     * @param string $tableName A tábla neve escape-elés nélkül.
-     * @param array $data Az adat tömb. A tömb egy asszociatív tömb, ahol
-     *  minden kulcs egy oszlopnevet reprezntál, és az érték pedig az az
-     *  érték, amire változna az érték annál az oszlopnál.
-     *  FIGYELEM: Itt a tableName CSAK egy string lehet!     
-     * @param string $where A WHERE string-je.
-     * @return integer mysql_affected_rows()
-     * @throws AMysql_Exception                
-     **/               
-    public function update($tableName, array $data, $where) {
-	if (!$data) {
-	    return false;
-	}
-	$sets = array ();
-	foreach ($data as $columnName => $value) {
-	    $columnName = $this->escapeIdentifierSimple($columnName);
-	    $sets[] = "$columnName = " . $this->amysql->escape($value);
-	}
-	$setsString = join(', ', $sets);
-
-	/**
-	 * Ezt beforeSql-el kell megoldani, különben az értékekben lévő
-	 * kérdőjelek bezavarnak.         
-	 **/		         
-	$beforeSql = "UPDATE `$tableName` SET $setsString WHERE ";
-	$this->prepare($where);
-	$this->beforeSql = $beforeSql;
-
-	return $this;
-    }
-
-    /**
-     * INSERT-et végez egy táblanév és egy adat tömb alapján. Egyzserre
-     * több sort is lehet beszúrni.
-     * @param string $tableName A tábla neve escape-elés nélkül.
-     * @param array $data Az adat tömb. Az alábbi formák között lehet:
-     *  - Indexelt tömb, ahol minden elem egy asszociatív tömb, ahol minden
-     *      kulcs egy oszlopnév, az érték pedig a mező értéke.
-     *  - Asszociatív tömb, ahol minden kulcs egy táblanév, és minden érték
-     *      vagy a mező értéke, vagy egy tömb a különböző sorokhoz tartozó
-     *      mező értékkel.
-     * @return integer mysql_affected_rows()
-     * @throws AMysql_Exception                              
-     **/     
-    public function insert($tableName, array $data) {
-	$cols = array ();
-	$vals = array();
-	$i = 0;
-	if (!$data) {
-	    return false;
-	}
+     * Builds a columns list with values as a string
+     *
+     * @param array $data @see $this->insertReplace()
+     * @return string
+     */
+    public function buildColumnsValues(array $data) {
+        $i = 0;
 	if (empty($data[0])) {
+            // keys are column names
 	    foreach ($data as $columnName => $values) {
 		$cols[] = $this->escapeIdentifierSimple($columnName);
-		if (!is_array($values)) {
+                if (!is_array($values)) {
+                    // single piece of data here.
 		    $values = array($values);
 		}
 		foreach ($values as $key => $value) {
@@ -646,7 +992,10 @@ class AMysql_Statement {
 		}
 	    }
 	}
-	else {
+        else {
+            // keys are indexes
+
+            // the column names should be found in the first index's keys
 	    $akeys = array_keys($data[0]);
 	    $cols = array ();
 	    foreach ($akeys as $col) {
@@ -670,18 +1019,125 @@ class AMysql_Statement {
 	    $rowValueStrings[] = join(', ', $rowValues);
 	}
 	$valuesString = join('), (', $rowValueStrings);
-	$sql = "INSERT INTO `$tableName` ($columnsString) VALUES ($valuesString)";
-	$this->prepare($sql);
+        $columnsValuesString = "($columnsString) VALUES ($valuesString)";
+        return $columnsValuesString;
+    }
+
+    /**
+     * Puts together a string that is to be placed after a SET statement.
+     * i.e. column1 = 'value', int_col = 3
+     *
+     * @param array $data Keys are column names, values are the values unescaped
+     * @return string
+     */
+    public function buildSet(array $data) {
+	$sets = array ();
+	foreach ($data as $columnName => $value) {
+	    $columnName = $this->escapeIdentifierSimple($columnName);
+	    $sets[] = "$columnName = " . $this->amysql->escape($value);
+	}
+	$setsString = join(', ', $sets);
+        return $setsString;
+    }
+
+    /**
+     * Prepares a mysql UPDATE unexecuted. By execution, have the placeholders
+     * of the WHERE statement binded.
+     * It is rather recommended to use AMysql_Abstract::update() instead, which
+     * lets you also bind the values in one call and it returns the success
+     * of the query.
+     *
+     * @param string $tableName 	The table name.
+     * @param array $data 		The array of data changes. A
+     *					    one-dimensional array
+     * 					with keys as column names and values
+     *					    as their values.
+     * @param string $where		An SQL substring of the WHERE clause.
+     *
+     * @return $this
+     * @throws AMysql_Exception                
+     **/               
+    public function update($tableName, array $data, $where) {
+	if (!$data) {
+	    return false;
+	}
+        $setsString = $this->buildSet($data);
+
+	/**
+	 * Ezt beforeSql-el kell megoldani, különben az értékekben lévő
+	 * kérdőjelek bezavarnak.         
+	 **/		         
+	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
+	$beforeSql = "UPDATE $tableSafe SET $setsString WHERE ";
+	$this->prepare($where);
+	$this->beforeSql = $beforeSql;
+
 	return $this;
     }
 
     /**
-     * Törlést kezdeményez egy táblán. Opcionálisan a WHERE clause is megadható.
-     * @param string $tableName A tábla neve.
-     * @param string $where (Opcionális) A WHERE clause.          
+     * Prepares a mysql INSERT or REPLACE unexecuted. After this, you should just
+     * call $this->execute().
+     * It is rather recommended to use AMysql_Abstract::insert() instead, which
+     * returns the last inserted id already.
+     *
+     * @param string $type              "$type INTO..." (INSERT, INSERT IGNORE, REPLACE)
+     *                                  etc.
+     * @param string $tableName 	The table name.
+     * @param array $data		A one or two-dimensional array.
+     * 					1D:
+     * 					an associative array of keys as column names and values
+     * 					as their values. This inserts one row.
+     * 					2D numeric:
+     * 					A numeric array where each value is an associative array
+     * 					with column-value pairs. Each outer, numeric value represents
+     * 					a row of data.
+     * 					2D associative:
+     * 					An associative array where the keys are the columns, the
+     * 					values are numerical arrays, where each value represents the
+     * 					value for the new row of that key.
+     *
+     * @return $this
+     * @throws AMysql_Exception                              
+     **/     
+    public function insertReplace($type, $tableName, array $data) {
+	$cols = array ();
+	$vals = array();
+	if (!$data) {
+	    return false;
+	}
+	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
+        $columnsValues = $this->buildColumnsValues($data);
+	$sql = "$type INTO $tableSafe $columnsValues";
+	$this->prepare($sql);
+	return $this;
+    }
+
+    public function insert($tableName, array $data) {
+        return $this->insertReplace('INSERT', $tableName, $data);
+    }
+
+    public function replace($tableName, array $data) {
+        return $this->insertReplace('REPLACE', $tableName, $data);
+    }
+
+    /**
+     * Prepares a mysql DELETE unexecuted. By execution, have the placeholders
+     * of the WHERE statement binded.
+     * It is rather recommended to use AMysql_Abstract::delete() instead, which
+     * lets you also bind the values in one call and it returns the success
+     * of the query.
+     *
+     * @param string $tableName 	The table name.
+     * @param string $where		An SQL substring of the WHERE clause.
+     *
+     * @see AMysql_Abstract::delete()
+     *
+     * @return $this
      **/         
-    public function delete($tableName, $where = null) {
-	$sql = "DELETE FROM `$tableName`";
+    public function delete($tableName, $where) {
+	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
+	$sql = "DELETE FROM $tableSafe";
 	$this->prepare($sql);
 	if ($where) {
 	    $this->where($where);
@@ -710,11 +1166,12 @@ class AMysql_Statement {
     }
 
     /**
-     * Visszaadja az új insertált id-t
-     * @return int     
+     * Returns the last insert id
+     *
+     * @return integer|false
      **/	     
     public function insertId() {
-	$ret = mysql_insert_id($this->link);
+	$ret = 'mysqli' == $this->linkType ? $result->insert_id() : mysql_insert_id($this->link);
 	return $ret;
     }
 
@@ -735,6 +1192,16 @@ class AMysql_Statement {
 	    throw new OutOfBoundsException("Invalid member: `$name` " .
 		"(target value was `$value`)");
 	}
+    }
+
+    public function count() {
+	if (!is_resource($this->result)) {
+	    $msg = "No SELECT result. ".
+		"Last query: " . $this->query;
+	    throw new LogicException ($msg);
+	}
+	$count = $this->numRows();
+	return $count;
     }
 }
 ?>

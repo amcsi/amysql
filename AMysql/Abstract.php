@@ -1,42 +1,206 @@
-<?php
+<?php /* vim: set tabstop=8 expandtab : */
 /**
  * Mysql abstraction which only uses mysql_* functions
- * @author Szerémi Attila
- * @version 0.9
  *
- * @todo mysql_select_db
+ * For information on binding placeholders, @see AMysql_Statement::execute()
+ *
  * @todo try to make a new select class that works similarly like in Zend
  * @todo Maybe remove automatic dot detection for identifier escaping.
- * @todo Be able to construct this class with connection arguments to make
- *  a new connection.
  * @todo AMysql_Select
  *
+ * Visit https://github.com/amcsi/amysql
+ * @author      Szerémi Attila
+ * @license     MIT License; http://www.opensource.org/licenses/mit-license.php
  **/
+
+$dir = dirname(realpath(__FILE__));
+require_once $dir . '/Exception.php';
+require_once $dir . '/Expr.php';
+require_once $dir . '/Statement.php';
+require_once $dir . '/Iterator.php';
+require_once $dir . '/Select.php';
+
 abstract class AMysql_Abstract {
 
     public $insertId; // last insert id
     public $lastStatement; // last AMysql_Statement
     public $link = null; // mysql link
+    public $linkType; // mysql or mysqli
     public $error; // last error message
     public $errno; // last error number
     public $result; // last mysql result
     public $query; // last used query string
     public $affectedRows; // last affected rows count
+    /**
+     * Contains the number of total affected rows by the last multiple statement deploying
+     * method, such as updateMultipleByData and updateMultipleByKey
+     * 
+     * @var int
+     */
+    public $multipleAffectedRows;
     public $throwExceptions = true; // whether to throw exceptions
+    public $totalTime = 0.0;
 
     /**
-     * @todo Allow for making a new connection here
+     * Whether the time all the queries take should be recorded.
+     *
+     * @var boolean
+     */
+    public $profileQueries = false;
+    /**
+     * Whether backtraces should be added to each array for getQueriesData(). If true,
+     * backtraces will be found under the 'backtrace' key.
+     *
+     * @var boolean
+     */
+    public $includeBacktrace = false;
+
+    protected $_queries = array ();
+    protected $_queriesData = array ();
+
+    /**
+     * Let AMysql_Statement::bindParam() and AMysql_Statement::bindValue()
+     * use indexes starting from 1 instead of 0 in case of unnamed placeholders.
+     * The same way PDO does it. The factory default is false.
+     **/
+    public $pdoIndexedBinding = false;
+    /**
+     * The fetch mode. Can be changed here or set at runtime with
+     * setFetchMode.
+     * 
+     * @var string
+     * @access protected
+     */
+    protected $_fetchMode = self::FETCH_ASSOC;
+
+    const FETCH_ASSOC	= 'assoc';
+    const FETCH_OBJECT	= 'object';
+    const FETCH_ARRAY	= 'array';
+    const FETCH_ROW	= 'row';
+
+    /**
      * @constructor
-     * @param resource $res The mysql connection resource.
+     * @param resource|string $resOrHost    Either a valid mysql connection
+     *					    resource, or if you're connecting
+     *					    to mysql with this class, then
+     *					    pass the same parameters you would
+     *					    pass to mysql_connect.
      *
      **/
-    public function __construct($res) {
-        if ('mysql link' == get_resource_type($res)) {
-            $this->link = $res;
+    public function __construct(
+        $resOrHost = null, $username = null,
+        $password = null, $newLink = null, $clientFlags = 0) 
+    {
+        static $useMysqli = null;
+
+        if (
+            is_resource($resOrHost) &&
+            'mysql link' == get_resource_type($resOrHost)) 
+        {
+            $this->link = $resOrHost;
+            $this->linkType = 'mysql';
+        }
+        else if ($resOrHost instanceof Mysqli) {
+            $this->link = $resOrHost;
+            $this->linkType = 'mysqli';
+        }
+        else if(is_null($resOrHost) || is_string($resOrHost)) {
+            if (!isset($useMysqli)) {
+                // use mysqli if available and PHP is at least of version 5.3.0 (required)
+                $useMysqli = class_exists('Mysqli', false) && function_exists('mysqli_stmt_get_result');
+            }
+            $args = func_get_args();
+            $linkType = $useMysqli ? 'mysqli' : 'mysql';
+            $funcName = "{$linkType}_connect";
+            $this->linkType = $linkType;
+            $res = call_user_func_array($funcName, $args);
+            if ($res) {
+                $this->link = $res;
+            }
+            else {
+                if ('mysqli' == $linkType) {
+                    throw new AMysql_Exception(mysqli_connect_error(), mysqli_connect_errno(),
+                        '(connection to mysql)');
+                }
+                else {
+                    throw new AMysql_Exception(mysql_error(), mysql_errno(),
+                        '(connection to mysql)');
+                }
+            }
         }
         else {
             throw new RuntimeException('Resource given is not a mysql resource.', 0);
         }
+    }
+
+    public function getFetchMode() {
+	return $this->_fetchMode;
+    }
+
+    /**
+     * Selects the given database.
+     * 
+     * @param string $db 
+     * @return $this
+     */
+    public function selectDb($db) {
+        $isMysqli = 'mysqli' == $this->linkType;
+	$result = $isMysqli ? $this->link->select_db($db) : mysql_select_db($db, $this->link);
+	if (!$result) {
+            $error = $isMysqli ? $this->link->error : mysql_error($this->link);
+            $errno = $isMysqli ? $this->link->errno : mysql_errno($this->link);
+	    if ($this->throwExceptions) {
+                throw new AMysql_Exception($error, $errno, 'USE ' . $db);
+	    }
+	    else {
+                trigger_error($error, E_USER_WARNING);
+	    }
+	}
+	return $this;
+    }
+
+    /**
+     * Changes the character set of the connection.
+     * 
+     * @param string $charset Example: utf8
+     * @return $this
+     */
+    public function setCharset($charset) {
+        $isMysqli = 'mysqli' == $this->linkType;
+        if ($isMysqli) {
+            $result = $this->link->set_charset($charset);
+        }
+        else {
+            if (!function_exists('mysql_set_charset')) {
+                function mysql_set_charset($charset, $link = null) {
+                    return mysql_query("SET CHARACTER SET '$charset'", $link);
+                }
+            }
+            $result = mysql_set_charset($charset, $this->link);
+        }
+	if (!$result) {
+            $error = $isMysqli ? $this->link->error : mysql_error($this->link);
+            $errno = $isMysqli ? $this->link->errno : mysql_errno($this->link);
+	    if ($this->throwExceptions) {
+		throw new AMysql_Exception($error, $errno, "(setting charset)");
+	    }
+	    else {
+		trigger_error($error, E_USER_WARNING);
+	    }
+	}
+	return $this;
+    }
+
+    /**
+     * Performs SET NAMES <charset> to change the character set. It may be
+     * enough to use $this->setCharset().
+     * 
+     * @param string $names Example: utf8
+     * @return $this
+     */
+    public function setNames($names) {
+        $stmt = $this->query("SET NAMES $names");
+        return $this;
     }
 
     /**
@@ -147,14 +311,13 @@ abstract class AMysql_Abstract {
      * @todo Variable params possibility for binds?
      *
      * @param string $sql The SQL string.
-     * @param array $binds The binds.
+     * @param mixed $binds The binds or a single bind.
      *
      * @return AMysql_Statement
      **/
-    public function query($sql, array $binds = array ()) {
+    public function query($sql, $binds = array ()) {
         $stmt = new AMysql_Statement($this);
         $result = $stmt->query($sql, $binds);
-        $this->lastStatement = $stmt;
         return $stmt;
     }
 
@@ -165,14 +328,48 @@ abstract class AMysql_Abstract {
      * @todo Variable params possibility for binds?
      *
      * @param string $sql The SQL string.
-     * @param array $binds The binds.
+     * @param mixed $binds The binds or a single bind.
      *
      * @return string
      **/
-    public function getOne($sql, array $binds = array ()) {
+    public function getOne($sql, $binds = array ()) {
         $stmt = new AMysql_Statement($this);
         $stmt->query($sql, $binds);
         return $stmt->result(0, 0);
+    }
+
+    /**
+     * Like $this->getOne(), except returns a null when no result is found,
+     * without throwing an error.
+     *
+     * @param string $sql The SQL string.
+     * @param mixed $binds The binds or a single bind.
+     *
+     * @see $this->getOne()
+     *
+     * @return string
+     **/
+    public function getOneNull($sql, $binds = array ()) {
+        $stmt = new AMysql_Statement($this);
+        $stmt->query($sql, $binds);
+        return $stmt->resultNull(0, 0);
+    }
+
+    /**
+     * Like $this->getOne(), but casts the result to an int. No exception is
+     * thrown when there is no result.
+     *
+     * @param string $sql The SQL string.
+     * @param mixed $binds The binds or a single bind.
+     *
+     * @see $this->getOne()
+     *
+     * @return string
+     **/
+    public function getOneInt($sql, $binds = array ()) {
+        $stmt = new AMysql_Statement($this);
+        $stmt->query($sql, $binds);
+        return $stmt->resultInt(0, 0);
     }
 
     /**
@@ -192,6 +389,8 @@ abstract class AMysql_Abstract {
      * Starts building a new SELECT sql.
      * USAGE OF THIS METHOD IS HIGHLY DISCOURAGED. IT IS BOUND TO CHANGE A LOT.
      * Use prepared statements instead.
+     *
+     * @see AMysql_Statement::select()
      *
      * @return AMysql_Statement
      **/
@@ -214,18 +413,104 @@ abstract class AMysql_Abstract {
      * Performs an instant UPDATE returning its success.
      *
      * @param string $tableName 	The table name.
-     * @param array $data 		The array of data changes. A one-dimensional array
-     * 					with keys as column names and values as their values.
+     * @param array $data 		The array of data changes. A
+     *					    one-dimensional array
+     * 					with keys as column names and values
+     *					    as their values.
      * @param string $where		An SQL substring of the WHERE clause.
-     * @param array $binds		(Optional) The binds for the WHERE clause.
+     * @param mixed $binds		(Optional) The binds or a single bind for the WHERE clause.
      *
      * @return boolean Whether the update was successful.
      **/
-    public function update($tableName, array $data, $where, $binds = null) {
+    public function update($tableName, array $data, $where, $binds = array()) {
         $stmt = new AMysql_Statement($this);
         $stmt->update($tableName, $data, $where);
         $result = $stmt->execute($binds);
-        return $result;
+        return $stmt->result;
+    }
+
+    /**
+     * Updates multiple rows.
+     * The number of total affected rows can be found in
+     * $this->multipleAffectedRows.
+     *
+     * @param string $tableName 	The table name.
+     * @param array $data 		The array of data changes. A
+     *					    one-dimensional array
+     * 					with keys as column names and values
+     *					    as their values.
+     *					One of the keys should be the one
+     *					    with the value to search for for
+     *					    replacement.
+     * @param string $column		(Options) the name of the column and
+     *					    key to search for. The default is
+     *					    'id'.
+     * @return boolean
+     **/
+    public function updateMultipleByData(
+	$tableName, array $data, $column = 'id'
+    ) {
+	$successesNeeded = count($data);
+	$where = self::escapeIdentifier($column) . " = ?";
+	$affectedRows = 0;
+	foreach ($data as $row) {
+	    $by = $row[$column];
+	    unset($row[$column]);
+	    $stmt = new AMysql_Statement($this);
+	    $stmt->update($tableName, $row, $where)->execute(array ($by));
+	    $affectedRows += $stmt->affectedRows;
+	    if ($stmt->result) {
+		$successesNeeded--;
+	    }
+	}
+	$this->multipleAffectedRows = $affectedRows;
+	return 0 === $successesNeeded;
+    }
+
+    /**
+     * Updates multiple rows. The values for the column to search for is the
+     * key of each row.
+     * The number of total affected rows can be found in
+     * $this->multipleAffectedRows.
+     *
+     * @param string $tableName 	The table name.
+     * @param array $data 		The array of data changes. A
+     *					    one-dimensional array
+     * 					with keys as column names and values
+     *					    as their values.
+     *					Each data row must be under the key
+     *					    that is the same as the value of
+     *					    the column being searched for.
+     * @param string $column		(Options) the name of the column and
+     *					    key to search for. The default is
+     *					    'id'.
+     * @param string $updateSameColumn	(Options) If the column being searched
+     *					    for is within the a data row,
+     *					    if this is false, that key should
+     *					    be removed before updating the data.
+     *					    This is the default.
+     *
+     * @return boolean
+     **/
+    public function updateMultipleByKey(
+	$tableName, array $data, $column = 'id', $updateSameColumn = false
+    ) {
+	$successesNeeded = count($data);
+	$where = self::escapeIdentifier($column) . " = ?";
+	$affectedRows = 0;
+	foreach ($data as $by => $row) {
+	    if (!$updateSameColumn) {
+		unset($row[$column]);
+	    }
+	    $stmt = new AMysql_Statement($this);
+	    $stmt->update($tableName, $row, $where)->execute(array ($by));
+	    $affectedRows += $stmt->affectedRows;
+	    if ($stmt->result) {
+		$successesNeeded--;
+	    }
+	}
+	$this->multipleAffectedRows = $affectedRows;
+	return 0 === $successesNeeded;
     }
 
     /**
@@ -261,15 +546,62 @@ abstract class AMysql_Abstract {
     }
 
     /**
+     * Performs an instant REPLACE.
+     *
+     * @see $this->insert()
+     *
+     * @return boolean Success.
+     **/
+    public function replace($tableName, array $data) {
+        $stmt = new AMysql_Statement($this);
+        $stmt->replace($tableName, $data);
+        $success = $stmt->execute();
+        return $success;
+    }
+
+    /**
+     * Performs an INSERT or an UPDATE; if the $value
+     * parameter is not falsy, an UPDATE is performed with the given column name
+     * and value, otherwise an insert. It is recommended that this is used for
+     * tables with a primary key, and use the primary key as the column to
+     * look at. Also, this would keep the return value consistent.
+     * 
+     * @param mixed $tableName		The table name to INSERT or UPDATE to
+     * @param mixed $data		The data to change
+     * @param mixed $columnName		The column to search by. It should be
+     *					a primary key.
+     * @param mixed $value		(Optional) The value to look for in
+     *					case you want
+     *					to UPDATE. Keep this at null, 0,
+     *					or anything else falsy for INSERT.
+     *
+     * @return integer			If the $value is not falsy, it returns
+     *					$value after UPDATING. Otherwise the
+     *					mysql_insert_id() of the newly
+     *					INSERTED row.
+     */
+    public function save($tableName, $data, $columnName, $value = null) {
+	if ($value) {
+	    $where = AMysql_Abstract::escapeIdentifier($columnName) . ' = ?';
+	    $this->update($tableName, $data, $where, array ($value));
+	    return $value;
+	}
+	else {
+	    $id = $this->insert($tableName, $data);
+	    return $id;
+	}
+    }
+
+    /**
      * Performs an instant DELETE.
      *
      * @param string $tableName 	The table name.
      * @param string $where		An SQL substring of the WHERE clause.
-     * @param array $binds		(Optional) The binds for the WHERE clause.
+     * @param mixed $binds		(Optional) The binds or a single bind for the WHERE clause.
      *
      * @return resource|false The mysql resource if the delete was successful, otherwise false.
      **/
-    public function delete($tableName, $where, $binds = null) {
+    public function delete($tableName, $where, $binds = array ()) {
         $stmt = new AMysql_Statement($this);
         $stmt->delete($tableName, $where);
         $result = $stmt->execute($binds);
@@ -293,6 +625,12 @@ abstract class AMysql_Abstract {
 
     /**
      * Returns an AMysql_Expr for using in prepared statements as values.
+     * See the AMysql_Expr class for details.
+     * To bind a literal value without apostrophes, here is an example of
+     * how you can execute a prepared statement with the help of placeholders:
+     *	$amysql->prepare('SELECT ? AS time')->execute(array (
+     *	    $amysql->expr('CURRENT_TIMESTAMP')
+     *	))
      *
      * @see AMysql_Expr
      *
@@ -333,13 +671,11 @@ abstract class AMysql_Abstract {
      **/
     public function escape($value) {
         $res = $this->link;
-        if ('mysql link' != get_resource_type($res)) {
+        $isValidLink = $res instanceof Mysqli || 'mysql link' == get_resource_type($res);
+        if (!$isValidLink) {
             throw new RuntimeException('Resource is not a mysql resource.', 0, $sql);
         }
-        // In the case of a string, let's put it between apostrophes
-        if (is_string($value)) {
-            return "'" . mysql_real_escape_string($value, $res) . "'";
-        }
+        $isMysqli = 'mysqli' == $this->linkType;
         // If it's an int, place it there literally
         if (is_int($value)) {
             return $value;
@@ -356,6 +692,101 @@ abstract class AMysql_Abstract {
         if ($value instanceof AMysql_Expr) {
             return $value->__toString();
         }
+	// In the case of a string or anything else, let's escape it and
+	// put it between apostrophes.
+        return "'" .
+            ($isMysqli ? $this->link->real_escape_string($value) : mysql_real_escape_string($value, $res)) .
+            "'"
+        ;
+    }
+
+    /**
+     * Transposes a 2 dimensional array.
+     * Every inner array must contain the same keys as the other inner arrays,
+     * otherwise unexpected results may occur.
+     *
+     * Example:
+     *   $input = array (
+     *       3 => array (
+     *           'col1' => 'bla',
+     *           'col2' => 'yo'
+     *       ),
+     *       9 => array (
+     *           'col1' => 'ney',
+     *           'col2' => 'lol'
+     *       )
+     *   );
+     *   $output = $amysql->transpose($input);
+     *
+     *   $output: array (
+     *       'col1' => array (
+     *           3 => 'bla',
+     *           9 => 'ney'
+     *       ),
+     *       'col2' => array (
+     *           3 => 'yo',
+     *           9 => 'lol'
+     *       )
+     *   );
+     *
+     * @param array $array The 2 dimensional array to transpose
+     * @return array
+     */
+    public static function transpose(array $array) {
+        $ret = array ();
+        if (!$array) {
+            return $ret;
+        }
+        foreach ($array as $key1 => $arraySub) {
+            if (!$ret) {
+                foreach ($arraySub as $key2 => $value) {
+                    $ret[$key2] = array ($key1 => $value);
+                }
+            }
+            else {
+                foreach ($arraySub as $key2 => $value) {
+                    $ret[$key2][$key1] = $value;
+                }
+            }
+        }
+        return $ret;
+    }
+
+    public function addQuery($query, $queryTime) {
+        $this->_queries[] = $query;
+        $data = array (
+            'query' => $query,
+            'time' => $queryTime
+        );
+        if ($this->includeBacktrace) {
+            $opts = 0;
+            if (defined('DEBUG_BACKTRACE_IGNORE_ARGS')) {
+                $opts |= DEBUG_BACKTRACE_IGNORE_ARGS;
+            }
+            $data['backtrace'] = debug_backtrace($opts);
+        }
+        $this->_queriesData[] = $data;
+        if (is_numeric($queryTime)) {
+            $this->totalTime += $queryTime;
+        }
+    }
+
+    public function getQueries() {
+        return $this->_queries;
+    }
+
+    /**
+     * Returns an arrays of profiled query data. Each value is an array that consists
+     * of:
+     *  - query - The SQL query performed
+     *  - time - The amount of seconds the query took (float)
+     *
+     * If profileQueries wss off at any query, its time value will be null.
+     * 
+     * @return array[]
+     */
+    public function getQueriesData() {
+        return $this->_queriesData;
     }
 }
 ?>
