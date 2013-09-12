@@ -735,44 +735,6 @@ class AMysql_Statement implements IteratorAggregate, Countable {
         return mysql_num_rows($this->result);
     }
 
-    /**
-     * Do not use this method! It requires a lot of revision, and is subject
-     * to change a lot.
-     * 
-     * Begins a SELECT statement. To this method you can pass an array of
-     * column names, or column names as variable arguments. The column names
-     * will be listed after SELECT, so the prepared statement will look like:
-     *	SELECT `column1`, `column2`, `column3`
-     * In the case that those three columns were passed to this method
-     * (without the backticks).
-     * If you pass an array of columns instead of columns as dynamic parameters,
-     * and the array's keys are not numeric, the given column names will be
-     * aliased with "AS" to the key.
-     *
-     * @return this                                   
-     **/         
-    public function select(/* $params... */) {
-	$sql = 'SELECT ';
-	$arg0 = func_get_arg(0);
-	if (is_array($arg0)) {
-	    $columnsString = $this->_getColumnsStringByArray($arg0);
-	}
-	else {
-	    $args = func_get_args();
-	    // ha csak egy paraméter lett átadva, akkor literálisan vesszük
-	    // azt a kiválasztást
-	    if (1 == count($args)) {
-		$columnsString = $args[0];
-	    }
-	    else {
-		$columnsString = $this->_getColumnsStringByArray($args);
-	    }
-	}
-	$sql .= $columnsString;
-	$this->prepared = $sql;
-	return $this;
-    }
-
     protected function _getTablesStringByArray($tableArray) {
 	$tables = array ();
 	foreach ($tableArray as $alias => $tableName) {
@@ -798,96 +760,6 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	    $columns[] = $column;
 	}
 	return implode(', ', $columns);
-    }
-
-    /**
-     * Append FROM and a list of table names to the prepared sql string.
-     * This method accepts table names as an array or as dynamic arguments,
-     * and in case of the former, the table names will be aliased with "AS"
-     * to their key if it is not numeric.
-     *
-     * This method is experimental, not supported yet, and use of it is
-     * discouraged, because it may change a lot in the future.
-     *
-     * @return $this
-     **/         
-    public function from(/* $params... */) {
-	$arg0 = func_get_arg(0);
-	if (is_array($arg0)) {
-	    $tablesString = $this->_getTablesStringByArray($arg0);
-	}
-	else {
-	    $args = func_get_args();
-	    // ha csak egy paraméter lett átadva, akkor literálisan vesszük
-	    // azt az 1 stringet
-	    if (1 == count($args)) {
-		$tablesString = $args[0];
-	    }
-	    else {
-		$tablesString = $this->_getTablesStringByArray($args);
-	    }
-	}
-	$sql = ' FROM ' . $tablesString . ' ';
-	$this->prepared .= $sql;
-	return $this;
-    }
-
-    /**
-     * Appends WHERE and a given string to the prepared sql string.
-     *
-     * This method is experimental, not supported yet, and use of it is
-     * discouraged, because it may change a lot in the future.
-     *
-     * @param string $where		The string that goes after WHERE
-     *
-     * @return $this;
-     **/         
-    public function where($where) {
-	$sql = ' WHERE ';
-	if (is_string($where) or ($where instanceof AMysql_Expr)) {
-	    $sql .= $where;
-	}
-	$this->prepared .= $sql;
-	return $this;
-    }
-
-    /**
-     * Appends LEFT JOIN and a given table name, an optional AS and an
-     * optional ON to the prepared sql string.
-     *
-     * This method is experimental, not supported yet, and use of it is
-     * discouraged, because it may change a lot in the future.
-     *
-     * @param string $tableName		The table name to left join.
-     * @param string $as		(Optional) What to alias the table
-     * @param string $on		(Optional) The ON condition.
-     *
-     * @return $this;
-     **/         
-    public function leftJoin($tableName, $as = null, $on = null) {
-	$sql = ' LEFT JOIN ' . $this->escapeIdentifier($tableName, $as);
-	$this->prepared .= $sql;
-	if ($on) {
-	    $this->on($on);
-	}
-
-	return $this;
-    }
-
-    /**
-     * Appends ON and a given string to the prepared sql string.
-     *
-     * This method is experimental, not supported yet, and use of it is
-     * discouraged, because it may change a lot in the future.
-     *
-     * @param string $on		The ON condition.
-     *
-     * @return $this;
-     **/
-    public function on($on) {
-	$sql = ' ON ' . $on;
-	$this->prepared .= $sql;
-	return $this;
     }
 
     public function escapeIdentifierSimple($columnName) {
@@ -1141,26 +1013,6 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	$this->prepare($sql);
 	if ($where) {
 	    $this->where($where);
-	}
-	return $this;
-    }
-
-    public function orderBy($orderBy, $order = 'ASC') {
-	$this->prepared .= ' ORDER BY ' . $orderBy . ' ' . $order;
-	return $this;
-    }
-
-    /**
-     * LIMIT-et fűz hozzá az előkészített sql stringhez.
-     * @param int $limit A max sorok száma
-     * @param int $offset (Opcionális) OFFSET     
-     **/         
-    public function limit($limit = null, $offset = null) {
-	if ($limit) {
-	    $this->prepared .= " LIMIT $limit";
-	}
-	if ($offset) {
-	    $this->prepared .= "OFFSET $offset";
 	}
 	return $this;
     }

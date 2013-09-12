@@ -386,18 +386,13 @@ abstract class AMysql_Abstract {
     }
 
     /**
-     * Starts building a new SELECT sql.
-     * USAGE OF THIS METHOD IS HIGHLY DISCOURAGED. IT IS BOUND TO CHANGE A LOT.
-     * Use prepared statements instead.
+     * Returns a new instance of AMysql_Select.
      *
-     * @see AMysql_Statement::select()
-     *
-     * @return AMysql_Statement
+     * @return AMysql_Select
      **/
     public function select() {
-        $stmt = $this->newStatement();
-        $args = func_get_args();
-        return call_user_func_array(array($stmt, 'select'), $args);
+        $select = new AMysql_Select($this);
+        return $select;
     }
 
     /**
