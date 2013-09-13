@@ -626,13 +626,17 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @access public
      * @return array
      */
-    public function pairUp($keyColumn = 0, $valueColumn = 1) {
+    public function fetchPairs($keyColumn = 0, $valueColumn = 1) {
 	$ret = array ();
 	while ($row = $this->fetchArray()) {
 	    $key = $row[$keyColumn];
 	    $ret[$key] = $row[$valueColumn];
 	}
 	return $ret;
+    }
+
+    public function pairUp($keyColumn = 0, $valueColumn = 1) {
+        return $this->fetchPairs($keyColumn, $valueColumn);
     }
 
     /**
