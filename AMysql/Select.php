@@ -70,19 +70,23 @@ class AMysql_Select extends AMysql_Statement {
      * @param string|AMysql_Expr|array $columns          The column name. Can be an array or column
      *                                                  names in which case the key can mark the
      *                                                  optional alias of the column.
+     * @param array $options                            (Options) an array of config options
+     *                                                  columnPrefix - prefix each column with this
+     *                                                  table prefix
      * @access public
      * @return $this
      */
-    public function column($columns)
+    public function column($columns, $options = array ())
     {
         $columns = (array) $columns;
+        $columnPrefix = !empty($options['columnPrefix']) ? $options.columnPrefix . '.' : '';
         foreach ($columns as $alias => $columnName) {
             if ('*' == $columnName[strlen($columnName)- 1]) {
-                $this->columns['*'] = $columnName;
+                $this->columns['*'] = "$columnPrefix$columnName";
             }
             else {
                 $key = $alias && !is_numeric($alias) ? $alias : $columnName;
-                $this->columns[$key] = $this->formatSelectColumn($columnName, $alias);
+                $this->columns[$key] = $this->formatSelectColumn("$columnPrefix$columnName", $alias);
             }
         }
         return $this;
@@ -125,14 +129,24 @@ class AMysql_Select extends AMysql_Statement {
     }
 
     /**
-     * Adds a table name to the list of tables to select FROM.
+     * Adds one or more table name to the list of tables to select FROM.
      * You can use literals as table names with AMysql_Expr.
+     *
+     * Alternatively, if you only select from 1 table here, you can supply an array
+     * of columns to select, having them automatically prefixed to the needed prefix
+     * of the table selected from. Similar to Zend Framework 1.
+     * 
+     * e.g.
+     * ->from(array('p' => 'products'),
+     *       array('product_id', 'product_name'));// Build this query:
+     * // results in: SELECT p."product_id", p."product_name" FROM "products" AS p
      * 
      * @param string|AMysql_Expr|array $tables          The table name. Can be an array or table
      *                                                  names in which case the key can mark the
      *                                                  optional alias of the table.
      * @param array $columns                            (Optional)
-     *                                                  The columns from this table to select. TODO!
+     *                                                  The columns from this table to select.
+     *                                                  Do not use if you are selecting from more than 1 tables!
      * @access public
      * @return $this
      */
@@ -142,6 +156,12 @@ class AMysql_Select extends AMysql_Statement {
         foreach ($tables as $alias => $tableName) {
             $key = !is_numeric($alias) ? $alias : $tableName;
             $this->froms[$key] = $this->formatFrom($tableName);
+        }
+        if ($columns) {
+            $key = !is_numeric($alias) ? $alias : $tableName;
+            $columnOptions = array ();
+            $columnOptions['columnPrefix'] = $key;
+            $this->column($columns, $columnOptions);
         }
         return $this;
     }
@@ -164,20 +184,22 @@ class AMysql_Select extends AMysql_Statement {
     public function join($type, $table, $on, $columns = array (), $prepend = false)
     {
         $table = (array) $table;
-
         $tableName = reset($table);
         $alias = key($table);
-
         $joinText = $type ? strtoupper($type) . ' JOIN' : 'JOIN';
-
-        $table = $this->formatFrom($table, $alias);
-
-        $text = "$joinText $table ON $on";
+        $tableText = $this->formatFrom($tableName, $alias);
+        $text = "$joinText $tableText ON $on";
         if ($prepend) {
             array_unshift($this->joins, $text);
         }
         else {
             $this->joins[] = $text;
+        }
+        if ($columns) {
+            $key = !is_numeric($alias) ? $alias : $tableName;
+            $columnOptions = array ();
+            $columnOptions['columnPrefix'] = $key;
+            $this->column($columns, $columnOptions);
         }
         return $this;
     }
