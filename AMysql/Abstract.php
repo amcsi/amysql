@@ -71,6 +71,10 @@ abstract class AMysql_Abstract {
      */
     protected $_fetchMode = self::FETCH_ASSOC;
 
+    protected $connDetails = array ();
+
+    static $useMysqli;
+
     const FETCH_ASSOC	= 'assoc';
     const FETCH_OBJECT	= 'object';
     const FETCH_ARRAY	= 'array';
@@ -78,56 +82,121 @@ abstract class AMysql_Abstract {
 
     /**
      * @constructor
-     * @param resource|string $resOrHost    Either a valid mysql connection
-     *					    resource, or if you're connecting
-     *					    to mysql with this class, then
-     *					    pass the same parameters you would
-     *					    pass to mysql_connect.
+     * @param resource|mysqli|array|string $resOrArrayOrHost    (Optional) Either a valid mysql or mysqli connection
+     *					            resource/object, or a connection details array
+     *					            as according to setConnDetails() (doesn't auto connect),
+     *					            or parameters you would normally pass to the mysql_connect()
+     *					            function. (auto connects)
+     *					            (NOTE that this last construction method is
+     *					            discouraged and may be deprecated and removed in later versions)
+     *					            (Also note that I mention the arguments mysql_connect(), but only
+     *					            the arguments. This library will still connect to mysqli if it
+     *					            is available)
+     *
+     * @see $this->setConnDetails()
+     * @see $this->setConnDetails()
      *
      **/
     public function __construct(
-        $resOrHost = null, $username = null,
-        $password = null, $newLink = null, $clientFlags = 0) 
-    {
-        static $useMysqli = null;
-
+        $resOrArrayOrHost = null, $username = null,
+        $password = null, $newLink = false, $clientFlags = 0
+    ) {
         if (
-            is_resource($resOrHost) &&
-            'mysql link' == get_resource_type($resOrHost)) 
+            is_resource($resOrArrayOrHost) &&
+            'mysql link' == get_resource_type($resOrArrayOrHost)) 
         {
-            $this->link = $resOrHost;
+            $this->link = $resOrArrayOrHost;
             $this->linkType = 'mysql';
         }
-        else if ($resOrHost instanceof Mysqli) {
-            $this->link = $resOrHost;
+        else if ($resOrArrayOrHost instanceof Mysqli) {
+            $this->link = $resOrArrayOrHost;
             $this->linkType = 'mysqli';
         }
-        else if(is_null($resOrHost) || is_string($resOrHost)) {
-            if (!isset($useMysqli)) {
-                // use mysqli if available and PHP is at least of version 5.3.0 (required)
-                $useMysqli = class_exists('Mysqli', false) && function_exists('mysqli_stmt_get_result');
-            }
-            $args = func_get_args();
-            $linkType = $useMysqli ? 'mysqli' : 'mysql';
-            $funcName = "{$linkType}_connect";
-            $this->linkType = $linkType;
-            $res = call_user_func_array($funcName, $args);
-            if ($res) {
-                $this->link = $res;
-            }
-            else {
-                if ('mysqli' == $linkType) {
-                    throw new AMysql_Exception(mysqli_connect_error(), mysqli_connect_errno(),
-                        '(connection to mysql)');
-                }
-                else {
-                    throw new AMysql_Exception(mysql_error(), mysql_errno(),
-                        '(connection to mysql)');
-                }
-            }
+        else if (is_array ($resOrArrayOrHost)) {
+            $this->setConnDetails($resOrArrayOrHost);
+        }
+        else if (is_string($resOrArrayOrHost)) {
+            $this->oldSetConnDetails($resOrArrayOrHost, $username, $password, $newLink, $clientFlags);
+            $this->connect();
+        }
+    }
+
+    /**
+     * Sets the connection details
+     * 
+     * @param array $connDetails        An array of details:
+     *                                  host - hostname or ip
+     *                                  username - username
+     *                                  password - password
+     *                                  db - db to auto connect to
+     *                                  port - port
+     *                                  socket - socket
+     *
+     *
+     * @access public
+     * @return void
+     */
+    public function setConnDetails(array $cd) {
+        $defaults = array (
+            'socket' => ini_get('mysqli.default_socket'),
+            'db' => null,
+            'newLink' => false,
+            'clientFlags' => 0,
+        );
+        $this->connDetails = array_merge($defaults, $cd);
+        return $this;
+    }
+
+    /**
+     * @see mysql_connect() 
+     */
+    public function oldSetConnDetails(
+        $host = null, $username = null, $password = null, $newLink = false, $clientFlags = 0
+    ) {
+        $port = null;
+        $cd = array ();
+        if ($host && false !== strpos($host, ':')) {
+            list ($host, $port) = explode(':', $host, 2);
+        }
+        $cd['host'] = $host;
+        $cd['port'] = $port;
+        $cd['username'] = $username;
+        $cd['password'] = $password;
+        $cd['newLink'] = $newLink;
+        $cd['clientFlags'] = $clientFlags;
+        $this->setConnDetails($cd);
+        return $this;
+    }
+
+    public function connect() {
+        if (!isset(self::$useMysqli)) {
+            // use mysqli if available and PHP is at least of version 5.3.0 (required)
+            self::$useMysqli = class_exists('Mysqli', false) && function_exists('mysqli_stmt_get_result');
+        }
+        $linkType = self::$useMysqli ? 'mysqli' : 'mysql';
+        $funcName = "{$linkType}_connect";
+        $this->linkType = $linkType;
+        $cd = $this->connDetails;
+        if (self::$useMysqli) {
+            $port = isset($cd['port']) ? $cd['port'] : ini_get('mysqli.default_port');
+            $res = mysqli_connect($cd['host'], $cd['username'], $cd['password'], $cd['db'], $port, $cd['socket']);
         }
         else {
-            throw new RuntimeException('Resource given is not a mysql resource.', 0);
+            $host = isset($cd['port']) ? "$cd[host]:$cd[port]" : $cd['host'];
+            $res = mysql_connect($host, $cd['username'], $cd['password'], false, $cd['clientFlags']);
+        }
+        if ($res) {
+            $this->link = $res;
+        }
+        else {
+            if ('mysqli' == $linkType) {
+                throw new AMysql_Exception(mysqli_connect_error(), mysqli_connect_errno(),
+                    '(connection to mysql)');
+            }
+            else {
+                throw new AMysql_Exception(mysql_error(), mysql_errno(),
+                    '(connection to mysql)');
+            }
         }
     }
 

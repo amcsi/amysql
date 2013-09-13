@@ -7,8 +7,13 @@ class AbstractTest extends PHPUnit_Framework_TestCase {
     public $tableName = 'abstracttest';
 
     public function setUp() {
+        try {
 	$this->_amysql = new AMysql(
-	    AMYSQL_TEST_HOST, AMYSQL_TEST_USER, AMYSQL_TEST_PASS);
+            AMYSQL_TEST_HOST, AMYSQL_TEST_USER, AMYSQL_TEST_PASS);
+        }
+        catch (Exception $e) {
+            var_dump($e);
+        }
 	$this->_amysql->selectDb(AMYSQL_TEST_DB);
 
 	$sql = <<<EOT
