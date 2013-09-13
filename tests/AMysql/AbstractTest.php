@@ -16,6 +16,10 @@ class AbstractTest extends PHPUnit_Framework_TestCase {
         }
 	$this->_amysql->selectDb(AMYSQL_TEST_DB);
 
+        $this->createTable();
+    }
+
+    public function createTable() {
 	$sql = <<<EOT
 CREATE TABLE IF NOT EXISTS `$this->tableName` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -31,7 +35,15 @@ EOT;
 	$this->_amysql = null;
     }
 
-    public function createTable() {
+    public function testLazyConnect() {
+        $this->tearDown();
+        $this->_amysql = new AMysql;
+        $this->_amysql->setConnDetails(array (
+            'host' => AMYSQL_TEST_HOST,
+            'username' =>AMYSQL_TEST_USER,
+            'password' => AMYSQL_TEST_PASS
+        ));
+        $this->createTable();
     }
 
     public function testInsertSingleRow() {

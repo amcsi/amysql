@@ -101,6 +101,7 @@ abstract class AMysql_Abstract {
         $resOrArrayOrHost = null, $username = null,
         $password = null, $newLink = false, $clientFlags = 0
     ) {
+
         if (
             is_resource($resOrArrayOrHost) &&
             'mysql link' == get_resource_type($resOrArrayOrHost)) 
@@ -137,6 +138,9 @@ abstract class AMysql_Abstract {
      * @return void
      */
     public function setConnDetails(array $cd) {
+        // use mysqli if available and PHP is at least of version 5.3.0 (required)
+        self::$useMysqli = class_exists('Mysqli', false) && function_exists('mysqli_stmt_get_result');
+
         $defaults = array (
             'socket' => ini_get('mysqli.default_socket'),
             'db' => null,
@@ -177,10 +181,6 @@ abstract class AMysql_Abstract {
      */
     public function connect()
     {
-        if (!isset(self::$useMysqli)) {
-            // use mysqli if available and PHP is at least of version 5.3.0 (required)
-            self::$useMysqli = class_exists('Mysqli', false) && function_exists('mysqli_stmt_get_result');
-        }
         $isMysqli = self::$useMysqli;
         $this->isMysqli = $isMysqli;
         $cd = $this->connDetails;
