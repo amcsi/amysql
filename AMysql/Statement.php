@@ -65,11 +65,33 @@ class AMysql_Statement implements IteratorAggregate, Countable {
     public function __construct(AMysql_Abstract $amysql) {
 	$amysql->lastStatement = $this;
 	$this->amysql = $amysql;
-	$this->link = $amysql->link;
+        $this->link = $amysql->link;
         $this->isMysqli = $amysql->isMysqli;
         $this->profileQueries = $amysql->profileQueries;
 	$this->throwExceptions = $this->amysql->throwExceptions;
 	$this->setFetchMode($amysql->getFetchMode());
+    }
+
+    /**
+     * Fetches the mysql link. If it is not set, try to take it
+     * from the amysql object. Of still not set, try to connect and
+     * take it.
+     * 
+     * @access public
+     * @return resource|Mysqli $link        The mysql resource or Mysqli object
+     */
+    public function getLink()
+    {
+        if (!$this->link) {
+            $amysql = $this->amysql;
+            $link = $amysql->link;
+            if (!$link) {
+                $amysql->connect();
+                $link = $amysql->link;
+            }
+            $this->link = $link;
+        }
+        return $this->link;
     }
 
     public function getIterator() {
@@ -284,7 +306,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	    );
         }
         $isMysqli = $this->isMysqli;
-        $link = $this->link;
+        $link = $this->getLink();
         $this->_executed = true;
 	$this->query = $sql; 
 	if (!$isMysqli && 'mysql link' != get_resource_type($link)) {
@@ -1049,7 +1071,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @return integer|false
      **/	     
     public function insertId() {
-	$ret = $this->isMysqli ? $result->insert_id() : mysql_insert_id($this->link);
+	$ret = $this->isMysqli ? $result->insert_id() : mysql_insert_id($this->getLink());
 	return $ret;
     }
 

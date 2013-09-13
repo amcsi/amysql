@@ -168,7 +168,15 @@ abstract class AMysql_Abstract {
         return $this;
     }
 
-    public function connect() {
+    /**
+     * Connects to the database with the configured settings.
+     * Sets $this->link and $this->isMysqli
+     * 
+     * @access public
+     * @return $this
+     */
+    public function connect()
+    {
         if (!isset(self::$useMysqli)) {
             // use mysqli if available and PHP is at least of version 5.3.0 (required)
             self::$useMysqli = class_exists('Mysqli', false) && function_exists('mysqli_stmt_get_result');
@@ -186,6 +194,10 @@ abstract class AMysql_Abstract {
         }
         if ($res) {
             $this->link = $res;
+
+            if (!$isMysqli && !empty($cd['db'])) {
+                $this->selectDb($cd['db']);
+            }
         }
         else {
             if ($this->isMysqli) {
@@ -197,6 +209,7 @@ abstract class AMysql_Abstract {
                     '(connection to mysql)');
             }
         }
+        return $this;
     }
 
     public function getFetchMode() {
