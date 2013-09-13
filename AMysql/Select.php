@@ -12,9 +12,9 @@
  */
 class AMysql_Select extends AMysql_Statement {
 
+    protected $selectOptions = array ();
     protected $columnLiteral;
     protected $columns = array ();
-
     protected $froms = array ();
     protected $joins = array ();
     protected $wheres = array ();
@@ -23,8 +23,6 @@ class AMysql_Select extends AMysql_Statement {
     protected $orderBys = array ();
     protected $limit = null;
     protected $offset = null;
-
-    protected $selectOptions = array ();
 
     /**
      * Adds a select option.
@@ -40,6 +38,7 @@ class AMysql_Select extends AMysql_Statement {
     public function option($selectOption)
     {
         $this->selectOptions[$selectOption] = $selectOption;
+        return $this;
     }
 
     /**
@@ -59,7 +58,7 @@ class AMysql_Select extends AMysql_Statement {
         }
         $ret = AMysql_Abstract::escapeIdentifier($columnName);
         if ($alias && !is_numeric($alias)) {
-            $ret .= " AS $alias";
+            $ret .= ' AS ' . AMysql_Abstract::escapeIdentifierSimple($alias);
         }
         return $ret;
     }
@@ -79,7 +78,7 @@ class AMysql_Select extends AMysql_Statement {
     public function column($columns, $options = array ())
     {
         $columns = (array) $columns;
-        $columnPrefix = !empty($options['columnPrefix']) ? $options.columnPrefix . '.' : '';
+        $columnPrefix = !empty($options['columnPrefix']) ? $options['columnPrefix'] . '.' : '';
         foreach ($columns as $alias => $columnName) {
             if ('*' == $columnName[strlen($columnName)- 1]) {
                 $this->columns['*'] = "$columnPrefix$columnName";
@@ -123,7 +122,7 @@ class AMysql_Select extends AMysql_Statement {
     {
         $ret = AMysql_Abstract::escapeIdentifier($tableName);
         if ($alias && !is_numeric($alias)) {
-            $ret .= " AS $alias";
+            $ret .= ' AS ' . AMysql_Abstract::escapeIdentifierSimple($alias);
         }
         return $ret;
     }
@@ -156,7 +155,7 @@ class AMysql_Select extends AMysql_Statement {
         $tables = (array) $tables;
         foreach ($tables as $alias => $tableName) {
             $key = !is_numeric($alias) ? $alias : $tableName;
-            $this->froms[$key] = $this->formatFrom($tableName);
+            $this->froms[$key] = $this->formatFrom($tableName, $alias);
         }
         if ($columns) {
             $key = !is_numeric($alias) ? $alias : $tableName;
@@ -189,7 +188,7 @@ class AMysql_Select extends AMysql_Statement {
         $alias = key($table);
         $joinText = $type ? strtoupper($type) . ' JOIN' : 'JOIN';
         $tableText = $this->formatFrom($tableName, $alias);
-        $text = "$joinText $tableText ON $on";
+        $text = "$joinText $tableText ON ($on)";
         if ($prepend) {
             array_unshift($this->joins, $text);
         }
@@ -332,7 +331,7 @@ class AMysql_Select extends AMysql_Statement {
     {
         $parts = array ('SELECT');
         if ($this->selectOptions) {
-            $parts[] = join (', ', $this->selectOptions) . ' ';
+            $parts[] = join (', ', $this->selectOptions);
         }
 
         $columns = $this->columns;
@@ -340,7 +339,10 @@ class AMysql_Select extends AMysql_Statement {
             $columns[] = $this->columnLiteral;
         }
         $parts[] = join(', ', $columns);
-        if ($this->from) {
+
+        $parts = array (join(' ', $parts)); // okay so everything so far should be 1 part.
+
+        if ($this->froms) {
             $parts[] = 'FROM ' . join(', ', $this->froms);
         }
 
@@ -349,7 +351,7 @@ class AMysql_Select extends AMysql_Statement {
         }
 
         if ($this->wheres) {
-            $parts[] = 'WHERE ' . join(', ', $this->wheres);
+            $parts[] = 'WHERE ' . join(' AND ', $this->wheres);
         }
 
         if ($this->groupBys) {
@@ -362,7 +364,7 @@ class AMysql_Select extends AMysql_Statement {
         }
 
         if ($this->havings) {
-            $parts[] = 'HAVING ' . join(', ', $this->havings);
+            $parts[] = 'HAVING ' . join(' AND ', $this->havings);
         }
 
         if ($this->orderBys) {
