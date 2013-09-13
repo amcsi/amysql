@@ -131,10 +131,12 @@ class AMysql_Select extends AMysql_Statement {
      * @param string|AMysql_Expr|array $tables          The table name. Can be an array or table
      *                                                  names in which case the key can mark the
      *                                                  optional alias of the table.
+     * @param array $columns                            (Optional)
+     *                                                  The columns from this table to select. TODO!
      * @access public
      * @return $this
      */
-    public function from($tables)
+    public function from($tables, $columns = array ())
     {
         $tables = (array) $tables;
         foreach ($tables as $alias => $tableName) {
@@ -150,19 +152,25 @@ class AMysql_Select extends AMysql_Statement {
      * @param string $type      Type of join. 'left' would be LEFT JOIN, 'inner'
      *                          would be INNER JOIN. Leaving this falsy will result
      *                          in a normal JOIN.
-     * @param string $table     The table name to join.
+     * @param string $table     The table name to join. Can be a 1 element array of
+     *                          ['alias' => 'tableName']
      * @param string $on        The ON clause unbound.
-     * @param string $as        Column table name to alias this joined table as.
+     * @param array $columns    (Optional) The columns from this table to select. TODO!
      * @param boolean $prepend  (Optional) whether to prepend this JOIN to the other
      *                          joins. Default: false (append).
      * @access public
      * @return $this
      */
-    public function join($type, $table, $on, $as = false, $prepend = false)
+    public function join($type, $table, $on, $columns = array (), $prepend = false)
     {
+        $table = (array) $table;
+
+        $tableName = reset($table);
+        $alias = key($table);
+
         $joinText = $type ? strtoupper($type) . ' JOIN' : 'JOIN';
 
-        $table = $this->formatFrom($table, $as);
+        $table = $this->formatFrom($table, $alias);
 
         $text = "$joinText $table ON $on";
         if ($prepend) {
