@@ -11,15 +11,17 @@
  */
 class AMysql_Select extends AMysql_Statement {
 
+    protected $whatLiteral;
+    protected $what = array ();
+
     protected $froms = array ();
     protected $joins = array ();
     protected $wheres = array ();
+    protected $groupBys = array ();
+    protected $havings = array ();
+    protected $orderBys = array ();
     protected $limit = null;
     protected $offset = null;
-    protected $orderBys = array ();
-
-    protected $whatLiteral;
-    protected $what = array ();
 
     protected $selectOptions = array ();
 
@@ -33,20 +35,6 @@ class AMysql_Select extends AMysql_Statement {
         $this->selectOptions[$selectOption] = $selectOption;
     }
 
-    public function from($tableName, $as = null)
-    {
-        $ref = $as ? $as : $tableName;
-        $tableName = $tableName instanceof AMysql_Expr ?
-            $tableName->__toString() :
-            AMysql::escapeIdentifier($tableName) 
-        ;
-        if ($as) {
-            $tableName .= " AS $as";
-        }
-        $this->froms[$ref] = $tableName;
-        return $this;
-    }
-
     public function whatArray(array $what)
     {
         foreach ($what as $key => $val) {
@@ -57,7 +45,10 @@ class AMysql_Select extends AMysql_Statement {
 
     public function whatSingle($tableName, $alias = false)
     {
-        if ($alias) {
+        if ('*' == $tableName[strlen($tableName)- 1]) {
+            $this->what['*'] = $tableName;
+        }
+        else if ($alias) {
             // ['alias' => 'a.colName'] => ['alias' => `a.colName` AS `alias`]
             $this->what[$alias] = AMysql::escapeIdentifier($tableName, $alias);
         }
@@ -76,7 +67,22 @@ class AMysql_Select extends AMysql_Statement {
         $this->whatLiteral = $whatLiteral;
     }
 
-    public function join($type, $table, $on, $as = false, $prepend = false) {
+    public function from($tableName, $as = null)
+    {
+        $ref = $as ? $as : $tableName;
+        $tableName = $tableName instanceof AMysql_Expr ?
+            $tableName->__toString() :
+            AMysql::escapeIdentifier($tableName) 
+        ;
+        if ($as) {
+            $tableName .= " AS $as";
+        }
+        $this->froms[$ref] = $tableName;
+        return $this;
+    }
+
+    public function join($type, $table, $on, $as = false, $prepend = false)
+    {
         $joinText = $type ? strtoupper($type) . ' JOIN' : 'JOIN';
 
         $table = AMysql_Abstract::escapeIdentifier($table, $as);
@@ -91,10 +97,49 @@ class AMysql_Select extends AMysql_Statement {
         return $this;
     }
 
-    public function getFullColumnName($col)
+    public function where($where)
     {
-        $ret = AMysql_Abstract::escapeIdentifier($col);
-        return $ret;
+        $this->wheres[] = $where;
+        return $this;
+    }
+
+    public function groupBy($col, $dir = 'asc', $priority = 0)
+    {
+        return $this->_addOrderby($col, $dir, $priority, false);
+    }
+
+    public function prependGroupBy($col, $dir = 'asc', $priority = 0)
+    {
+        return $this->_addOrderby($col, $dir, $priority, true);
+    }
+
+    protected function _addGroupBy($col, $dir = 'asc', $priority = 0, $prepend = false)
+    {
+        $what = $this->getFullColumnName($col);
+        if ('desc' === strtolower($dir)) {
+            $what .= ' DESC';
+        }
+        return $this->_groupBy($what, $priority, $prepend);
+    }
+
+    protected function _groupBy($what, $priority = 0, $prepend = false)
+    {
+        if (!isset($this->groupBys[$priority])) {
+            $this->groupBys[$priority] = array ();
+        }
+        if ($prepend) {
+            array_unshift($this->groupBys[$priority], $what);
+        }
+        else {
+            $this->groupBys[$priority][] = $what;
+        }
+        return $this;
+    }
+
+    public function having($having)
+    {
+        $this->havings[] = $having;
+        return $this;
     }
 
     public function orderBy($col, $dir = 'asc', $priority = 0)
@@ -130,12 +175,6 @@ class AMysql_Select extends AMysql_Statement {
         return $this;
     }
 
-    public function where($where)
-    {
-        $this->wheres[] = $where;
-        return $this;
-    }
-
     public function limit($limit)
     {
         $this->limit = (is_numeric($limit) && 0 < $limit) ? (int) $limit : null;
@@ -148,12 +187,14 @@ class AMysql_Select extends AMysql_Statement {
         return $this;
     }
 
-    public function getSql($prepared = null) {
+    public function getSql($prepared = null)
+    {
         $this->prepared = $this->getUnboundSql();
         parent::getSql();
     }
 
-    public function getUnboundSql() {
+    public function getUnboundSql()
+    {
         $parts = array ('SELECT');
         if ($this->selectOptions) {
             $parts[] = join (', ', $this->selectOptions) . ' ';
@@ -172,6 +213,27 @@ class AMysql_Select extends AMysql_Statement {
             $parts[] = $join;
         }
 
+        if ($this->wheres) {
+            $parts[] = 'WHERE ' . join(', ', $this->wheres);
+        }
+
+        if ($this->groupBys) {
+            krsort($this->groupBys);
+            $ob = array ();
+            foreach ($this->groupBys as $priority => $groupBys) {
+                // these are only the array of groupBys under this priority. Let's iterate deeper.
+                foreach ($groupBys as $groupBy) {
+                    $ob[] = $groupBy;
+                }
+            }
+            $ob = join(', ', $ob);
+            $parts[] = 'GROUP BY ' . $ob;
+        }
+
+        if ($this->havings) {
+            $parts[] = 'HAVING ' . join(', ', $this->havings);
+        }
+
         if ($this->orderBys) {
             krsort($this->orderBys);
             $ob = array ();
@@ -185,10 +247,6 @@ class AMysql_Select extends AMysql_Statement {
             $parts[] = 'ORDER BY ' . $ob;
         }
 
-        if ($this->wheres) {
-            $parts[] = 'WHERE ' . join(', ', $wheres);
-        }
-
         if ($this->limit) {
             $parts[] = "LIMIT $this->limit";
         }
@@ -198,5 +256,11 @@ class AMysql_Select extends AMysql_Statement {
         }
         $sql = join("\n", $parts);
         return $sql;
+    }
+
+    public function getFullColumnName($col)
+    {
+        $ret = AMysql_Abstract::escapeIdentifier($col);
+        return $ret;
     }
 }
