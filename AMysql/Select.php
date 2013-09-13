@@ -43,28 +43,46 @@ class AMysql_Select extends AMysql_Statement {
     }
 
     /**
+     * Formats a column name and an optional alias to form `columnName` AS alias.
+     * The alias is automatically not taken into account if it's numeric.
+     * No need to worry about escaping the select all star character '*'.
+     * 
+     * @param string $columnName    The column name.
+     * @param string $alias         (Optional) the alias to select AS
+     * @access public
+     * @return string
+     */
+    public function formatSelectColumn($columnName, $alias = null)
+    {
+        if ('*' == $columnName[strlen($columnName) - 1]) {
+            return $columnName;
+        }
+        $ret = AMysql_Abstract::escapeIdentifier($columnName);
+        if ($alias && !is_numeric($alias)) {
+            $ret .= " AS $alias";
+        }
+        return $ret;
+    }
+
+    /**
      * Adds one or more COLUMN to the list of columns to select. 
      * 
-     * @param string|AMysql_Expr|array $tables          The table name. Can be an array or table
+     * @param string|AMysql_Expr|array $columns          The column name. Can be an array or column
      *                                                  names in which case the key can mark the
-     *                                                  optional alias of the table.
+     *                                                  optional alias of the column.
      * @access public
      * @return $this
      */
-    public function column($table)
+    public function column($columns)
     {
-        $tables = (array) $tables;
-        foreach ($tables as $alias => $tableName) {
-            if ('*' == $tableName[strlen($tableName)- 1]) {
-                $this->columns['*'] = $tableName;
-            }
-            else if (!is_numeric($alias)) {
-                // ['alias' => 'a.colName'] => ['alias' => `a.colName` AS `alias`]
-                $this->columns[$alias] = AMysql::escapeIdentifier($tableName) . " AS $alias";
+        $columns = (array) $columns;
+        foreach ($columns as $alias => $columnName) {
+            if ('*' == $columnName[strlen($columnName)- 1]) {
+                $this->columns['*'] = $columnName;
             }
             else {
-                // [0 => 'a.colName'] => ['a.colName' => `a.colName`]
-                $this->columns[$tableName] = AMysql::escapeIdentifier($tableName);
+                $key = $alias && !is_numeric($alias) ? $alias : $columnName;
+                $this->columns[$key] = $this->formatSelectColumn($columnName, $alias);
             }
         }
         return $this;
@@ -89,6 +107,24 @@ class AMysql_Select extends AMysql_Statement {
     }
 
     /**
+     * Formats a table name and an optional alias to form `tableName` AS alias.
+     * The alias is automatically not taken into account if it's numeric.
+     * 
+     * @param string $tableName      The table name.
+     * @param string $alias         (Optional) the alias to select AS
+     * @access public
+     * @return string
+     */
+    public function formatFrom($tableName, $alias = null)
+    {
+        $ret = AMysql_Abstract::escapeIdentifier($tableName);
+        if ($alias && !is_numeric($alias)) {
+            $ret .= " AS $alias";
+        }
+        return $ret;
+    }
+
+    /**
      * Adds a table name to the list of tables to select FROM.
      * You can use literals as table names with AMysql_Expr.
      * 
@@ -103,7 +139,7 @@ class AMysql_Select extends AMysql_Statement {
         $tables = (array) $tables;
         foreach ($tables as $alias => $tableName) {
             $key = !is_numeric($alias) ? $alias : $tableName;
-            $this->froms[$key] = AMysql_Abstract::escapeIdentifier($tableName);
+            $this->froms[$key] = $this->formatFrom($tableName);
         }
         return $this;
     }
@@ -126,7 +162,7 @@ class AMysql_Select extends AMysql_Statement {
     {
         $joinText = $type ? strtoupper($type) . ' JOIN' : 'JOIN';
 
-        $table = AMysql_Abstract::escapeIdentifier($table, $as);
+        $table = $this->formatFrom($table, $as);
 
         $text = "$joinText $table ON $on";
         if ($prepend) {
