@@ -23,7 +23,7 @@ abstract class AMysql_Abstract {
     public $insertId; // last insert id
     public $lastStatement; // last AMysql_Statement
     public $link = null; // mysql link
-    public $linkType; // mysql or mysqli
+    public $isMysqli; // mysql or mysqli
     public $error; // last error message
     public $errno; // last error number
     public $result; // last mysql result
@@ -106,11 +106,11 @@ abstract class AMysql_Abstract {
             'mysql link' == get_resource_type($resOrArrayOrHost)) 
         {
             $this->link = $resOrArrayOrHost;
-            $this->linkType = 'mysql';
+            $this->isMysqli = false;
         }
         else if ($resOrArrayOrHost instanceof Mysqli) {
             $this->link = $resOrArrayOrHost;
-            $this->linkType = 'mysqli';
+            $this->isMysqli = true;
         }
         else if (is_array ($resOrArrayOrHost)) {
             $this->setConnDetails($resOrArrayOrHost);
@@ -173,9 +173,8 @@ abstract class AMysql_Abstract {
             // use mysqli if available and PHP is at least of version 5.3.0 (required)
             self::$useMysqli = class_exists('Mysqli', false) && function_exists('mysqli_stmt_get_result');
         }
-        $linkType = self::$useMysqli ? 'mysqli' : 'mysql';
-        $funcName = "{$linkType}_connect";
-        $this->linkType = $linkType;
+        $isMysqli = self::$useMysqli;
+        $this->isMysqli = $isMysqli;
         $cd = $this->connDetails;
         if (self::$useMysqli) {
             $port = isset($cd['port']) ? $cd['port'] : ini_get('mysqli.default_port');
@@ -189,7 +188,7 @@ abstract class AMysql_Abstract {
             $this->link = $res;
         }
         else {
-            if ('mysqli' == $linkType) {
+            if ($this->isMysqli) {
                 throw new AMysql_Exception(mysqli_connect_error(), mysqli_connect_errno(),
                     '(connection to mysql)');
             }
@@ -211,7 +210,7 @@ abstract class AMysql_Abstract {
      * @return $this
      */
     public function selectDb($db) {
-        $isMysqli = 'mysqli' == $this->linkType;
+        $isMysqli = $this->isMysqli;
 	$result = $isMysqli ? $this->link->select_db($db) : mysql_select_db($db, $this->link);
 	if (!$result) {
             $error = $isMysqli ? $this->link->error : mysql_error($this->link);
@@ -233,7 +232,7 @@ abstract class AMysql_Abstract {
      * @return $this
      */
     public function setCharset($charset) {
-        $isMysqli = 'mysqli' == $this->linkType;
+        $isMysqli = $this->isMysqli;
         if ($isMysqli) {
             $result = $this->link->set_charset($charset);
         }
@@ -731,7 +730,7 @@ abstract class AMysql_Abstract {
         if (!$isValidLink) {
             throw new RuntimeException('Resource is not a mysql resource.', 0, $sql);
         }
-        $isMysqli = 'mysqli' == $this->linkType;
+        $isMysqli = $this->isMysqli;
         // If it's an int, place it there literally
         if (is_int($value)) {
             return $value;

@@ -41,7 +41,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
     public $profileQueries;
 
     public $link;
-    public $linkType;
+    public $isMysqli;
 
     protected $_fetchMode;
     protected $_fetchModeExtraArgs = array ();
@@ -66,7 +66,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	$amysql->lastStatement = $this;
 	$this->amysql = $amysql;
 	$this->link = $amysql->link;
-        $this->linkType = $amysql->linkType;
+        $this->isMysqli = $amysql->isMysqli;
         $this->profileQueries = $amysql->profileQueries;
 	$this->throwExceptions = $this->amysql->throwExceptions;
 	$this->setFetchMode($amysql->getFetchMode());
@@ -283,7 +283,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 		"This statement has already been executed.\nQuery: $sql"
 	    );
         }
-        $isMysqli = 'mysqli' == $this->linkType;
+        $isMysqli = $this->isMysqli;
         $link = $this->link;
         $this->_executed = true;
 	$this->query = $sql; 
@@ -367,7 +367,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
     public function freeResults() {
 	foreach ($this->results as $result) {
 	    if (is_resource($result)) {
-		'mysqli' == $this->linkType ? $result->free() : mysql_free_result($result);
+		$this->isMysqli ? $result->free() : mysql_free_result($result);
 	    }
 	}
 	return $this;
@@ -450,7 +450,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      */
     public function fetchAssoc() {
 	$result = $this->result;
-	return 'mysqli' == $this->linkType ? $result->fetch_assoc() : mysql_fetch_assoc($result);
+	return $this->isMysqli ? $result->fetch_assoc() : mysql_fetch_assoc($result);
     }
 
     /**
@@ -514,7 +514,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      */
     public function fetchRow() {
 	$result = $this->result;
-	return 'mysqli' == $this->linkType ? $result->fetch_row() : mysql_fetch_row($result);
+	return $this->isMysqli ? $result->fetch_row() : mysql_fetch_row($result);
     }
 
     /**
@@ -533,7 +533,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      */
     public function fetchArray() {
         $result = $this->result;
-        $isMysqli = 'mysqli' == $this->linkType;
+        $isMysqli = $this->isMysqli;
 	return $isMysqli ? $result->fetch_array(MYSQLI_BOTH) : mysql_fetch_array($result, MYSQL_BOTH);
     }
 
@@ -547,7 +547,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      */
     public function result($row = 0, $field = 0) {
         $result = $this->result;
-        if ('mysqli' == $this->linkType) {
+        if ($this->isMysqli) {
             if ($result->num_rows <= $row) {
                 // mysql_result compatibility, sort of...
                 trigger_error("Unable to jump to row $row", E_WARNING);
@@ -654,7 +654,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
         if (!$numRows) {
             return $ret;
         }
-        'mysqli' == $this->linkType ? $result->data_seek(0) : mysql_data_seek($result, 0);
+        $this->isMysqli ? $result->data_seek(0) : mysql_data_seek($result, 0);
 	while ($row = $this->fetchArray()) {
 	    $ret[] = $row[$column];
 	}
@@ -717,7 +717,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	$className = 'stdClass', array $params = array ()
     ) {
         $result = $this->result;
-        $isMysqli = 'mysqli' == $this->linkType;
+        $isMysqli = $this->isMysqli;
 	if ($params) {
             return $isMysqli ?
                 $result->fetch_object($className, $params) :
@@ -748,7 +748,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @return int|false
      */
     public function numRows() {
-        if ('mysqli' == $this->linkType) {
+        if ($this->isMysqli) {
             return $this->result instanceof Mysqli_Result ? $this->result->num_rows : false;
         }
         return mysql_num_rows($this->result);
@@ -1049,7 +1049,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @return integer|false
      **/	     
     public function insertId() {
-	$ret = 'mysqli' == $this->linkType ? $result->insert_id() : mysql_insert_id($this->link);
+	$ret = $this->isMysqli ? $result->insert_id() : mysql_insert_id($this->link);
 	return $ret;
     }
 
