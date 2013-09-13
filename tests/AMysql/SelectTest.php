@@ -34,6 +34,7 @@ EOT;
             ->from(array ('t3alias' => 'table3'), array ('t3_col1' => 'col1', 't3_col2' => 'col2'))
             ->column('t2alias.*')
             ->column (array ('t1_col1' => 'table1.col1'))
+            ->columnLiteral('table7, table8, CURRENT_TIMESTAMP AS ctimestamp')
             ->join(
                 '',
                 array ('t4alias' => 'table4'),
@@ -56,9 +57,11 @@ EOT;
             ->offset(200)
         ;
         $unboundSql = $select->getUnboundSql();
-        $expected = 'SELECT DISTINCT `t3alias`.`col1` AS `t3_col1`, `t3alias`.`col2` AS `t3_col2`, '
+        $expected = 'SELECT DISTINCT ' .
+            '`t3alias`.`col1` AS `t3_col1`, `t3alias`.`col2` AS `t3_col2`, '
             . 't2alias.*, `table1`.`col1` AS `t1_col1`, `t4alias`.`t4lol`, ' .
-            '`t4alias`.`t4lol2` AS `t4lol2aliased`' . "\n" .
+            '`t4alias`.`t4lol2` AS `t4lol2aliased`, ' .
+            'table7, table8, CURRENT_TIMESTAMP AS ctimestamp' . "\n" .
             'FROM `table1`, `table2` AS `t2alias`, `table3` AS `t3alias`' . "\n" .
             'LEFT JOIN `table5` ON (t2alias.colx = table5.coly)' . "\n" .
             'JOIN `table4` AS `t4alias` ON (t4alias.t1_id = table1.id)' . "\n" .
