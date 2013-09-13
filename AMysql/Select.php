@@ -129,10 +129,9 @@ class AMysql_Select extends AMysql_Statement {
     }
 
     /**
-     * Adds one or more table name to the list of tables to select FROM.
-     * You can use literals as table names with AMysql_Expr.
+     * 1) Adds one or more table name to the list of tables to select FROM.
      *
-     * Alternatively, if you only select from 1 table here, you can supply an array
+     * 2) Alternatively, if you only select from 1 table here, you can supply an array
      * of columns to select, having them automatically prefixed to the needed prefix
      * of the table selected from. Similar to Zend Framework 1.
      * 
@@ -140,6 +139,8 @@ class AMysql_Select extends AMysql_Statement {
      * ->from(array('p' => 'products'),
      *       array('product_id', 'product_name'));// Build this query:
      * // results in: SELECT p."product_id", p."product_name" FROM "products" AS p
+     *
+     * You can use literals as table names with AMysql_Expr.
      * 
      * @param string|AMysql_Expr|array $tables          The table name. Can be an array or table
      *                                                  names in which case the key can mark the
@@ -352,13 +353,9 @@ class AMysql_Select extends AMysql_Statement {
         }
 
         if ($this->groupBys) {
-            ksort($this->groupBys);
             $ob = array ();
-            foreach ($this->groupBys as $weight => $groupBys) {
-                // these are only the array of groupBys under this weight. Let's iterate deeper.
-                foreach ($groupBys as $groupBy) {
-                    $ob[] = $groupBy;
-                }
+            foreach ($this->groupBys as $groupBy) {
+                $ob[] = $groupBy;
             }
             $ob = join(', ', $ob);
             $parts[] = 'GROUP BY ' . $ob;
@@ -369,13 +366,9 @@ class AMysql_Select extends AMysql_Statement {
         }
 
         if ($this->orderBys) {
-            krsort($this->orderBys);
             $ob = array ();
-            foreach ($this->orderBys as $weight => $orderBys) {
-                // these are only the array of orderBys under this weight. Let's iterate deeper.
-                foreach ($orderBys as $orderBy) {
-                    $ob[] = $orderBy;
-                }
+            foreach ($this->orderBys as $orderBy) {
+                $ob[] = $orderBy;
             }
             $ob = join(', ', $ob);
             $parts[] = 'ORDER BY ' . $ob;
