@@ -3,7 +3,7 @@
  * AMysql_Select 
  *
  * Anatomy of a select:
- * SELECT <SELECT OPTIONS> <WHATS> FROM <FROMS> <JOINS> <WHERES> <GROUP BYS> <HAVINGS>
+ * SELECT <SELECT OPTIONS> <COLUMNS> FROM <FROMS> <JOINS> <WHERES> <GROUP BYS> <HAVINGS>
  * <ORDER BYS> <LIMIT> <OFFSET>
  * 
  * Visit https://github.com/amcsi/amysql
@@ -12,8 +12,8 @@
  */
 class AMysql_Select extends AMysql_Statement {
 
-    protected $whatLiteral;
-    protected $what = array ();
+    protected $columnLiteral;
+    protected $columns = array ();
 
     protected $froms = array ();
     protected $joins = array ();
@@ -45,57 +45,57 @@ class AMysql_Select extends AMysql_Statement {
     /**
      * Adds an array of columns to select.
      * 
-     * @param array $what       The array of table names. Aliases can optionally be
+     * @param array $columns       The array of table names. Aliases can optionally be
      *                          assigned with the array key.
      * @access public
      * @return $this
      */
-    public function whatArray(array $what)
+    public function columnArray(array $columns)
     {
-        foreach ($what as $key => $val) {
-            $this->whatSingle($val, $key);
+        foreach ($columns as $key => $val) {
+            $this->columnSingle($val, $key);
         }
         return $this;
     }
 
     /**
-     * Adds a WHAT to the list of columns to select. 
+     * Adds a COLUMN to the list of columns to select. 
      * 
      * @param string $tableName     The (namespaced) table name. No need to escape *.
      * @param string $alias         (Optional) the alias for the column.
      * @access public
      * @return $this
      */
-    public function whatSingle($tableName, $alias = false)
+    public function columnSingle($tableName, $alias = false)
     {
         if ('*' == $tableName[strlen($tableName)- 1]) {
-            $this->what['*'] = $tableName;
+            $this->columns['*'] = $tableName;
         }
         else if ($alias && !is_numeric($alias)) {
             // ['alias' => 'a.colName'] => ['alias' => `a.colName` AS `alias`]
-            $this->what[$alias] = AMysql::escapeIdentifier($tableName, $alias);
+            $this->columns[$alias] = AMysql::escapeIdentifier($tableName, $alias);
         }
         else {
             // [0 => 'a.colName'] => ['a.colName' => `a.colName`]
-            $this->what[$tableName] = AMysql::escapeIdentifier($tableName);
+            $this->columns[$tableName] = AMysql::escapeIdentifier($tableName);
         }
         return $this;
     }
 
     /**
-     * Add this literal string between select options and whats.
+     * Add this literal string between select options and columns.
      *
-     * @param string $whatLiteral       Literal string
+     * @param string $columnLiteral       Literal string
      * @access public
      * @return $this
      */
-    public function whatLiteral($whatLiteral)
+    public function columnLiteral($columnLiteral)
     {
-        if ($this->whatLiteral) {
-            $this->whatLiteral .= ", $whatLiteral";
+        if ($this->columnLiteral) {
+            $this->columnLiteral .= ", $columnLiteral";
         }
         else {
-            $this->whatLiteral = $whatLiteral;
+            $this->columnLiteral = $columnLiteral;
         }
         return $this;
     }
@@ -131,7 +131,7 @@ class AMysql_Select extends AMysql_Statement {
      *                          in a normal JOIN.
      * @param string $table     The table name to join.
      * @param string $on        The ON clause unbound.
-     * @param string $as        What table name to alias this joined table as.
+     * @param string $as        Column table name to alias this joined table as.
      * @param boolean $prepend  (Optional) whether to prepend this JOIN to the other
      *                          joins. Default: false (append).
      * @access public
@@ -293,11 +293,11 @@ class AMysql_Select extends AMysql_Statement {
             $parts[] = join (', ', $this->selectOptions) . ' ';
         }
 
-        $what = $this->what;
-        if ($this->whatLiteral) {
-            $what[] = $this->whatLiteral;
+        $columns = $this->columns;
+        if ($this->columnLiteral) {
+            $columns[] = $this->columnLiteral;
         }
-        $parts[] = join(', ', $what);
+        $parts[] = join(', ', $columns);
         if ($this->from) {
             $parts[] = 'FROM ' . join(', ', $this->froms);
         }
