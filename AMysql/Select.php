@@ -189,31 +189,26 @@ class AMysql_Select extends AMysql_Statement {
     }
 
     /**
-     * Adds a GROUP BY parameter 
+     * Adds an GROUP BY parameter 
      * 
      * @param name $col         Column name
      * @param bool $desc        (Optional) Whether to sort DESC. Default: false
-     * @param int $weight       (Optional) weight of the parameter.
-     *                              Lighter ones come sooner. Default: 0
      * @param int $prepend      (Optional) Whether to prepend this parameter.
      *                              Default: false
      * @access public
      * @return $this;
      */
-    public function groupBy($col, $desc = false, $weight = 0, $prepend = false)
+    public function groupBy($col, $desc = false, $prepend = false)
     {
         $what = AMysql_Abstract::escapeIdentifier($col);
         if ($desc) {
             $what .= ' DESC';
         }
-        if (!isset($this->groupBys[$weight])) {
-            $this->groupBys[$weight] = array ();
-        }
         if ($prepend) {
-            array_unshift($this->groupBys[$weight], $what);
+            array_unshift($this->groupBys, $what);
         }
         else {
-            $this->groupBys[$weight][] = $what;
+            $this->groupBys[] = $what;
         }
         return $this;
     }
@@ -237,27 +232,22 @@ class AMysql_Select extends AMysql_Statement {
      * 
      * @param name $col         Column name
      * @param bool $desc        (Optional) Whether to sort DESC. Default: false
-     * @param int $weight       (Optional) weight of the parameter.
-     *                              Lighter ones come sooner. Default: 0
      * @param int $prepend      (Optional) Whether to prepend this parameter.
      *                              Default: false
      * @access public
      * @return $this;
      */
-    public function orderBy($col, $desc = false, $weight = 0, $prepend = false)
+    public function orderBy($col, $desc = false, $prepend = false)
     {
         $what = AMysql_Abstract::escapeIdentifier($col);
         if ($desc) {
             $what .= ' DESC';
         }
-        if (!isset($this->orderBys[$weight])) {
-            $this->orderBys[$weight] = array ();
-        }
         if ($prepend) {
-            array_unshift($this->orderBys[$weight], $what);
+            array_unshift($this->orderBys, $what);
         }
         else {
-            $this->orderBys[$weight][] = $what;
+            $this->orderBys[] = $what;
         }
         return $this;
     }
