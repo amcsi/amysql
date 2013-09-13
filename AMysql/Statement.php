@@ -1,4 +1,4 @@
-<?php /* vim: set tabstop=8 expandtab : */
+<?php /* vim: set expandtab : */
 /**
  * The statement class belonging to the AMysql_Abstract class, where mysql
  * queries are built and handled.
@@ -62,14 +62,15 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      */
     public $queryTime;
 
-    public function __construct(AMysql_Abstract $amysql) {
-	$amysql->lastStatement = $this;
-	$this->amysql = $amysql;
+    public function __construct(AMysql_Abstract $amysql)
+    {
+        $amysql->lastStatement = $this;
+        $this->amysql = $amysql;
         $this->link = $amysql->link;
         $this->isMysqli = $amysql->isMysqli;
         $this->profileQueries = $amysql->profileQueries;
-	$this->throwExceptions = $this->amysql->throwExceptions;
-	$this->setFetchMode($amysql->getFetchMode());
+        $this->throwExceptions = $this->amysql->throwExceptions;
+        $this->setFetchMode($amysql->getFetchMode());
     }
 
     /**
@@ -94,8 +95,9 @@ class AMysql_Statement implements IteratorAggregate, Countable {
         return $this->link;
     }
 
-    public function getIterator() {
-	return new AMysql_Iterator($this);
+    public function getIterator()
+    {
+        return new AMysql_Iterator($this);
     }
 
     /**
@@ -107,20 +109,21 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @access public
      * @return $this
      */
-    public function setFetchMode($fetchMode/* [, extras [, extras...]]*/) {
-	static $fetchModes = array (
-	    AMysql_Abstract::FETCH_ASSOC, AMysql_Abstract::FETCH_OBJECT,
-	    AMysql_Abstract::FETCH_ARRAY, AMysql_Abstract::FETCH_ROW
-	);
-	$args = func_get_args();
-	$extraArgs = array_slice($args, 1);
-	if (in_array($fetchMode, $fetchModes)) {
-	    $this->_fetchMode = $fetchMode;
-	    $this->_fetchModeExtraArgs = $extraArgs;
-	}
-	else {
-	    throw new Exception("Unknown fetch mode: `$fetchMode`");
-	}
+    public function setFetchMode($fetchMode/* [, extras [, extras...]]*/)
+    {
+        static $fetchModes = array (
+            AMysql_Abstract::FETCH_ASSOC, AMysql_Abstract::FETCH_OBJECT,
+            AMysql_Abstract::FETCH_ARRAY, AMysql_Abstract::FETCH_ROW
+        );
+        $args = func_get_args();
+        $extraArgs = array_slice($args, 1);
+        if (in_array($fetchMode, $fetchModes)) {
+            $this->_fetchMode = $fetchMode;
+            $this->_fetchModeExtraArgs = $extraArgs;
+        }
+        else {
+            throw new Exception("Unknown fetch mode: `$fetchMode`");
+        }
         return $this;
     }
 
@@ -158,13 +161,14 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      *
      * @return $this
      */
-    public function execute($binds = array ()) {
-	if (1 <= func_num_args()) {
-	    $this->binds = is_array($binds) ? $binds : array ($binds);
-	}
-	$sql = $this->getSql();
-	$result = $this->_query($sql);
-	return $this;
+    public function execute($binds = array ())
+    {
+        if (1 <= func_num_args()) {
+            $this->binds = is_array($binds) ? $binds : array ($binds);
+        }
+        $sql = $this->getSql();
+        $result = $this->_query($sql);
+        return $this;
     }
 
     /**
@@ -178,11 +182,12 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      *
      * @author Szerémi Attila               
      **/         
-    public function getSql($prepared = null) {
-	if (!$prepared) {
-	    $prepared = $this->prepared;
-	}
-	return $this->beforeSql . $this->quoteInto($prepared, $this->binds);
+    public function getSql($prepared = null)
+    {
+        if (!$prepared) {
+            $prepared = $this->prepared;
+        }
+        return $this->beforeSql . $this->quoteInto($prepared, $this->binds);
     }
 
     /**
@@ -196,24 +201,25 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      *					to an array.
      * @return string
      */
-    public function quoteInto($prepared, $binds) {
-	$sql = $prepared;
-	if (!is_array($binds)) {
-	    $binds = is_array($binds) ? $binds : array ($binds);
-	}
+    public function quoteInto($prepared, $binds)
+    {
+        $sql = $prepared;
+        if (!is_array($binds)) {
+            $binds = is_array($binds) ? $binds : array ($binds);
+        }
         if (!$binds) {
             return $sql;
         }
-	if (array_key_exists(0, $binds)) {
-	    $parts = explode('?', $sql);
-	    $sql = '';
-	    if (count($parts)-1 == count($binds)) {
-		foreach ($binds as &$bind) {
-		    $sql .= array_shift($parts);
-		    $sql .= $this->amysql->escape($bind);
-		};
-		$sql .= array_shift($parts);
-	    }
+        if (array_key_exists(0, $binds)) {
+            $parts = explode('?', $sql);
+            $sql = '';
+            if (count($parts)-1 == count($binds)) {
+                foreach ($binds as &$bind) {
+                    $sql .= array_shift($parts);
+                    $sql .= $this->amysql->escape($bind);
+                };
+                $sql .= array_shift($parts);
+            }
             else if (count($parts)-1 < count($binds)) {
                 $msg = "More binds than question marks!\n";
                 $msg .= "Prepared query: `$prepared`\n";
@@ -227,36 +233,37 @@ class AMysql_Statement implements IteratorAggregate, Countable {
                 throw new RuntimeException($msg);
             }
         }
-	else {
-	    $keysQuoted = array ();
-	    $replacements = array ();
-	    foreach ($binds as $key => &$bind) {
-		if (127 < ord($key[0]) || preg_match('/^\w$/', $key[0])) {
-		    $key = ':' . $key;
-		}
-		$keyQuoted = preg_quote($key, '/');
-		$keysQuoted[] = $keyQuoted;
-		$replacements[$key] = $this->amysql->escape($bind);
-	    }
-	    $keysOr = join('|', $keysQuoted);
-	    $pattern =
-		"/($keysOr)(?![\w\x80-\xff])/m";
-	    $this->_replacements = $replacements;
+        else {
+            $keysQuoted = array ();
+            $replacements = array ();
+            foreach ($binds as $key => &$bind) {
+                if (127 < ord($key[0]) || preg_match('/^\w$/', $key[0])) {
+                    $key = ':' . $key;
+                }
+                $keyQuoted = preg_quote($key, '/');
+                $keysQuoted[] = $keyQuoted;
+                $replacements[$key] = $this->amysql->escape($bind);
+            }
+            $keysOr = join('|', $keysQuoted);
+            $pattern =
+                "/($keysOr)(?![\w\x80-\xff])/m";
+            $this->_replacements = $replacements;
 
-	    $sql = preg_replace_callback($pattern,
-		array ($this, '_replaceCallback'),
-		$sql
-	    );
-	}
-	return $sql;
+            $sql = preg_replace_callback($pattern,
+                array ($this, '_replaceCallback'),
+                $sql
+            );
+        }
+        return $sql;
     }
 
-    protected function _replaceCallback($match) {
-	$key = $match[0];
-	$replacement = array_key_exists($key, $this->_replacements) ?
-	    $this->_replacements[$key] :
-	    $key;
-	return $replacement;
+    protected function _replaceCallback($match)
+    {
+        $key = $match[0];
+        $replacement = array_key_exists($key, $this->_replacements) ?
+            $this->_replacements[$key] :
+            $key;
+        return $replacement;
     }
 
     /**
@@ -267,11 +274,12 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @param string $sql The SQL string to prepare.
      * @return $this
      */
-    public function prepare($sql) {
-	$this->beforeSql = '';
-	$this->prepared = $sql;
-	$this->binds = array();
-	return $this;
+    public function prepare($sql)
+    {
+        $this->beforeSql = '';
+        $this->prepared = $sql;
+        $this->binds = array();
+        return $this;
     }
 
     /**
@@ -285,10 +293,11 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @access public
      * @return $this
      */
-    public function query($sql, $binds = array ()) {
-	$this->prepare($sql);
-	$result = $this->execute($binds);
-	return $this;
+    public function query($sql, $binds = array ())
+    {
+        $this->prepare($sql);
+        $result = $this->execute($binds);
+        return $this;
     }
 
     /**
@@ -299,21 +308,22 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @access protected
      * @return $this
      */
-    protected function _query($sql) {
+    protected function _query($sql)
+    {
         if ($this->_executed) {
-	    throw new LogicException(
-		"This statement has already been executed.\nQuery: $sql"
-	    );
+            throw new LogicException(
+                "This statement has already been executed.\nQuery: $sql"
+            );
         }
         $isMysqli = $this->isMysqli;
         $link = $this->getLink();
         $this->_executed = true;
-	$this->query = $sql; 
-	if (!$isMysqli && 'mysql link' != get_resource_type($link)) {
-	    throw new LogicException(
-		"Resource is not a mysql resource.\nQuery: $sql"
-	    );
-	}
+        $this->query = $sql; 
+        if (!$isMysqli && 'mysql link' != get_resource_type($link)) {
+            throw new LogicException(
+                "Resource is not a mysql resource.\nQuery: $sql"
+            );
+        }
         if ($isMysqli) {
             if ($this->profileQueries) {
                 $startTime = microtime(true);
@@ -359,26 +369,26 @@ class AMysql_Statement implements IteratorAggregate, Countable {
             $this->affectedRows = mysql_affected_rows($link);
             $this->insertId = mysql_insert_id($link);
         }
-	$this->result = $result;
+        $this->result = $result;
         $this->results[] = $result;
-	$this->amysql->affectedRows = $this->affectedRows;
-	$this->amysql->insertId = $this->insertId;
-	if (false === $result) {
-	    try {
-		$this->throwException();
-		$this->lastException = null;
-	    }
-	    catch (AMysql_Exception $e) {
-		$this->lastException = $e;
-		if ($this->throwExceptions) {
-		    throw $e;
-		}
-		else {
-		    trigger_error($e, E_USER_WARNING);
-		}
-	    }
-	}
-	return $this;
+        $this->amysql->affectedRows = $this->affectedRows;
+        $this->amysql->insertId = $this->insertId;
+        if (false === $result) {
+            try {
+                $this->throwException();
+                $this->lastException = null;
+            }
+            catch (AMysql_Exception $e) {
+                $this->lastException = $e;
+                if ($this->throwExceptions) {
+                    throw $e;
+                }
+                else {
+                    trigger_error($e, E_USER_WARNING);
+                }
+            }
+        }
+        return $this;
     }
 
     /**
@@ -386,13 +396,14 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      *
      * @return $this
      **/         
-    public function freeResults() {
-	foreach ($this->results as $result) {
-	    if (is_resource($result)) {
-		$this->isMysqli ? $result->free() : mysql_free_result($result);
-	    }
-	}
-	return $this;
+    public function freeResults()
+    {
+        foreach ($this->results as $result) {
+            if (is_resource($result)) {
+                $this->isMysqli ? $result->free() : mysql_free_result($result);
+            }
+        }
+        return $this;
     }
 
     /**
@@ -403,39 +414,40 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      *
      * @return array
      **/         
-    public function fetchAll() {
-	$result = $this->result;
-	$ret = array ();
-	if (AMysql_Abstract::FETCH_ASSOC == $this->_fetchMode) {
-	    $methodName = 'fetchAssoc';
-	}
-	else if (AMysql_Abstract::FETCH_OBJECT == $this->_fetchMode) {
-	    $methodName = 'fetchObject';
-	}
-	else if (AMysql_Abstract::FETCH_ARRAY == $this->_fetchMode) {
-	    $methodName = 'fetchArray';
-	}
-	else if (AMysql_Abstract::FETCH_ROW == $this->_fetchMode) {
-	    $methodName = 'fetchRow';
-	}
-	else {
-	    throw new Exception("Unknown fetch mode: `$this->_fetchMode`");
-	}
-	$ret = array();
-	$numRows = $this->numRows();
-	if (0 === $numRows) {
-	    return array ();
-	}
-	else if (false === $numRows) {
-	    return false;
-	}
-	$extraArgs = $this->_fetchModeExtraArgs;
-	$method = array ($this, $methodName);
+    public function fetchAll()
+    {
+        $result = $this->result;
+        $ret = array ();
+        if (AMysql_Abstract::FETCH_ASSOC == $this->_fetchMode) {
+            $methodName = 'fetchAssoc';
+        }
+        else if (AMysql_Abstract::FETCH_OBJECT == $this->_fetchMode) {
+            $methodName = 'fetchObject';
+        }
+        else if (AMysql_Abstract::FETCH_ARRAY == $this->_fetchMode) {
+            $methodName = 'fetchArray';
+        }
+        else if (AMysql_Abstract::FETCH_ROW == $this->_fetchMode) {
+            $methodName = 'fetchRow';
+        }
+        else {
+            throw new Exception("Unknown fetch mode: `$this->_fetchMode`");
+        }
+        $ret = array();
+        $numRows = $this->numRows();
+        if (0 === $numRows) {
+            return array ();
+        }
+        else if (false === $numRows) {
+            return false;
+        }
+        $extraArgs = $this->_fetchModeExtraArgs;
+        $method = array ($this, $methodName);
         $result instanceof Mysqli_Result ? $result->data_seek(0) : mysql_data_seek($result, 0);
-	while (false !== ($row = call_user_func_array($method, $extraArgs))) {
-	    $ret[] = $row;
-	}
-	return $ret;
+        while (false !== ($row = call_user_func_array($method, $extraArgs))) {
+            $ret[] = $row;
+        }
+        return $ret;
     }
 
     /**
@@ -445,24 +457,25 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * 
      * @return array
      */
-    public function fetch() {
-	if ('assoc' == $this->_fetchMode) {
-	    return $this->fetchAssoc();
-	}
-	else if ('object' == $this->_fetchMode) {
-	    $extraArgs = $this->_fetchModeExtraArgs;
-	    $method = array ($this, 'fetchObject');
-	    return call_user_func_array($method, $extraArgs);
-	}
-	else if ('row' == $this->_fetchMode) {
-	    return $this->fetchRow();
-	}
-	else if (AMysql_Abstract::FETCH_ARRAY == $this->_fetchMode) {
-	    return $this->fetchArray();
-	}
-	else {
-	    throw new Exception("Unknown fetch mode: `$this->_fetchMode`");
-	}
+    public function fetch()
+    {
+        if ('assoc' == $this->_fetchMode) {
+            return $this->fetchAssoc();
+        }
+        else if ('object' == $this->_fetchMode) {
+            $extraArgs = $this->_fetchModeExtraArgs;
+            $method = array ($this, 'fetchObject');
+            return call_user_func_array($method, $extraArgs);
+        }
+        else if ('row' == $this->_fetchMode) {
+            return $this->fetchRow();
+        }
+        else if (AMysql_Abstract::FETCH_ARRAY == $this->_fetchMode) {
+            return $this->fetchArray();
+        }
+        else {
+            throw new Exception("Unknown fetch mode: `$this->_fetchMode`");
+        }
     }
 
     /**
@@ -470,9 +483,10 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * 
      * @return array|false
      */
-    public function fetchAssoc() {
-	$result = $this->result;
-	return $this->isMysqli ? $result->fetch_assoc() : mysql_fetch_assoc($result);
+    public function fetchAssoc()
+    {
+        $result = $this->result;
+        return $this->isMysqli ? $result->fetch_assoc() : mysql_fetch_assoc($result);
     }
 
     /**
@@ -489,44 +503,45 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @access public
      * @return <Associative result array>[]
      */
-    public function fetchAllAssoc($keyColumn = false) {
-	$result = $this->result;
-	$ret = array();
-	$numRows = $this->numRows();
-	if (0 === $numRows) {
-	    return array ();
-	}
-	else if (false === $numRows) {
-	    return false;
-	}
+    public function fetchAllAssoc($keyColumn = false)
+    {
+        $result = $this->result;
+        $ret = array();
+        $numRows = $this->numRows();
+        if (0 === $numRows) {
+            return array ();
+        }
+        else if (false === $numRows) {
+            return false;
+        }
         $result instanceof Mysqli_Result ? $result->data_seek(0) : mysql_data_seek($result, 0);
         $keyColumnGiven = is_string($keyColumn) || is_int($keyColumn);
-	if (!$keyColumnGiven) {
-	    while (false !== ($row = $this->fetchAssoc()) && isset($row)) {
-		$ret[] = $row;
-	    }
-	}
-	else {
-	    $row = $this->fetchAssoc();
-	    /**
-	     * Since we are using associative keys here, if we gave the key as an
-	     * int, we have to find out the associative version of the key.
-	     **/
-	    if (is_int($keyColumn)) {
-		$cnt = count($keyColumn);
-		reset($row);
-		for ($i = 0; $i < $cnt; $i++) {
-		    next($row);
-		}
-		$keyColumn = key($row);
-		reset($row);
-	    }
-	    $ret[$row[$keyColumn]] = $row;
+        if (!$keyColumnGiven) {
+            while (false !== ($row = $this->fetchAssoc()) && isset($row)) {
+                $ret[] = $row;
+            }
+        }
+        else {
+            $row = $this->fetchAssoc();
+            /**
+             * Since we are using associative keys here, if we gave the key as an
+             * int, we have to find out the associative version of the key.
+             **/
+            if (is_int($keyColumn)) {
+                $cnt = count($keyColumn);
+                reset($row);
+                for ($i = 0; $i < $cnt; $i++) {
+                    next($row);
+                }
+                $keyColumn = key($row);
+                reset($row);
+            }
+            $ret[$row[$keyColumn]] = $row;
             while ($row = $this->fetchAssoc()) {
                 $ret[$row[$keyColumn]] = $row;
-	    }
+            }
         }
-	return $ret;
+        return $ret;
     }
 
     /**
@@ -534,9 +549,10 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * 
      * @return array
      */
-    public function fetchRow() {
-	$result = $this->result;
-	return $this->isMysqli ? $result->fetch_row() : mysql_fetch_row($result);
+    public function fetchRow()
+    {
+        $result = $this->result;
+        return $this->isMysqli ? $result->fetch_row() : mysql_fetch_row($result);
     }
 
     /**
@@ -544,8 +560,9 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * 
      * @return array
      */
-    public function fetchNum() {
-	return $this->fetchRow();
+    public function fetchNum()
+    {
+        return $this->fetchRow();
     }
 
     /**
@@ -553,10 +570,11 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * 
      * @return array
      */
-    public function fetchArray() {
+    public function fetchArray()
+    {
         $result = $this->result;
         $isMysqli = $this->isMysqli;
-	return $isMysqli ? $result->fetch_array(MYSQLI_BOTH) : mysql_fetch_array($result, MYSQL_BOTH);
+        return $isMysqli ? $result->fetch_array(MYSQLI_BOTH) : mysql_fetch_array($result, MYSQL_BOTH);
     }
 
     /**
@@ -567,7 +585,8 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @param mixed $field	(Optional) The field number or name.
      * @return mixed
      */
-    public function result($row = 0, $field = 0) {
+    public function result($row = 0, $field = 0)
+    {
         $result = $this->result;
         if ($this->isMysqli) {
             if ($result->num_rows <= $row) {
@@ -589,7 +608,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
             $result->data_seek(0);
             return $ret;
         }
-	return mysql_result($result, $row, $field);
+        return mysql_result($result, $row, $field);
     }
 
     /**
@@ -602,10 +621,11 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @param int $field	(Optional) The field.
      * @return mixed
      */
-    public function resultDefault($default, $row = 0, $field = 0) {
-	$result = $this->result;
-	return $row < $this->numRows() ? $this->result($row, $field) :
-	    $default;
+    public function resultDefault($default, $row = 0, $field = 0)
+    {
+        $result = $this->result;
+        return $row < $this->numRows() ? $this->result($row, $field) :
+            $default;
     }
 
     /**
@@ -618,8 +638,9 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @return mixed
      */
 
-    public function resultNull($row = 0, $field = 0) {
-	return $this->resultDefault(null, $row, $field);
+    public function resultNull($row = 0, $field = 0)
+    {
+        return $this->resultDefault(null, $row, $field);
     }
 
     /**
@@ -630,8 +651,9 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @param int $field	(Optional) The field.
      * @return integer
      */
-    public function resultInt($row = 0, $field = 0) {
-	return (int) $this->resultNull($row, $field);
+    public function resultInt($row = 0, $field = 0)
+    {
+        return (int) $this->resultNull($row, $field);
     }
 
     /**
@@ -648,16 +670,18 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @access public
      * @return array
      */
-    public function fetchPairs($keyColumn = 0, $valueColumn = 1) {
-	$ret = array ();
-	while ($row = $this->fetchArray()) {
-	    $key = $row[$keyColumn];
-	    $ret[$key] = $row[$valueColumn];
-	}
-	return $ret;
+    public function fetchPairs($keyColumn = 0, $valueColumn = 1)
+    {
+        $ret = array ();
+        while ($row = $this->fetchArray()) {
+            $key = $row[$keyColumn];
+            $ret[$key] = $row[$valueColumn];
+        }
+        return $ret;
     }
 
-    public function pairUp($keyColumn = 0, $valueColumn = 1) {
+    public function pairUp($keyColumn = 0, $valueColumn = 1)
+    {
         return $this->fetchPairs($keyColumn, $valueColumn);
     }
 
@@ -670,17 +694,18 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @access public
      * @return array
      */
-    public function fetchAllColumn($column = 0) {
-	$ret = array ();
-	$numRows = $this->numRows();
+    public function fetchAllColumn($column = 0)
+    {
+        $ret = array ();
+        $numRows = $this->numRows();
         if (!$numRows) {
             return $ret;
         }
         $this->isMysqli ? $result->data_seek(0) : mysql_data_seek($result, 0);
-	while ($row = $this->fetchArray()) {
-	    $ret[] = $row[$column];
-	}
-	return $ret;
+        while ($row = $this->fetchArray()) {
+            $ret[] = $row[$column];
+        }
+        return $ret;
     }
 
     /**
@@ -691,7 +716,8 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @access public
      * @return array
      */
-    public function fetchAllColumns($keyColumn = false) {
+    public function fetchAllColumns($keyColumn = false)
+    {
         $ret = array ();
         $numRows = $this->numRows();
         $keyColumnGiven = is_string($keyColumn) || is_int($keyColumn);
@@ -736,22 +762,22 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @return object
      */
     public function fetchObject(
-	$className = 'stdClass', array $params = array ()
+        $className = 'stdClass', array $params = array ()
     ) {
         $result = $this->result;
         $isMysqli = $this->isMysqli;
-	if ($params) {
+        if ($params) {
             return $isMysqli ?
                 $result->fetch_object($className, $params) :
                 mysql_fetch_object($result, $className, $params)
-            ;
-	}
-	else {
-	    return $isMysqli ?
+                ;
+        }
+        else {
+            return $isMysqli ?
                 $result->fetch_object($className) :
                 mysql_fetch_object($result, $className)
-            ;
-	}
+                ;
+        }
     }
 
     /**
@@ -759,8 +785,9 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * 
      * @return integer
      */
-    public function affectedRows() {
-	return $this->affectedRows;
+    public function affectedRows()
+    {
+        return $this->affectedRows;
     }
 
     /**
@@ -769,7 +796,8 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @access public
      * @return int|false
      */
-    public function numRows() {
+    public function numRows()
+    {
         if ($this->isMysqli) {
             return $this->result instanceof Mysqli_Result ? $this->result->num_rows : false;
         }
@@ -781,19 +809,22 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * 
      * @throws AMysql_Exception
      */
-    public function throwException() {
-	throw new AMysql_Exception($this->error, $this->errno, $this->query);
+    public function throwException()
+    {
+        throw new AMysql_Exception($this->error, $this->errno, $this->query);
     }
 
-    public function escapeIdentifierSimple($columnName) {
-	return AMysql_Abstract::escapeIdentifierSimple($columnName);
+    public function escapeIdentifierSimple($columnName)
+    {
+        return AMysql_Abstract::escapeIdentifierSimple($columnName);
     }
 
     /**
      * @see AMysql_Abstract::escapeIdentifier
      **/
-    public function escapeIdentifier($columnName, $as = null) {
-	return AMysql_Abstract::escapeIdentifier($columnName, $as);
+    public function escapeIdentifier($columnName, $as = null)
+    {
+        return AMysql_Abstract::escapeIdentifier($columnName, $as);
     }
 
     /**
@@ -802,9 +833,10 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @param string $sql The string to append.
      * @return $this
      **/
-    public function appendPrepare($sql) {
-	$this->prepared .= $sql;
-	return $this;
+    public function appendPrepare($sql)
+    {
+        $this->prepared .= $sql;
+        return $this;
     }
 
     /**
@@ -839,12 +871,13 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      *
      * @return $this
      **/         
-    public function bindValue($key, $val) {
-	if (is_numeric($key) && $this->amysql->pdoIndexedBinding) {
-	    $key--;
-	}
-	$this->binds[$key] = $val;
-	return $this;
+    public function bindValue($key, $val)
+    {
+        if (is_numeric($key) && $this->amysql->pdoIndexedBinding) {
+            $key--;
+        }
+        $this->binds[$key] = $val;
+        return $this;
     }
 
     /**
@@ -855,12 +888,13 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      *
      * @return $this
      */
-    public function bindParam($key, &$val) {
-	if (is_numeric($key) && $this->amysql->pdoIndexedBinding) {
-	    $key--;
-	}
-	$this->binds[$key] =& $val;
-	return $this;
+    public function bindParam($key, &$val)
+    {
+        if (is_numeric($key) && $this->amysql->pdoIndexedBinding) {
+            $key--;
+        }
+        $this->binds[$key] =& $val;
+        return $this;
     }
 
     /**
@@ -870,7 +904,8 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @access public
      * @return $this
      */
-    public function setBinds(array $binds) {
+    public function setBinds(array $binds)
+    {
         $this->binds = $binds;
         return $this;
     }
@@ -883,7 +918,8 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @access public
      * @return $this
      */
-    public function addBinds(array $binds) {
+    public function addBinds(array $binds)
+    {
         $this->binds = array_merge($this->binds, $binds);
         return $this;
     }
@@ -894,51 +930,52 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @param array $data @see $this->insertReplace()
      * @return string
      */
-    public function buildColumnsValues(array $data) {
+    public function buildColumnsValues(array $data)
+    {
         $i = 0;
-	if (empty($data[0])) {
+        if (empty($data[0])) {
             // keys are column names
-	    foreach ($data as $columnName => $values) {
-		$cols[] = $this->escapeIdentifierSimple($columnName);
+            foreach ($data as $columnName => $values) {
+                $cols[] = $this->escapeIdentifierSimple($columnName);
                 if (!is_array($values)) {
                     // single piece of data here.
-		    $values = array($values);
-		}
-		foreach ($values as $key => $value) {
-		    if (!isset($vals[$key])) {
-			$vals[$key] = array ();
-		    }
-		    $vals[$key][] = $this->amysql->escape($value);
-		}
-	    }
-	}
+                    $values = array($values);
+                }
+                foreach ($values as $key => $value) {
+                    if (!isset($vals[$key])) {
+                        $vals[$key] = array ();
+                    }
+                    $vals[$key][] = $this->amysql->escape($value);
+                }
+            }
+        }
         else {
             // keys are indexes
 
             // the column names should be found in the first index's keys
-	    $akeys = array_keys($data[0]);
-	    $cols = array ();
-	    foreach ($akeys as $col) {
-		$cols[] = $this->escapeIdentifierSimple($col);
-	    }
+            $akeys = array_keys($data[0]);
+            $cols = array ();
+            foreach ($akeys as $col) {
+                $cols[] = $this->escapeIdentifierSimple($col);
+            }
 
-	    foreach ($data as $row) {
-		$vals[$i] = array ();
-		$row2 = array_fill_keys($akeys, null);
-		foreach ($row as $columnName => $value) {
-		    $row2[$columnName] = $this->amysql->escape($value);
+            foreach ($data as $row) {
+                $vals[$i] = array ();
+                $row2 = array_fill_keys($akeys, null);
+                foreach ($row as $columnName => $value) {
+                    $row2[$columnName] = $this->amysql->escape($value);
 
-		}
-		$vals[$i] = $row2;
-		$i++;
-	    }
-	}
-	$columnsString = join(', ', $cols);
-	$rowValueStrings = array();
-	foreach ($vals as $rowValues) {
-	    $rowValueStrings[] = join(', ', $rowValues);
-	}
-	$valuesString = join('), (', $rowValueStrings);
+                }
+                $vals[$i] = $row2;
+                $i++;
+            }
+        }
+        $columnsString = join(', ', $cols);
+        $rowValueStrings = array();
+        foreach ($vals as $rowValues) {
+            $rowValueStrings[] = join(', ', $rowValues);
+        }
+        $valuesString = join('), (', $rowValueStrings);
         $columnsValuesString = "($columnsString) VALUES ($valuesString)";
         return $columnsValuesString;
     }
@@ -950,13 +987,14 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @param array $data Keys are column names, values are the values unescaped
      * @return string
      */
-    public function buildSet(array $data) {
-	$sets = array ();
-	foreach ($data as $columnName => $value) {
-	    $columnName = $this->escapeIdentifierSimple($columnName);
-	    $sets[] = "$columnName = " . $this->amysql->escape($value);
-	}
-	$setsString = join(', ', $sets);
+    public function buildSet(array $data)
+    {
+        $sets = array ();
+        foreach ($data as $columnName => $value) {
+            $columnName = $this->escapeIdentifierSimple($columnName);
+            $sets[] = "$columnName = " . $this->amysql->escape($value);
+        }
+        $setsString = join(', ', $sets);
         return $setsString;
     }
 
@@ -977,22 +1015,23 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @return $this
      * @throws AMysql_Exception                
      **/               
-    public function update($tableName, array $data, $where) {
-	if (!$data) {
-	    return false;
-	}
+    public function update($tableName, array $data, $where)
+    {
+        if (!$data) {
+            return false;
+        }
         $setsString = $this->buildSet($data);
 
-	/**
-	 * Ezt beforeSql-el kell megoldani, különben az értékekben lévő
-	 * kérdőjelek bezavarnak.         
-	 **/		         
-	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
-	$beforeSql = "UPDATE $tableSafe SET $setsString WHERE ";
-	$this->prepare($where);
-	$this->beforeSql = $beforeSql;
+        /**
+         * Ezt beforeSql-el kell megoldani, különben az értékekben lévő
+         * kérdőjelek bezavarnak.         
+         **/		         
+        $tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
+        $beforeSql = "UPDATE $tableSafe SET $setsString WHERE ";
+        $this->prepare($where);
+        $this->beforeSql = $beforeSql;
 
-	return $this;
+        return $this;
     }
 
     /**
@@ -1020,24 +1059,47 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @return $this
      * @throws AMysql_Exception                              
      **/     
-    public function insertReplace($type, $tableName, array $data) {
-	$cols = array ();
-	$vals = array();
-	if (!$data) {
-	    return false;
-	}
-	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
+    public function insertReplace($type, $tableName, array $data)
+    {
+        $cols = array ();
+        $vals = array();
+        if (!$data) {
+            return false;
+        }
+        $tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
         $columnsValues = $this->buildColumnsValues($data);
-	$sql = "$type INTO $tableSafe $columnsValues";
-	$this->prepare($sql);
-	return $this;
+        $sql = "$type INTO $tableSafe $columnsValues";
+        $this->prepare($sql);
+        return $this;
     }
 
-    public function insert($tableName, array $data) {
+    /**
+     * Performs an INSERT.
+     *
+     * @see $this->insertReplace
+     * 
+     * @param string $tableName 
+     * @param array $data 
+     * @access public
+     * @return $this
+     */
+    public function insert($tableName, array $data)
+    {
         return $this->insertReplace('INSERT', $tableName, $data);
     }
 
-    public function replace($tableName, array $data) {
+    /**
+     * Performs a REPLACE.
+     *
+     * @see $this->insertReplace
+     * 
+     * @param string $tableName 
+     * @param array $data 
+     * @access public
+     * @return $this
+     */
+    public function replace($tableName, array $data)
+    {
         return $this->insertReplace('REPLACE', $tableName, $data);
     }
 
@@ -1055,14 +1117,15 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      *
      * @return $this
      **/         
-    public function delete($tableName, $where) {
-	$tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
-	$sql = "DELETE FROM $tableSafe";
-	$this->prepare($sql);
-	if ($where) {
-	    $this->where($where);
-	}
-	return $this;
+    public function delete($tableName, $where)
+    {
+        $tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
+        $sql = "DELETE FROM $tableSafe";
+        $this->prepare($sql);
+        if ($where) {
+            $this->where($where);
+        }
+        return $this;
     }
 
     /**
@@ -1070,38 +1133,41 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      *
      * @return integer|false
      **/	     
-    public function insertId() {
-	$ret = $this->isMysqli ? $result->insert_id() : mysql_insert_id($this->getLink());
-	return $ret;
+    public function insertId()
+    {
+        $ret = $this->isMysqli ? $result->insert_id() : mysql_insert_id($this->getLink());
+        return $ret;
     }
 
     /**
-     * Ha nem marad példány ebből az objektumból, szabadítsa fel a result-ot,
-     * ha van.     
+     * Free the results.
      **/         
-    public function __destruct() {
-	$this->freeResults();
+    public function __destruct()
+    {
+        $this->freeResults();
     }
 
-    public function __set($name, $value) {
-	switch($name) {
-	case 'fetchMode':
-	    $this->setFetchMode($value);
-	    break;
-	default:
-	    throw new OutOfBoundsException("Invalid member: `$name` " .
-		"(target value was `$value`)");
-	}
+    public function __set($name, $value)
+    {
+        switch($name) {
+        case 'fetchMode':
+            $this->setFetchMode($value);
+            break;
+        default:
+            throw new OutOfBoundsException("Invalid member: `$name` " .
+                "(target value was `$value`)");
+        }
     }
 
-    public function count() {
-	if (!is_resource($this->result)) {
-	    $msg = "No SELECT result. ".
-		"Last query: " . $this->query;
-	    throw new LogicException ($msg);
-	}
-	$count = $this->numRows();
-	return $count;
+    public function count()
+    {
+        if (!is_resource($this->result)) {
+            $msg = "No SELECT result. ".
+                "Last query: " . $this->query;
+            throw new LogicException ($msg);
+        }
+        $count = $this->numRows();
+        return $count;
     }
 }
 ?>

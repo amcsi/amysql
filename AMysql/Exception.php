@@ -1,4 +1,4 @@
-<?php /* vim: set tabstop=8 expandtab : */
+<?php /* vim: set expandtab : */
 /**
  * MySQL exception class
  *
@@ -39,7 +39,8 @@ class AMysql_Exception extends RuntimeException {
      **/
     public $origMsg;
 
-    public function __construct($msg, $errno, $query) {
+    public function __construct($msg, $errno, $query)
+    {
         $this->query = $query;
         parent::__construct($msg, $errno);
         $this->origMsg = $msg;
@@ -79,17 +80,20 @@ class AMysql_Exception extends RuntimeException {
         }
     }
 
-    public function getDetails() {
+    public function getDetails()
+    {
         return "Code: $this->code\n" .
             "Message: $this->message\n" .
             "Last query: $this->query";
     }
 
-    public function getLogMessage() {
+    public function getLogMessage()
+    {
         return "Mysql error!\n" . $this->getDetails();
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return "AMysqlException: `$this->message`\n" .
             "Error code `$this->code` in $this->file:$this->line\n" .
             "Query: $this->query\n";

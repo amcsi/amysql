@@ -1,4 +1,4 @@
-<?php /* vim: set tabstop=8 expandtab : */
+<?php /* vim: set expandtab : */
 /**
  * Mysql abstraction which only uses mysql_* functions
  *
@@ -212,8 +212,9 @@ abstract class AMysql_Abstract {
         return $this;
     }
 
-    public function getFetchMode() {
-	return $this->_fetchMode;
+    public function getFetchMode()
+    {
+        return $this->_fetchMode;
     }
 
     /**
@@ -222,20 +223,21 @@ abstract class AMysql_Abstract {
      * @param string $db 
      * @return $this
      */
-    public function selectDb($db) {
+    public function selectDb($db)
+    {
         $isMysqli = $this->isMysqli;
-	$result = $isMysqli ? $this->link->select_db($db) : mysql_select_db($db, $this->link);
-	if (!$result) {
+        $result = $isMysqli ? $this->link->select_db($db) : mysql_select_db($db, $this->link);
+        if (!$result) {
             $error = $isMysqli ? $this->link->error : mysql_error($this->link);
             $errno = $isMysqli ? $this->link->errno : mysql_errno($this->link);
-	    if ($this->throwExceptions) {
+            if ($this->throwExceptions) {
                 throw new AMysql_Exception($error, $errno, 'USE ' . $db);
-	    }
-	    else {
+            }
+            else {
                 trigger_error($error, E_USER_WARNING);
-	    }
-	}
-	return $this;
+            }
+        }
+        return $this;
     }
 
     /**
@@ -244,7 +246,8 @@ abstract class AMysql_Abstract {
      * @param string $charset Example: utf8
      * @return $this
      */
-    public function setCharset($charset) {
+    public function setCharset($charset)
+    {
         $isMysqli = $this->isMysqli;
         if ($isMysqli) {
             $result = $this->link->set_charset($charset);
@@ -257,17 +260,17 @@ abstract class AMysql_Abstract {
             }
             $result = mysql_set_charset($charset, $this->link);
         }
-	if (!$result) {
+        if (!$result) {
             $error = $isMysqli ? $this->link->error : mysql_error($this->link);
             $errno = $isMysqli ? $this->link->errno : mysql_errno($this->link);
-	    if ($this->throwExceptions) {
-		throw new AMysql_Exception($error, $errno, "(setting charset)");
-	    }
-	    else {
-		trigger_error($error, E_USER_WARNING);
-	    }
-	}
-	return $this;
+            if ($this->throwExceptions) {
+                throw new AMysql_Exception($error, $errno, "(setting charset)");
+            }
+            else {
+                trigger_error($error, E_USER_WARNING);
+            }
+        }
+        return $this;
     }
 
     /**
@@ -277,7 +280,8 @@ abstract class AMysql_Abstract {
      * @param string $names Example: utf8
      * @return $this
      */
-    public function setNames($names) {
+    public function setNames($names)
+    {
         $stmt = $this->query("SET NAMES $names");
         return $this;
     }
@@ -289,7 +293,8 @@ abstract class AMysql_Abstract {
      *
      * @return The escaped identifier.
      **/
-    public static function escapeIdentifierSimple($identifier) {
+    public static function escapeIdentifierSimple($identifier)
+    {
         return '`' . addcslashes($identifier, '`\\') . '`';
     }
 
@@ -301,12 +306,13 @@ abstract class AMysql_Abstract {
      *
      * @return The escaped identifier.
      **/
-    protected static function _escapeIdentifier($identifier) {
+    protected static function _escapeIdentifier($identifier)
+    {
         $exploded = explode('.', $identifier);
         $count = count($exploded);
-	$identifier = $exploded[$count-1] == '*' ?
-	    '*' :
-	    '`' . $exploded[$count-1] . '`';
+        $identifier = $exploded[$count-1] == '*' ?
+            '*' :
+            '`' . $exploded[$count-1] . '`';
         if (1 < $count) {
             $identifier = "`$exploded[0]`.$identifier";
         }
@@ -335,25 +341,26 @@ abstract class AMysql_Abstract {
      *  echo $amysql->escapeIdentifier('table.order', 'ot');
      *  // `table`.`order` AS ot
      **/
-    public static function escapeIdentifier($identifierName, $as = null) {
-	$asString = '';
-	$escapeIdentifierName = true;
-	if ($as and !is_numeric($as)) {
-	    $asString = ' AS ' . $as;
-	}
-	else if (is_string($identifierName) and (false !== 
-	    strpos($identifierName, ' AS '))) {
-	    $exploded = explode(' AS ', $identifierName);
-	    $identifierName = $exploded[0];
-	    $asString = ' AS ' . $exploded[1];
-	}
-	if ($identifierName instanceof AMysql_Expr) {
-	    $ret = $identifierName->__toString() . $asString;
-	}
-	else {
-	    $ret = self::_escapeIdentifier($identifierName) . $asString;
-	}
-	return $ret;
+    public static function escapeIdentifier($identifierName, $as = null)
+    {
+        $asString = '';
+        $escapeIdentifierName = true;
+        if ($as and !is_numeric($as)) {
+            $asString = ' AS ' . $as;
+        }
+        else if (is_string($identifierName) and (false !== 
+            strpos($identifierName, ' AS '))) {
+                $exploded = explode(' AS ', $identifierName);
+                $identifierName = $exploded[0];
+                $asString = ' AS ' . $exploded[1];
+            }
+        if ($identifierName instanceof AMysql_Expr) {
+            $ret = $identifierName->__toString() . $asString;
+        }
+        else {
+            $ret = self::_escapeIdentifier($identifierName) . $asString;
+        }
+        return $ret;
     }
 
     /**
@@ -362,7 +369,8 @@ abstract class AMysql_Abstract {
      * @todo Checks (such as for whether we have already started a
      * transaction)
      **/
-    public function startTransaction() {
+    public function startTransaction()
+    {
         return $this->query('START TRANSACTION');
     }
 
@@ -371,7 +379,8 @@ abstract class AMysql_Abstract {
      *
      * @todo Checks
      **/
-    public function commit() {
+    public function commit()
+    {
         return $this->query('COMMIT');
     }
 
@@ -380,7 +389,8 @@ abstract class AMysql_Abstract {
      *
      * @todo Checks
      **/
-    public function rollback() {
+    public function rollback()
+    {
         return $this->query('ROLLBACK');
     }
 
@@ -392,7 +402,8 @@ abstract class AMysql_Abstract {
      *
      * @return AMysql_Statement
      **/
-    public function query($sql, $binds = array ()) {
+    public function query($sql, $binds = array ())
+    {
         $stmt = new AMysql_Statement($this);
         $result = $stmt->query($sql, $binds);
         return $stmt;
@@ -407,7 +418,8 @@ abstract class AMysql_Abstract {
      *
      * @return string
      **/
-    public function getOne($sql, $binds = array ()) {
+    public function getOne($sql, $binds = array ())
+    {
         $stmt = new AMysql_Statement($this);
         $stmt->query($sql, $binds);
         return $stmt->result(0, 0);
@@ -424,7 +436,8 @@ abstract class AMysql_Abstract {
      *
      * @return string
      **/
-    public function getOneNull($sql, $binds = array ()) {
+    public function getOneNull($sql, $binds = array ())
+    {
         $stmt = new AMysql_Statement($this);
         $stmt->query($sql, $binds);
         return $stmt->resultNull(0, 0);
@@ -441,7 +454,8 @@ abstract class AMysql_Abstract {
      *
      * @return string
      **/
-    public function getOneInt($sql, $binds = array ()) {
+    public function getOneInt($sql, $binds = array ())
+    {
         $stmt = new AMysql_Statement($this);
         $stmt->query($sql, $binds);
         return $stmt->resultInt(0, 0);
@@ -454,7 +468,8 @@ abstract class AMysql_Abstract {
      *
      * @return AMysql_Statement
      **/
-    public function prepare($sql) {
+    public function prepare($sql)
+    {
         $stmt = new AMysql_Statement($this);
         $stmt->prepare($sql);
         return $stmt;
@@ -465,7 +480,8 @@ abstract class AMysql_Abstract {
      *
      * @return AMysql_Select
      **/
-    public function select() {
+    public function select()
+    {
         $select = new AMysql_Select($this);
         return $select;
     }
@@ -475,7 +491,8 @@ abstract class AMysql_Abstract {
      *
      * @return AMysql_Statement
      **/
-    public function newStatement() {
+    public function newStatement()
+    {
         return new AMysql_Statement($this);
     }
 
@@ -492,7 +509,8 @@ abstract class AMysql_Abstract {
      *
      * @return boolean Whether the update was successful.
      **/
-    public function update($tableName, array $data, $where, $binds = array()) {
+    public function update($tableName, array $data, $where, $binds = array())
+    {
         $stmt = new AMysql_Statement($this);
         $stmt->update($tableName, $data, $where);
         $result = $stmt->execute($binds);
@@ -518,23 +536,23 @@ abstract class AMysql_Abstract {
      * @return boolean
      **/
     public function updateMultipleByData(
-	$tableName, array $data, $column = 'id'
+        $tableName, array $data, $column = 'id'
     ) {
-	$successesNeeded = count($data);
-	$where = self::escapeIdentifier($column) . " = ?";
-	$affectedRows = 0;
-	foreach ($data as $row) {
-	    $by = $row[$column];
-	    unset($row[$column]);
-	    $stmt = new AMysql_Statement($this);
-	    $stmt->update($tableName, $row, $where)->execute(array ($by));
-	    $affectedRows += $stmt->affectedRows;
-	    if ($stmt->result) {
-		$successesNeeded--;
-	    }
-	}
-	$this->multipleAffectedRows = $affectedRows;
-	return 0 === $successesNeeded;
+        $successesNeeded = count($data);
+        $where = self::escapeIdentifier($column) . " = ?";
+        $affectedRows = 0;
+        foreach ($data as $row) {
+            $by = $row[$column];
+            unset($row[$column]);
+            $stmt = new AMysql_Statement($this);
+            $stmt->update($tableName, $row, $where)->execute(array ($by));
+            $affectedRows += $stmt->affectedRows;
+            if ($stmt->result) {
+                $successesNeeded--;
+            }
+        }
+        $this->multipleAffectedRows = $affectedRows;
+        return 0 === $successesNeeded;
     }
 
     /**
@@ -563,24 +581,24 @@ abstract class AMysql_Abstract {
      * @return boolean
      **/
     public function updateMultipleByKey(
-	$tableName, array $data, $column = 'id', $updateSameColumn = false
+        $tableName, array $data, $column = 'id', $updateSameColumn = false
     ) {
-	$successesNeeded = count($data);
-	$where = self::escapeIdentifier($column) . " = ?";
-	$affectedRows = 0;
-	foreach ($data as $by => $row) {
-	    if (!$updateSameColumn) {
-		unset($row[$column]);
-	    }
-	    $stmt = new AMysql_Statement($this);
-	    $stmt->update($tableName, $row, $where)->execute(array ($by));
-	    $affectedRows += $stmt->affectedRows;
-	    if ($stmt->result) {
-		$successesNeeded--;
-	    }
-	}
-	$this->multipleAffectedRows = $affectedRows;
-	return 0 === $successesNeeded;
+        $successesNeeded = count($data);
+        $where = self::escapeIdentifier($column) . " = ?";
+        $affectedRows = 0;
+        foreach ($data as $by => $row) {
+            if (!$updateSameColumn) {
+                unset($row[$column]);
+            }
+            $stmt = new AMysql_Statement($this);
+            $stmt->update($tableName, $row, $where)->execute(array ($by));
+            $affectedRows += $stmt->affectedRows;
+            if ($stmt->result) {
+                $successesNeeded--;
+            }
+        }
+        $this->multipleAffectedRows = $affectedRows;
+        return 0 === $successesNeeded;
     }
 
     /**
@@ -603,7 +621,8 @@ abstract class AMysql_Abstract {
      * @return mixed The mysql_insert_id(), if the query succeeded and there exists a primary
      * key. Otherwise the boolean of whether the insert was successful.
      **/
-    public function insert($tableName, array $data) {
+    public function insert($tableName, array $data)
+    {
         $stmt = new AMysql_Statement($this);
         $stmt->insert($tableName, $data);
         $success = $stmt->execute();
@@ -622,7 +641,8 @@ abstract class AMysql_Abstract {
      *
      * @return boolean Success.
      **/
-    public function replace($tableName, array $data) {
+    public function replace($tableName, array $data)
+    {
         $stmt = new AMysql_Statement($this);
         $stmt->replace($tableName, $data);
         $success = $stmt->execute();
@@ -650,16 +670,17 @@ abstract class AMysql_Abstract {
      *					mysql_insert_id() of the newly
      *					INSERTED row.
      */
-    public function save($tableName, $data, $columnName, $value = null) {
-	if ($value) {
-	    $where = AMysql_Abstract::escapeIdentifier($columnName) . ' = ?';
-	    $this->update($tableName, $data, $where, array ($value));
-	    return $value;
-	}
-	else {
-	    $id = $this->insert($tableName, $data);
-	    return $id;
-	}
+    public function save($tableName, $data, $columnName, $value = null)
+    {
+        if ($value) {
+            $where = AMysql_Abstract::escapeIdentifier($columnName) . ' = ?';
+            $this->update($tableName, $data, $where, array ($value));
+            return $value;
+        }
+        else {
+            $id = $this->insert($tableName, $data);
+            return $id;
+        }
     }
 
     /**
@@ -671,7 +692,8 @@ abstract class AMysql_Abstract {
      *
      * @return resource|false The mysql resource if the delete was successful, otherwise false.
      **/
-    public function delete($tableName, $where, $binds = array ()) {
+    public function delete($tableName, $where, $binds = array ())
+    {
         $stmt = new AMysql_Statement($this);
         $stmt->delete($tableName, $where);
         $result = $stmt->execute($binds);
@@ -686,11 +708,12 @@ abstract class AMysql_Abstract {
      * @access public
      * @return void
      */
-    public function foundRows() {
+    public function foundRows()
+    {
         $stmt = new AMysql_Statement($this);
-	$sql = 'SELECT FOUND_ROWS()';
-	$stmt->query($sql);
-	return $stmt->resultInt();
+        $sql = 'SELECT FOUND_ROWS()';
+        $stmt->query($sql);
+        return $stmt->resultInt();
     }
 
     /**
@@ -706,11 +729,12 @@ abstract class AMysql_Abstract {
      *
      * @return AMysql_Expr
      **/
-    public function expr(/* args */) {
-	$args = func_get_args();
-	$expr = new AMysql_Expr($this);
-	call_user_func_array(array ($expr, 'set'), $args);
-	return $expr;
+    public function expr(/* args */)
+    {
+        $args = func_get_args();
+        $expr = new AMysql_Expr($this);
+        call_user_func_array(array ($expr, 'set'), $args);
+        return $expr;
     }
 
     /**
@@ -721,12 +745,13 @@ abstract class AMysql_Abstract {
      * @param string $s The string to LIKE escape
      * @param string $escapeChar (Opcionális) The escape character
      **/
-    public static function escapeLike($s, $escapeStr = '=') {
-	return str_replace(
-	    array($escapeStr, '_', '%'), 
-	    array($escapeStr.$escapeStr, $escapeStr.'_', $escapeStr.'%'), 
-	    $s
-	);
+    public static function escapeLike($s, $escapeStr = '=')
+    {
+        return str_replace(
+            array($escapeStr, '_', '%'), 
+            array($escapeStr.$escapeStr, $escapeStr.'_', $escapeStr.'%'), 
+            $s
+        );
     }
 
     /**
@@ -737,7 +762,8 @@ abstract class AMysql_Abstract {
      * @param mixed The value to escape
      *
      **/
-    public function escape($value) {
+    public function escape($value)
+    {
         $res = $this->link;
         $isValidLink = $res instanceof Mysqli || 'mysql link' == get_resource_type($res);
         if (!$isValidLink) {
@@ -764,12 +790,12 @@ abstract class AMysql_Abstract {
         if ($value instanceof AMysql_Expr) {
             return $value->__toString();
         }
-	// In the case of a string or anything else, let's escape it and
-	// put it between apostrophes.
+        // In the case of a string or anything else, let's escape it and
+        // put it between apostrophes.
         return "'" .
             ($isMysqli ? $this->link->real_escape_string($value) : mysql_real_escape_string($value, $res)) .
             "'"
-        ;
+            ;
     }
 
     /**
@@ -804,7 +830,8 @@ abstract class AMysql_Abstract {
      * @param array $array The 2 dimensional array to transpose
      * @return array
      */
-    public static function transpose(array $array) {
+    public static function transpose(array $array)
+    {
         $ret = array ();
         if (!$array) {
             return $ret;
@@ -833,7 +860,8 @@ abstract class AMysql_Abstract {
      * @access public
      * @return $this
      */
-    public function addQuery($query, $queryTime) {
+    public function addQuery($query, $queryTime)
+    {
         $this->_queries[] = $query;
         $data = array (
             'query' => $query,
@@ -860,7 +888,8 @@ abstract class AMysql_Abstract {
      * @access public
      * @return array
      */
-    public function getQueries() {
+    public function getQueries()
+    {
         return $this->_queries;
     }
 
@@ -874,7 +903,8 @@ abstract class AMysql_Abstract {
      * 
      * @return array[]
      */
-    public function getQueriesData() {
+    public function getQueriesData()
+    {
         return $this->_queriesData;
     }
 }

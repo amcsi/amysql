@@ -1,4 +1,4 @@
-<?php /* vim: set tabstop=8 expandtab : */
+<?php /* vim: set expandtab : */
 /**
  * Class for making custom expressions for AMysql value binding.
  * This is what you should use to be able to add specific kinds
@@ -65,48 +65,50 @@ class AMysql_Expr {
      * In case of a literal string, you can just pass the literal string as
      * the only parameter.
      **/         
-    public function __construct(/* args */) {
-	$args = func_get_args();
-	if ($args[0] instanceof AMysql) {
-	    $this->amysql = array_shift($args);
-	}
-	if ($args) {
-	    call_user_func_array(array($this, 'set'), $args);
-	}
+    public function __construct(/* args */)
+    {
+        $args = func_get_args();
+        if ($args[0] instanceof AMysql) {
+            $this->amysql = array_shift($args);
+        }
+        if ($args) {
+            call_user_func_array(array($this, 'set'), $args);
+        }
     }
 
-    public function set() {
-	$args = func_get_args();
-	// literál
-	if (is_string($args[0])) {
-	    $prepared = $args[0];
-	}
-	else {
-	    switch ($args[0]) {
-	    case self::EXPR_LITERAL:
-		$prepared = $args[1];
-		break;
-	    case self::EXPR_COLUMN_IN:
-		$prepared = '';
-		if ($args[2]) {
+    public function set()
+    {
+        $args = func_get_args();
+        // literál
+        if (is_string($args[0])) {
+            $prepared = $args[0];
+        }
+        else {
+            switch ($args[0]) {
+            case self::EXPR_LITERAL:
+                $prepared = $args[1];
+                break;
+            case self::EXPR_COLUMN_IN:
+                $prepared = '';
+                if ($args[2]) {
                     foreach ($args[2] as &$val) {
                         $val = $this->amysql->escape($val);
                     }
-		    $prepared = AMysql::escapeIdentifier($args[1]) . ' IN 
-			(' . join(', ', $args[2]) . ') ';
-		}
-		else {
-		    // If the array is empty, don't break the WHERE syntax
-		    $prepared = 0;
-		}
-		break;
-	    case self::ESCAPE_LIKE:
-		$format = '%%%s%%';
-		if (!empty($args[2])) {
-		    $format = $args[2];
-		}
-		$likeEscaped = AMysql::escapeLike($args[1]);
-		$formatted = sprintf($format, $likeEscaped);
+                    $prepared = AMysql::escapeIdentifier($args[1]) . ' IN 
+                        (' . join(', ', $args[2]) . ') ';
+                }
+                else {
+                    // If the array is empty, don't break the WHERE syntax
+                    $prepared = 0;
+                }
+                break;
+            case self::ESCAPE_LIKE:
+                $format = '%%%s%%';
+                if (!empty($args[2])) {
+                    $format = $args[2];
+                }
+                $likeEscaped = AMysql::escapeLike($args[1]);
+                $formatted = sprintf($format, $likeEscaped);
                 if ($this->amysql) {
                     if ('mysqli' == $this->amysql->linkType) {
                         $escaped = $this->amysql->link->real_escape_string($formatted);
@@ -118,26 +120,28 @@ class AMysql_Expr {
                 else {
                     $escaped = mysql_real_escape_string($formatted);
                 }
-		$prepared = "'$escaped'";
-		$prepared .= " ESCAPE '='";
-		break;
-	    default:
-		throw new Exception("No such expression type: `$args[0]`.");
-		break;
-	    }
-	}
-	$this->prepared = $prepared;
+                $prepared = "'$escaped'";
+                $prepared .= " ESCAPE '='";
+                break;
+            default:
+                throw new Exception("No such expression type: `$args[0]`.");
+                break;
+            }
+        }
+        $this->prepared = $prepared;
     }
 
-    public function toString() {
-	if (!isset($this->prepared)) {
-	    throw new Exception ("No prepared string for mysql expression.");
-	}
-	return $this->prepared;
+    public function toString()
+    {
+        if (!isset($this->prepared)) {
+            throw new Exception ("No prepared string for mysql expression.");
+        }
+        return $this->prepared;
     }
 
-    public function __toString() {
-	return $this->toString();
+    public function __toString()
+    {
+        return $this->toString();
     }
 } 
 ?>
