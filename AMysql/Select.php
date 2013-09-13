@@ -54,7 +54,10 @@ class AMysql_Select extends AMysql_Statement {
     public function formatSelectColumn($columnName, $alias = null)
     {
         if ('*' == $columnName[strlen($columnName) - 1]) {
-            return $columnName;
+            return '*' === $columnName ? '*'
+                : AMysql_Abstract::escapeIdentifierSimple(substr($columnName, 0, -2)) .
+                '.*'
+            ;
         }
         $ret = AMysql_Abstract::escapeIdentifier($columnName);
         if ($alias && !is_numeric($alias)) {
@@ -81,12 +84,12 @@ class AMysql_Select extends AMysql_Statement {
         $columnPrefix = !empty($options['columnPrefix']) ? $options['columnPrefix'] . '.' : '';
         foreach ($columns as $alias => $columnName) {
             if ('*' == $columnName[strlen($columnName)- 1]) {
-                $this->columns['*'] = "$columnPrefix$columnName";
+                $key = '*';
             }
             else {
                 $key = $alias && !is_numeric($alias) ? $alias : $columnName;
-                $this->columns[$key] = $this->formatSelectColumn("$columnPrefix$columnName", $alias);
             }
+            $this->columns[$key] = $this->formatSelectColumn("$columnPrefix$columnName", $alias);
         }
         return $this;
     }

@@ -59,7 +59,7 @@ EOT;
         $unboundSql = $select->getUnboundSql();
         $expected = 'SELECT DISTINCT ' .
             '`t3alias`.`col1` AS `t3_col1`, `t3alias`.`col2` AS `t3_col2`, '
-            . 't2alias.*, `table1`.`col1` AS `t1_col1`, `t4alias`.`t4lol`, ' .
+            . '`t2alias`.*, `table1`.`col1` AS `t1_col1`, `t4alias`.`t4lol`, ' .
             '`t4alias`.`t4lol2` AS `t4lol2aliased`, ' .
             'table7, table8, CURRENT_TIMESTAMP AS ctimestamp' . "\n" .
             'FROM `table1`, `table2` AS `t2alias`, `table3` AS `t3alias`' . "\n" .
