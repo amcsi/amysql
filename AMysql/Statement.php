@@ -76,6 +76,15 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	return new AMysql_Iterator($this);
     }
 
+    /**
+     * Sets the fetch mode for fetch() and fetchAll()
+     * Any extra parameters are passed on to the handler for that fetch type.
+     * For example you can pass the class name and parameters for fetchObject here.
+     * 
+     * @param mixed $fetchMode          The fetch mode. Use the AMysql_Abstract constants.
+     * @access public
+     * @return $this
+     */
     public function setFetchMode($fetchMode/* [, extras [, extras...]]*/) {
 	static $fetchModes = array (
 	    AMysql_Abstract::FETCH_ASSOC, AMysql_Abstract::FETCH_OBJECT,
@@ -90,6 +99,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	else {
 	    throw new Exception("Unknown fetch mode: `$fetchMode`");
 	}
+        return $this;
     }
 
     /**
@@ -242,12 +252,31 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	return $this;
     }
 
+    /**
+     * Prepares a statement and executes it with the given binds.
+     *
+     * @see $this->prepare()
+     * @see $this->execute()
+     * 
+     * @param string $sql       The SQL string to prepare.
+     * @param array $binds      @see $this->execute()
+     * @access public
+     * @return $this
+     */
     public function query($sql, $binds = array ()) {
 	$this->prepare($sql);
 	$result = $this->execute($binds);
 	return $this;
     }
 
+    /**
+     * Performs the actual query on the database with the given SQL string,
+     * making no further modifications on it. 
+     * 
+     * @param string $sql       The SQL string.
+     * @access protected
+     * @return $this
+     */
     protected function _query($sql) {
         if ($this->_executed) {
 	    throw new LogicException(
@@ -263,22 +292,25 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 		"Resource is not a mysql resource.\nQuery: $sql"
 	    );
 	}
-        if ($this->profileQueries) {
-            $startTime = microtime(true);
-            if ($isMysqli) {
+        if ($isMysqli) {
+            if ($this->profileQueries) {
+                $startTime = microtime(true);
                 $stmt = $link->prepare($sql);
                 $success = $stmt->execute();
+                $duration = microtime(true) - $startTime;
+                $this->queryTime = $duration;
             }
             else {
-                $result = mysql_query($sql, $link);
-            }
-            $duration = microtime(true) - $startTime;
-            $this->queryTime = $duration;
-        }
-        else {
-            if ($isMysqli) {
                 $stmt = $link->prepare($sql);
                 $success = $stmt->execute();
+            }
+        }
+        else {
+            if ($this->profileQueries) {
+                $startTime = microtime(true);
+                $result = mysql_query($sql, $link);
+                $duration = microtime(true) - $startTime;
+                $this->queryTime = $duration;
             }
             else {
                 $result = mysql_query($sql, $link);
@@ -325,33 +357,6 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	    }
 	}
 	return $this;
-    }
-
-    /**
-     * Executes START TRANSACTION (Not supported in all db formats).
-     *
-     * @return $this
-     */
-    public function startTransaction() {
-	return $this->_query('START TRANSACTION');
-    }
-
-    /**
-     * Executes COMMIT (Not supported in all db formats).
-     *
-     * @return $this
-     */
-    public function commit() {
-	return $this->_query('COMMIT');
-    }
-
-    /**
-     * Executes ROLLBACK (Not supported in all db formats).
-     *
-     * @return $this
-     */
-    public function rollback() {
-	return $this->_query('ROLLBACK');
     }
 
     /**
@@ -521,6 +526,11 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	return $this->fetchRow();
     }
 
+    /**
+     * Fetches the next row with column names and their indexes as keys.
+     * 
+     * @return array
+     */
     public function fetchArray() {
         $result = $this->result;
         $isMysqli = 'mysqli' == $this->linkType;
@@ -657,7 +667,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * @todo phpunit tests
      *
      * @access public
-     * @return void
+     * @return array
      */
     public function fetchAllColumns($keyColumn = false) {
         $ret = array ();
@@ -697,6 +707,9 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 
     /**
      * Fetches the next row as an object.
+     *
+     * @param string $className         (Optional) The class to use. Default is stdClass.
+     * @param array $params             (Optional) The params to pass to the object.
      * 
      * @return object
      */
@@ -728,20 +741,17 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	return $this->affectedRows;
     }
 
+    /**
+     * Returns the number of rows selected, or FALSE on failure.
+     * 
+     * @access public
+     * @return int|false
+     */
     public function numRows() {
         if ('mysqli' == $this->linkType) {
             return $this->result instanceof Mysqli_Result ? $this->result->num_rows : false;
         }
         return mysql_num_rows($this->result);
-    }
-
-    protected function _getTablesStringByArray($tableArray) {
-	$tables = array ();
-	foreach ($tableArray as $alias => $tableName) {
-	    $table = $this->escapeIdentifier($tableName, $alias);
-	    $tables[] = $table;
-	}
-	return implode(', ', $tables);
     }
 
     /**
@@ -751,15 +761,6 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      */
     public function throwException() {
 	throw new AMysql_Exception($this->error, $this->errno, $this->query);
-    }
-
-    protected function _getColumnsStringByArray($columnArray) {
-	$columns = array ();
-	foreach ($columnArray as $alias => $columnName) {
-	    $column = $this->escapeIdentifier($columnName, $alias);
-	    $columns[] = $column;
-	}
-	return implode(', ', $columns);
     }
 
     public function escapeIdentifierSimple($columnName) {
