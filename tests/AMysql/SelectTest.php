@@ -6,7 +6,8 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 
     public $tableName = 'abstracttest';
 
-    public function setUp() {
+    public function setUp()
+    {
         $this->_amysql = new AMysql(
             AMYSQL_TEST_HOST, AMYSQL_TEST_USER, AMYSQL_TEST_PASS);
         $this->_amysql->selectDb(AMYSQL_TEST_DB);
@@ -21,12 +22,14 @@ EOT;
         $this->_amysql->query($sql);
     }
 
-    public function tearDown() {
+    public function tearDown()
+    {
         $this->_amysql->query("DROP TABLE `$this->tableName`");
         $this->_amysql = null;
     }
 
-    public function testComplexQuery() {
+    public function testComplexQuery()
+    {
         $select = $this->_amysql->select();
         $select 
             ->option('DISTINCT')
@@ -76,7 +79,8 @@ EOT;
         $this->assertEquals($expected, $unboundSql);
     }
 
-    public function testBlankQuery() {
+    public function testBlankQuery()
+    {
         $select = $this->_amysql->select();
         $unboundSql = $select->getUnboundSql();
         $expected = 'SELECT ';
