@@ -43,41 +43,29 @@ class AMysql_Select extends AMysql_Statement {
     }
 
     /**
-     * Adds an array of columns to select.
+     * Adds one or more COLUMN to the list of columns to select. 
      * 
-     * @param array $columns       The array of table names. Aliases can optionally be
-     *                          assigned with the array key.
+     * @param string|AMysql_Expr|array $tables          The table name. Can be an array or table
+     *                                                  names in which case the key can mark the
+     *                                                  optional alias of the table.
      * @access public
      * @return $this
      */
-    public function columnArray(array $columns)
+    public function column($table)
     {
-        foreach ($columns as $key => $val) {
-            $this->columnSingle($val, $key);
-        }
-        return $this;
-    }
-
-    /**
-     * Adds a COLUMN to the list of columns to select. 
-     * 
-     * @param string $tableName     The (namespaced) table name. No need to escape *.
-     * @param string $alias         (Optional) the alias for the column.
-     * @access public
-     * @return $this
-     */
-    public function columnSingle($tableName, $alias = false)
-    {
-        if ('*' == $tableName[strlen($tableName)- 1]) {
-            $this->columns['*'] = $tableName;
-        }
-        else if ($alias && !is_numeric($alias)) {
-            // ['alias' => 'a.colName'] => ['alias' => `a.colName` AS `alias`]
-            $this->columns[$alias] = AMysql::escapeIdentifier($tableName, $alias);
-        }
-        else {
-            // [0 => 'a.colName'] => ['a.colName' => `a.colName`]
-            $this->columns[$tableName] = AMysql::escapeIdentifier($tableName);
+        $tables = (array) $tables;
+        foreach ($tables as $alias => $tableName) {
+            if ('*' == $tableName[strlen($tableName)- 1]) {
+                $this->columns['*'] = $tableName;
+            }
+            else if (!is_numeric($alias)) {
+                // ['alias' => 'a.colName'] => ['alias' => `a.colName` AS `alias`]
+                $this->columns[$alias] = AMysql::escapeIdentifier($tableName) . " AS $alias";
+            }
+            else {
+                // [0 => 'a.colName'] => ['a.colName' => `a.colName`]
+                $this->columns[$tableName] = AMysql::escapeIdentifier($tableName);
+            }
         }
         return $this;
     }
@@ -104,22 +92,19 @@ class AMysql_Select extends AMysql_Statement {
      * Adds a table name to the list of tables to select FROM.
      * You can use literals as table names with AMysql_Expr.
      * 
-     * @param string|AMysql_Expr $tableName     The table name
-     * @param string $as                        (Optional) The alias
+     * @param string|AMysql_Expr|array $tables          The table name. Can be an array or table
+     *                                                  names in which case the key can mark the
+     *                                                  optional alias of the table.
      * @access public
      * @return $this
      */
-    public function from($tableName, $as = null)
+    public function from($tables)
     {
-        $ref = $as ? $as : $tableName;
-        $tableName = $tableName instanceof AMysql_Expr ?
-            $tableName->__toString() :
-            AMysql::escapeIdentifier($tableName) 
-        ;
-        if ($as) {
-            $tableName .= " AS $as";
+        $tables = (array) $tables;
+        foreach ($tables as $alias => $tableName) {
+            $key = !is_numeric($alias) ? $alias : $tableName;
+            $this->froms[$key] = AMysql_Abstract::escapeIdentifier($tableName);
         }
-        $this->froms[$ref] = $tableName;
         return $this;
     }
 
