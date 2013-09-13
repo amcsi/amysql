@@ -4,9 +4,7 @@
  *
  * For information on binding placeholders, @see AMysql_Statement::execute()
  *
- * @todo try to make a new select class that works similarly like in Zend
  * @todo Maybe remove automatic dot detection for identifier escaping.
- * @todo AMysql_Select
  *
  * Visit https://github.com/amcsi/amysql
  * @author      Szerémi Attila
@@ -308,8 +306,6 @@ abstract class AMysql_Abstract {
     /**
      * Executes a query by an sql string and binds.
      *
-     * @todo Variable params possibility for binds?
-     *
      * @param string $sql The SQL string.
      * @param mixed $binds The binds or a single bind.
      *
@@ -324,8 +320,6 @@ abstract class AMysql_Abstract {
     /**
      * Executes a query, and returns the first found row's first column's value.
      * Throws a warning if no rows were found.
-     *
-     * @todo Variable params possibility for binds?
      *
      * @param string $sql The SQL string.
      * @param mixed $binds The binds or a single bind.
@@ -659,8 +653,6 @@ abstract class AMysql_Abstract {
      * is an AMysql_Expr, the safety is almost guaranteed. Do not put apostrophes around bind marks!
      * Those are handled by this escaping method.
      *
-     * @todo Automatic AMysql_Expr(AMysql_Expr::COLUMN_IN) in case of an array?
-     *
      * @param mixed The value to escape
      *
      **/
@@ -682,6 +674,10 @@ abstract class AMysql_Abstract {
         // Literal TRUE or FALSE in case of a boolean
         if (is_bool($value)) {
             return $value ? 'TRUE' : 'FALSE';
+        }
+        // for selectception ;)
+        if ($value instanceof AMysql_Statement) {
+            return $value->getSql();
         }
         // In case of an AMysql_Expr, use its __toString() methods return value.
         if ($value instanceof AMysql_Expr) {
@@ -747,6 +743,15 @@ abstract class AMysql_Abstract {
         return $ret;
     }
 
+    /**
+     * Adds a query and a profile for it to the list of queries.
+     * Used by AMysql_Statement. Do not call externally!
+     * 
+     * @param string $query         The SQL query.
+     * @param float $queryTime      The time the query took.
+     * @access public
+     * @return $this
+     */
     public function addQuery($query, $queryTime) {
         $this->_queries[] = $query;
         $data = array (
@@ -764,8 +769,16 @@ abstract class AMysql_Abstract {
         if (is_numeric($queryTime)) {
             $this->totalTime += $queryTime;
         }
+        return $this;
     }
 
+    /**
+     * Gets the list of SQL queries performed so far by AMysql_Statement
+     * objects connected by this object.
+     * 
+     * @access public
+     * @return array
+     */
     public function getQueries() {
         return $this->_queries;
     }

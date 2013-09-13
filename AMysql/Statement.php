@@ -666,10 +666,6 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * of values.
      * Works simalarly to fetchAllAssoc(), but with the resulting array transposed.
      *
-     * Note: no phpunit tests have been written for this method yet.
-     *
-     * @todo phpunit tests
-     *
      * @access public
      * @return array
      */
@@ -843,6 +839,31 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 	}
 	$this->binds[$key] =& $val;
 	return $this;
+    }
+
+    /**
+     * Sets the binds binding question marks or named binds to values.
+     * 
+     * @param array $binds      The binds.
+     * @access public
+     * @return $this
+     */
+    public function setBinds(array $binds) {
+        $this->binds = $binds;
+        return $this;
+    }
+
+    /**
+     * Merges an array of binds with the ones already set.
+     * Only use for named parameters!
+     * 
+     * @param array $binds      The binds.
+     * @access public
+     * @return $this
+     */
+    public function addBinds(array $binds) {
+        $this->binds = array_merge($this->binds, $binds);
+        return $this;
     }
 
     /**
