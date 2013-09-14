@@ -1,6 +1,20 @@
 <?php
 /**
- * AMysql_Select 
+ * The class is for helping with the assembly of a mysqli SELECT string.
+ * Rather than having to manually the string - especially of not only the values
+ * of certain parameters would be dynamic, but the tables, columns, joins, wheres
+ * and everything else is - you can get a new instance of this class by calling
+ * $amyql->select(), and you can freely add fragments to the SELECT query with
+ * the different methods of this class.
+ * When you call ->execute(), the final, but unbound SQL string is automatically
+ * prepared for binding with the passed (or pre-set) binds and execution.
+ *
+ * Since the bindings are applied after the SELECT sql string is assembled,
+ * you are encouraged to use :named placeholders for WHEREs and anything similar,
+ * binding the values with ->bindValue() each time, or collecting all the binds
+ * to use in the end and passing it to ->execute().
+ *
+ * Please check @link tests/AMysql/SelectTest.php for examples.
  *
  * Anatomy of a select:
  * SELECT <SELECT OPTIONS> <COLUMNS> FROM <FROMS> <JOINS> <WHERES> <GROUP BYS> <HAVINGS>
