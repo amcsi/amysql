@@ -1,4 +1,11 @@
-<!--- vim: set tabstop=8 expandtab filetype=php : <?php -->
+Version 1.0.0 is finally out! Now with AMysql_Select!
+
+Installation
+=
+
+See [INSTALL](INSTALL.md) file.
+
+
 Usage
 =
 
@@ -137,6 +144,56 @@ Preparing select first, executing later
         $stmt = $amysql->prepare("SELECT * FROM tablename WHERE id = :id AND state = :state");
         $stmt->execute($binds);
         $results = $stmt->fetchAllAssoc();
+
+And now with a new AMysql_Select class to help assemble a SELECT SQL string:
+-
+
+        $select = $mysql->select();
+        $select 
+            ->option('DISTINCT')
+            ->from(array ('table1', 't2alias' => 'table2'))
+            ->from(array ('t3alias' => 'table3'), array ('t3_col1' => 'col1', 't3_col2' => 'col2'))
+            ->column('t2alias.*')
+            ->column (array ('t1_col1' => 'table1.col1'))
+            ->columnLiteral('table7, table8, CURRENT_TIMESTAMP AS ctimestamp')
+            ->join(
+                '',
+                array ('t4alias' => 'table4'),
+                't4alias.t1_id = table1.id',
+                array ('t4lol', 't4lol2aliased' => 't4lol2')
+            )
+            ->join('left', array ('table5'), 't2alias.colx = table5.coly', array (), true)
+            ->join('cross', array ('table6'), 't3alias.colx = table6.coly', array ())
+            ->groupBy('t2alias.col1')
+            ->groupBy('t2alias.col2', true, true)
+            ->groupBy('t2alias.col3', true)
+            ->having('1 = 1')
+            ->having('2 = 2')
+            ->orderBy('t3alias.col1')
+            ->orderBy('t3alias.col2', true, true)
+            ->orderBy('t3alias.col3', true)
+            ->where('3 = :aBind')
+            ->where("'yes' = :anotherBind")
+            ->limit(100)
+            ->offset(200)
+        ;
+        $select->execute(array ('aBind' => 3, 'anotherBind' => 'yes'));
+        /*
+        SELECT DISTINCT `t3alias`.`col1` AS `t3_col1`, `t3alias`.`col2` AS `t3_col2`,
+            `t2alias`.*, `table1`.`col1` AS `t1_col1`, `t4alias`.`t4lol`,
+            `t4alias`.`t4lol2` AS `t4lol2aliased`,
+            table7, table8, CURRENT_TIMESTAMP AS ctimestamp'
+            FROM `table1`, `table2` AS `t2alias`, `table3` AS `t3alias`
+            LEFT JOIN `table5` ON (t2alias.colx = table5.coly)
+            JOIN `table4` AS `t4alias` ON (t4alias.t1_id = table1.id)
+            CROSS JOIN `table6` ON (t3alias.colx = table6.coly)
+            WHERE 3 = 3 AND 'yes' = 'yes'
+            GROUP BY `t2alias`.`col2` DESC, `t2alias`.`col1`, `t2alias`.`col3` DESC
+            HAVING 1 = 1 AND 2 = 2
+            ORDER BY `t3alias`.`col2` DESC, `t3alias`.`col1`, `t3alias`.`col3` DESC
+            LIMIT 100
+            OFFSET 200
+         */
 
 A documentation on binding parameters can be found in the comments for AMysql_Statement::execute(). Be sure to check it out.
 
