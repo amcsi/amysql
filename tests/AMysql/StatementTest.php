@@ -30,17 +30,6 @@ EOT;
 	$this->_amysql->query($sql);
     }
 
-    public function testLazyConnect() {
-        $this->tearDown();
-        $this->_amysql = new AMysql;
-        $this->_amysql->setConnDetails(array (
-            'host' => AMYSQL_TEST_HOST,
-            'username' =>AMYSQL_TEST_USER,
-            'password' => AMYSQL_TEST_PASS
-        ));
-        $this->createTable();
-    }
-
     public function testDoubleExecute() {
         $sql = "SELECT * FROM $this->tableName";
         $stmt = $this->_amysql->prepare($sql);

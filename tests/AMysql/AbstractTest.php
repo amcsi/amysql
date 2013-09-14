@@ -41,7 +41,8 @@ EOT;
         $this->_amysql->setConnDetails(array (
             'host' => AMYSQL_TEST_HOST,
             'username' =>AMYSQL_TEST_USER,
-            'password' => AMYSQL_TEST_PASS
+            'password' => AMYSQL_TEST_PASS,
+            'db' => AMYSQL_TEST_DB,
         ));
         $this->createTable();
     }
