@@ -31,8 +31,39 @@ EOT;
     }
 
     public function tearDown() {
-	$this->_amysql->query("DROP TABLE `$this->tableName`");
+        try {
+            $this->_amysql->query("DROP TABLE `$this->tableName`");
+        }
+        catch (Exception $e) {
+
+        }
 	$this->_amysql = null;
+    }
+
+    public function testConnect() {
+        $this->tearDown();
+        $this->_amysql = new AMysql;
+        $this->_amysql->setConnDetails(array (
+            'host' => AMYSQL_TEST_HOST,
+            'username' =>AMYSQL_TEST_USER,
+            'password' => AMYSQL_TEST_PASS,
+            'db' => AMYSQL_TEST_DB,
+        ));
+        $this->_amysql->connect();
+        $this->createTable();
+    }
+
+    public function testConnectThenToDb() {
+        $this->tearDown();
+        $this->_amysql = new AMysql;
+        $this->_amysql->setConnDetails(array (
+            'host' => AMYSQL_TEST_HOST,
+            'username' =>AMYSQL_TEST_USER,
+            'password' => AMYSQL_TEST_PASS,
+        ));
+        $this->_amysql->connect();
+        $this->_amysql->selectDb(AMYSQL_TEST_DB);
+        $this->createTable();
     }
 
     public function testLazyConnect() {
@@ -45,6 +76,35 @@ EOT;
             'db' => AMYSQL_TEST_DB,
         ));
         $this->createTable();
+    }
+
+    public function testConnectRightPort() {
+        $this->tearDown();
+        $this->_amysql = new AMysql;
+        $this->_amysql->setConnDetails(array (
+            'host' => AMYSQL_TEST_HOST,
+            'username' =>AMYSQL_TEST_USER,
+            'password' => AMYSQL_TEST_PASS,
+            'port' => 3306,
+            'db' => AMYSQL_TEST_DB,
+        ));
+        $this->createTable();
+    }
+
+    public function testForceMysql() {
+        $this->tearDown();
+        $this->_amysql = new AMysql;
+        $this->_amysql->setConnDetails(array (
+            'host' => AMYSQL_TEST_HOST,
+            'username' =>AMYSQL_TEST_USER,
+            'password' => AMYSQL_TEST_PASS,
+            'port' => 3306,
+            'db' => AMYSQL_TEST_DB,
+        ));
+        AMysql_Abstract::$useMysqli = false;
+        $this->createTable();
+        $this->assertEquals('resource', gettype($this->_amysql->link));
+        AMysql_Abstract::$useMysqli = true;
     }
 
     public function testInsertSingleRow() {
