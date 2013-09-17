@@ -6,37 +6,37 @@ Composer
 -----
 Install composer in your project:
 
-        curl -s https://getcomposer.org/installer | php
+    curl -s https://getcomposer.org/installer | php
 
 Create a composer.json file in your project root:
 
-        {
-            "require": {
-                "amcsi/amysql": "1.*"
-            }
+    {
+        "require": {
+            "amcsi/amysql": "1.*"
         }
+    }
 
 Install via composer:
 
-        php composer.phar install
+    php composer.phar install
 
 Add this line to your application’s index.php file (PHP 5.3+):
 
-        <?php
-        require 'vendor/autoload.php';
+    <?php
+    require 'vendor/autoload.php';
 
 Or just include AMysql.php if your PHP version is 5.2.*:
 
-        <?php
-        require 'vendor/amcsi/amysql/AMysql.php';
+    <?php
+    require 'vendor/amcsi/amysql/AMysql.php';
 
 Manual
 -----
 
 Copy files:
 
-        AMysql.php
-        AMysql/
+    AMysql.php
+    AMysql/
 
 To /path/to/libs/ (Zend Framework style) or /path/to/libs/AMysql/ (subprojects separated)
 
