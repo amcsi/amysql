@@ -21,6 +21,7 @@ require_once $dir . '/Select.php';
 abstract class AMysql_Abstract {
 
     public $insertId; // last insert id
+    protected $driver;
     public $lastStatement; // last AMysql_Statement
     public $link = null; // mysql link
     public $isMysqli; // mysql or mysqli
@@ -44,7 +45,7 @@ abstract class AMysql_Abstract {
      *
      * @var boolean
      */
-    public $profileQueries = false;
+    protected $profileQueries = false;
     /**
      * Whether backtraces should be added to each array for getQueriesData(). If true,
      * backtraces will be found under the 'backtrace' key.
@@ -906,6 +907,55 @@ abstract class AMysql_Abstract {
     public function getQueriesData()
     {
         return $this->_queriesData;
+    }
+
+    /**
+     * getDriver 
+     * 
+     * @access public
+     * @return AMysql_Driver_Abstract
+     */
+    public function getDriver()
+    {
+        if (!$this->driver) {
+            if (!$this->link) {
+                $this->connect();
+            }
+            if (!class_exists('AMysql_Driver_Abstract')) {
+                require_once dirname(__FILE__) . '/Driver/Abstract.php';
+            }
+            if (is_resource($this->link)) {
+                if (!class_exists('AMysql_Driver_Mysql')) {
+                    require_once dirname(__FILE__) . '/Driver/Mysql.php';
+                }
+                $driver = new AMysql_Driver_Mysql($this->link);
+            }
+            else if ($this->link instanceof Mysqli) {
+                if (!class_exists('AMysql_Driver_Mysqli')) {
+                    require_once dirname(__FILE__) . '/Driver/Mysqli.php';
+                }
+                $driver = new AMysql_Driver_Mysqli($this->link);
+            }
+            $this->driver = $driver;
+            $driver->profileQueries = $this->profileQueries;
+        }
+        return $this->driver;
+    }
+
+    public function __set($name, $val)
+    {
+        if ('profileQueries' == $name) {
+            $this->$name = $val;
+            if ($this->driver) {
+                $this->driver->profileQueries = $val;
+            }
+        }
+    }
+
+    public function __get($name) {
+        if ('profileQueries' == $name) {
+            return $this->$name;
+        }
     }
 }
 ?>

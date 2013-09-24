@@ -23,6 +23,7 @@
  **/ 
 class AMysql_Statement implements IteratorAggregate, Countable {
     public $amysql;
+    public $driver;
     public $error;
     public $errno;
     public $result;
@@ -71,6 +72,14 @@ class AMysql_Statement implements IteratorAggregate, Countable {
         $this->profileQueries = $amysql->profileQueries;
         $this->throwExceptions = $this->amysql->throwExceptions;
         $this->setFetchMode($amysql->getFetchMode());
+    }
+
+    public function getDriver()
+    {
+        if (!$this->driver) {
+            $this->driver = $this->amysql->getDriver();
+        }
+        return $this->driver;
     }
 
     /**
@@ -325,68 +334,26 @@ class AMysql_Statement implements IteratorAggregate, Countable {
             );
         }
         $link = $this->getLink();
-        $isMysqli = $this->isMysqli();
         $this->_executed = true;
         $this->query = $sql; 
         $success = false;
-        if ($isMysqli) {
-            if ($this->profileQueries) {
-                $startTime = microtime(true);
-                $stmt = $link->prepare($sql);
-                if ($stmt) {
-                    $success = $stmt->execute();
-                }
-                $duration = microtime(true) - $startTime;
-                $this->queryTime = $duration;
-            }
-            else {
-                $stmt = $link->prepare($sql);
-                if ($stmt) {
-                    $success = $stmt->execute();
-                }
-            }
-        }
-        else {
-            if ($this->profileQueries) {
-                $startTime = microtime(true);
-                $result = mysql_query($sql, $link);
-                $duration = microtime(true) - $startTime;
-                $this->queryTime = $duration;
-            }
-            else {
-                $result = mysql_query($sql, $link);
-            }
-        }
-        if ($isMysqli) {
-            $result = $stmt ? $stmt->get_result() : false;
-            if (!$result && $success) {
-                /**
-                 * In mysqli, result_metadata will return a falsy value
-                 * even for successful SELECT queries, so for compatibility
-                 * let's set the result to true if it isn't an object (is false),
-                 * but the query was successful.
-                 */
-                $result = true;
-            }
-        }
+
+        $driver = $this->getDriver();
+        $result = $driver->query($sql);
+        $this->queryTime = $driver->lastQueryTime;
         $this->amysql->addQuery($sql, $this->queryTime);
+
         if (false !== $result) {
-            if ($isMysqli) {
-                $this->affectedRows = $stmt->affected_rows;
-                $this->insertId = $stmt->insert_id;
-            }
-            else {
-                $this->affectedRows = mysql_affected_rows($link);
-                $this->insertId = mysql_insert_id($link);
-            }
+            $this->affectedRows = $driver->lastAffectedRows;
+            $this->insertId = $driver->lastInsertId;
             $this->result = $result;
             $this->results[] = $result;
             $this->amysql->affectedRows = $this->affectedRows;
             $this->amysql->insertId = $this->insertId;
         }
         else {
-            $this->error = $isMysqli ? $link->error : mysql_error($link);
-            $this->errno = $isMysqli ? $link->errno : mysql_errno($link);
+            $this->error = $driver->lastError;
+            $this->errno = $driver->lastErrno;
             try {
                 $this->throwException();
                 $this->lastException = null;
