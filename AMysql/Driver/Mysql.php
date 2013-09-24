@@ -1,4 +1,14 @@
 <?php
+/**
+ * The driver for the old mysql_* functions
+ * 
+ * @abstract
+ * @package amysql
+ *
+ * Visit https://github.com/amcsi/amysql
+ * @author      Szerémi Attila
+ * @license     MIT License; http://www.opensource.org/licenses/mit-license.php
+ */
 class AMysql_Driver_Mysql extends AMysql_Driver_Abstract
 {
     public function query($sql) {
@@ -25,5 +35,48 @@ class AMysql_Driver_Mysql extends AMysql_Driver_Abstract
             $this->lastErrno = mysql_errno($link);
         }
         return $result;
+    }
+
+    public function numRows($result)
+    {
+        return mysql_num_rows($result);
+    }
+
+    public function fetchAssoc($result)
+    {
+        return mysql_fetch_assoc($result);
+    }
+
+    public function fetchRow($result)
+    {
+        return mysql_fetch_row($result);
+    }
+
+    public function fetchArray($result)
+    {
+        return mysql_fetch_array($result);
+    }
+
+    public function fetchObject($result, $className, array $params)
+    {
+        if ($params) {
+            return mysql_fetch_object($result, $className, $params);
+        }
+        return mysql_fetch_object($result, $className);
+    }
+
+    public function result($result, $row = 0, $field = 0)
+    {
+        return mysql_result($result, $row, $field);
+    }
+
+    public function dataSeek($result, $row)
+    {
+        return mysql_data_seek($result, $row);
+    }
+
+    public function free($result)
+    {
+        return mysql_free_result($result);
     }
 }
