@@ -25,6 +25,7 @@ define('AMYSQL_TEST_HOST', $mysqlHost);
 define('AMYSQL_TEST_USER', $mysqlUser);
 define('AMYSQL_TEST_PASS', $mysqlPass);
 define('AMYSQL_TEST_DB', $mysqlDb);
+define('SQL_DRIVER', 'mysqli'); // change to test different sql drivers
 
 require_once APPLICATION_PATH . '/AMysql.php';
 ?>

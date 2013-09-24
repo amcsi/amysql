@@ -6,17 +6,19 @@ class StatementTest extends PHPUnit_Framework_TestCase {
     public $tableName = 'abstracttest';
 
     public function setUp() {
-	$conn = mysql_connect(AMYSQL_TEST_HOST, AMYSQL_TEST_USER,
-	    AMYSQL_TEST_PASS);
-	$this->_amysql = new AMysql($conn);
-	$this->_amysql->selectDb(AMYSQL_TEST_DB);
+        if ('mysqli' == SQL_DRIVER) {
+            $this->_amysql = new AMysql(
+                AMYSQL_TEST_HOST, AMYSQL_TEST_USER, AMYSQL_TEST_PASS);
+            $this->_amysql->selectDb(AMYSQL_TEST_DB);
+        }
+        else if ('mysql' == SQL_DRIVER) {
+            $conn = mysql_connect(AMYSQL_TEST_HOST, AMYSQL_TEST_USER,
+                AMYSQL_TEST_PASS);
+            $this->_amysql = new AMysql($conn);
+            $this->_amysql->selectDb(AMYSQL_TEST_DB);
+        }
 
         $this->createTable();
-    }
-
-    public function tearDown() {
-	$this->_amysql->query("DROP TABLE `$this->tableName`");
-	$this->_amysql = null;
     }
 
     public function createTable() {
@@ -28,6 +30,11 @@ CREATE TABLE IF NOT EXISTS `$this->tableName` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 EOT;
 	$this->_amysql->query($sql);
+    }
+
+    public function tearDown() {
+	$this->_amysql->query("DROP TABLE `$this->tableName`");
+	$this->_amysql = null;
     }
 
     public function testDoubleExecute() {

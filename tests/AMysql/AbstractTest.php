@@ -7,14 +7,17 @@ class AbstractTest extends PHPUnit_Framework_TestCase {
     public $tableName = 'abstracttest';
 
     public function setUp() {
-        try {
-	$this->_amysql = new AMysql(
-            AMYSQL_TEST_HOST, AMYSQL_TEST_USER, AMYSQL_TEST_PASS);
+        if ('mysqli' == SQL_DRIVER) {
+            $this->_amysql = new AMysql(
+                AMYSQL_TEST_HOST, AMYSQL_TEST_USER, AMYSQL_TEST_PASS);
+            $this->_amysql->selectDb(AMYSQL_TEST_DB);
         }
-        catch (Exception $e) {
-            var_dump($e);
+        else if ('mysql' == SQL_DRIVER) {
+            $conn = mysql_connect(AMYSQL_TEST_HOST, AMYSQL_TEST_USER,
+                AMYSQL_TEST_PASS);
+            $this->_amysql = new AMysql($conn);
+            $this->_amysql->selectDb(AMYSQL_TEST_DB);
         }
-	$this->_amysql->selectDb(AMYSQL_TEST_DB);
 
         $this->createTable();
     }

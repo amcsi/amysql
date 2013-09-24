@@ -457,7 +457,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
         $extraArgs = $this->_fetchModeExtraArgs;
         $method = array ($this, $methodName);
         $result instanceof Mysqli_Result ? $result->data_seek(0) : mysql_data_seek($result, 0);
-        while (false !== ($row = call_user_func_array($method, $extraArgs))) {
+        while (($row = call_user_func_array($method, $extraArgs)) && isset($row)) {
             $ret[] = $row;
         }
         return $ret;
@@ -1174,7 +1174,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 
     public function count()
     {
-        if (!is_resource($this->result)) {
+        if (!is_resource($this->result) && !is_object($this->result)) {
             $msg = "No SELECT result. ".
                 "Last query: " . $this->query;
             throw new LogicException ($msg);

@@ -7,10 +7,22 @@ class IteratorTest extends PHPUnit_Framework_TestCase {
     public $tableName = 'abstracttest';
 
     public function setUp() {
-	$this->_amysql = new AMysql(
-	    AMYSQL_TEST_HOST, AMYSQL_TEST_USER, AMYSQL_TEST_PASS);
-	$this->_amysql->selectDb(AMYSQL_TEST_DB);
+        if ('mysqli' == SQL_DRIVER) {
+            $this->_amysql = new AMysql(
+                AMYSQL_TEST_HOST, AMYSQL_TEST_USER, AMYSQL_TEST_PASS);
+            $this->_amysql->selectDb(AMYSQL_TEST_DB);
+        }
+        else if ('mysql' == SQL_DRIVER) {
+            $conn = mysql_connect(AMYSQL_TEST_HOST, AMYSQL_TEST_USER,
+                AMYSQL_TEST_PASS);
+            $this->_amysql = new AMysql($conn);
+            $this->_amysql->selectDb(AMYSQL_TEST_DB);
+        }
 
+        $this->createTable();
+    }
+
+    public function createTable() {
 	$sql = <<<EOT
 CREATE TABLE IF NOT EXISTS `$this->tableName` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
