@@ -423,7 +423,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
         }
         $extraArgs = $this->_fetchModeExtraArgs;
         $method = array ($this, $methodName);
-        $result instanceof Mysqli_Result ? $result->data_seek(0) : mysql_data_seek($result, 0);
+        $this->dataSeek(0);
         while (($row = call_user_func_array($method, $extraArgs)) && isset($row)) {
             $ret[] = $row;
         }
@@ -493,7 +493,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
         else if (false === $numRows) {
             return false;
         }
-        $result instanceof Mysqli_Result ? $result->data_seek(0) : mysql_data_seek($result, 0);
+        $this->dataSeek(0);
         $keyColumnGiven = is_string($keyColumn) || is_int($keyColumn);
         if (!$keyColumnGiven) {
             while (false !== ($row = $this->fetchAssoc()) && isset($row)) {
@@ -684,7 +684,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
          **/
         else if (!$keyColumnGiven) {
             $result = $this->result;
-            $result instanceof Mysqli_Result ? $result->data_seek(0) : mysql_data_seek($result, 0);
+            $this->dataSeek(0);
             $firstRow = $this->fetchAssoc();
             foreach ($firstRow as $colName => $val) {
                 $ret[$colName] = array ($val);

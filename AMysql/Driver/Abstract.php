@@ -26,6 +26,16 @@ abstract class AMysql_Driver_Abstract {
     }
 
     /**
+     * Selects a db 
+     * 
+     * @param mixed $sql      The full, bound query string.
+     * @abstract
+     * @access public
+     * @return bool
+     */
+    abstract function selectDb($db);
+
+    /**
      * query 
      * 
      * @param mixed $sql      The full, bound query string.
@@ -98,6 +108,16 @@ abstract class AMysql_Driver_Abstract {
     abstract function result($result, $row = 0, $field = 0);
 
     /**
+     * Escapes a string to go between apostrophes
+     * 
+     * @param mixed $string 
+     * @abstract
+     * @access public
+     * @return void
+     */
+    abstract function realEscapeString($string);
+
+    /**
      * Change the internel SQL row pointer's index
      * 
      * @param int $row 
@@ -108,6 +128,16 @@ abstract class AMysql_Driver_Abstract {
     abstract function dataSeek($result, $row);
 
     /**
+     * Sets the character set
+     * 
+     * @param mixed $charset 
+     * @abstract
+     * @access public
+     * @return void
+     */
+    abstract function setCharset($charset);
+
+    /**
      * Frees the result
      * 
      * @param mixed $sql 
@@ -116,4 +146,40 @@ abstract class AMysql_Driver_Abstract {
      * @return void
      */
     abstract function free($sql);
+
+    /**
+     * Gets the last SQL error message
+     * 
+     * @abstract
+     * @access public
+     * @return string
+     */
+    abstract function getError();
+
+    /**
+     * Gets the last SQL error code
+     * 
+     * @abstract
+     * @access public
+     * @return int
+     */
+    abstract function getErrno();
+
+    /**
+     * Gets the last SQL error message if the connection itself was unsuccessful
+     * 
+     * @abstract
+     * @access public
+     * @return string
+     */
+    abstract function getConnectionError();
+
+    /**
+     * Gets the last SQL error code if the connection itself was unsuccessful
+     * 
+     * @abstract
+     * @access public
+     * @return int
+     */
+    abstract function getConnectionErrno();
 }

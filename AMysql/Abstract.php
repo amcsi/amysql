@@ -226,11 +226,11 @@ abstract class AMysql_Abstract {
      */
     public function selectDb($db)
     {
-        $isMysqli = $this->isMysqli;
-        $result = $isMysqli ? $this->link->select_db($db) : mysql_select_db($db, $this->link);
+        $driver = $this->getDriver();
+        $result = $driver->selectDb($db);
         if (!$result) {
-            $error = $isMysqli ? $this->link->error : mysql_error($this->link);
-            $errno = $isMysqli ? $this->link->errno : mysql_errno($this->link);
+            $error = $driver->getError();
+            $errno = $driver->getErrno();
             if ($this->throwExceptions) {
                 throw new AMysql_Exception($error, $errno, 'USE ' . $db);
             }
@@ -249,21 +249,11 @@ abstract class AMysql_Abstract {
      */
     public function setCharset($charset)
     {
-        $isMysqli = $this->isMysqli;
-        if ($isMysqli) {
-            $result = $this->link->set_charset($charset);
-        }
-        else {
-            if (!function_exists('mysql_set_charset')) {
-                function mysql_set_charset($charset, $link = null) {
-                    return mysql_query("SET CHARACTER SET '$charset'", $link);
-                }
-            }
-            $result = mysql_set_charset($charset, $this->link);
-        }
+        $driver = $this->getDriver();
+        $driver->setCharset($charset);
         if (!$result) {
-            $error = $isMysqli ? $this->link->error : mysql_error($this->link);
-            $errno = $isMysqli ? $this->link->errno : mysql_errno($this->link);
+            $error = $driver->getError();
+            $errno = $driver->getErrno();
             if ($this->throwExceptions) {
                 throw new AMysql_Exception($error, $errno, "(setting charset)");
             }
@@ -766,11 +756,6 @@ abstract class AMysql_Abstract {
     public function escape($value)
     {
         $res = $this->link;
-        $isValidLink = $res instanceof Mysqli || 'mysql link' == get_resource_type($res);
-        if (!$isValidLink) {
-            throw new RuntimeException('Resource is not a mysql resource.', 0, $sql);
-        }
-        $isMysqli = $this->isMysqli;
         // If it's an int, place it there literally
         if (is_int($value)) {
             return $value;
@@ -793,10 +778,7 @@ abstract class AMysql_Abstract {
         }
         // In the case of a string or anything else, let's escape it and
         // put it between apostrophes.
-        return "'" .
-            ($isMysqli ? $this->link->real_escape_string($value) : mysql_real_escape_string($value, $res)) .
-            "'"
-            ;
+        return "'" . $this->getDriver()->realEscapeString($value) .  "'";
     }
 
     /**

@@ -11,6 +11,11 @@
  */
 class AMysql_Driver_Mysqli extends AMysql_Driver_Abstract
 {
+    public function selectDb($db)
+    {
+        return $this->link->select_db($db);
+    }
+
     public function query($sql) {
 
         $link = $this->link;
@@ -102,13 +107,43 @@ class AMysql_Driver_Mysqli extends AMysql_Driver_Abstract
         return $ret;
     }
 
+    public function realEscapeString($string)
+    {
+        return $this->link->real_escape_string($string);
+    }
+
     public function dataSeek($result, $row)
     {
         return $result->data_seek($row);
     }
 
+    public function setCharset($charset)
+    {
+        return $this->link->setCharset($charset);
+    }
+
     public function free($result)
     {
         return $result->free();
+    }
+
+    public function getError()
+    {
+        return $this->link->error;
+    }
+
+    public function getErrno()
+    {
+        return $this->link->errno;
+    }
+
+    public function getConnectionError()
+    {
+        return mysqli_connect_error();
+    }
+
+    public function getConnectionErrno()
+    {
+        return mysqli_connect_errno();
     }
 }

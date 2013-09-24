@@ -11,6 +11,11 @@
  */
 class AMysql_Driver_Mysql extends AMysql_Driver_Abstract
 {
+    public function selectDb($db)
+    {
+        return mysql_select_db($db, $this->link);
+    }
+
     public function query($sql) {
 
         $link = $this->link;
@@ -70,13 +75,51 @@ class AMysql_Driver_Mysql extends AMysql_Driver_Abstract
         return mysql_result($result, $row, $field);
     }
 
+    public function realEscapeString($string)
+    {
+        return mysql_real_escape_string($string, $this->link);
+    }
+
     public function dataSeek($result, $row)
     {
         return mysql_data_seek($result, $row);
     }
 
+    public function setCharset($charset)
+    {
+        static $fe;
+        if (!isset($fe)) {
+            $fe = function_exists('mysql_set_charset');
+        }
+
+        if (!$fe) {
+            return mysql_query("SET CHARACTER SET '$charset'", $this->link);
+        }
+        return mysql_set_charset($charset, $this->link);
+    }
+
     public function free($result)
     {
         return mysql_free_result($result);
+    }
+
+    public function getError()
+    {
+        return mysql_error($this->link);
+    }
+
+    public function getErrno()
+    {
+        return mysql_errno($this->link);
+    }
+
+    public function getConnectionError()
+    {
+        return mysql_error();
+    }
+
+    public function getConnectionErrno()
+    {
+        return mysql_errno();
     }
 }
