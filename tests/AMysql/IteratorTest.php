@@ -10,14 +10,23 @@ class IteratorTest extends PHPUnit_Framework_TestCase {
         if ('mysqli' == SQL_DRIVER) {
             $this->_amysql = new AMysql(
                 AMYSQL_TEST_HOST, AMYSQL_TEST_USER, AMYSQL_TEST_PASS);
-            $this->_amysql->selectDb(AMYSQL_TEST_DB);
         }
         else if ('mysql' == SQL_DRIVER) {
             $conn = mysql_connect(AMYSQL_TEST_HOST, AMYSQL_TEST_USER,
                 AMYSQL_TEST_PASS);
             $this->_amysql = new AMysql($conn);
-            $this->_amysql->selectDb(AMYSQL_TEST_DB);
         }
+        else if ('pgsql' == SQL_DRIVER) {
+            $config = array (
+                'system' => 'pgsql',
+                'host' => AMYSQL_TEST_HOST,
+                'username' => AMYSQL_TEST_USER,
+                'password' => AMYSQL_TEST_PASS,
+                'db' => AMYSQL_TEST_DB,
+            );
+            $this->_amysql = new AMysql($config);
+        }
+        $this->_amysql->selectDb(AMYSQL_TEST_DB);
 
         $this->createTable();
     }

@@ -127,6 +127,7 @@ abstract class AMysql_Abstract {
      * Sets the connection details
      * 
      * @param array $connDetails        An array of details:
+     *                                  system - type of database (default: mysql)
      *                                  host - hostname or ip
      *                                  username - username
      *                                  password - password
@@ -182,32 +183,61 @@ abstract class AMysql_Abstract {
      */
     public function connect()
     {
+        $cd = $this->connDetails;
+        $system = isset($cd['system']) ? $cd['system'] : 'mysql';
+        if ('mysql' == $system) {
+            $useDriver = self::$useMysqli ? 'mysqli' : 'mysql';
+        }
+        else if ('postgresql' == $system || 'pgsql' == $system) {
+            $useDriver = 'postgresql';
+        }
+
+
         $isMysqli = self::$useMysqli;
         $this->isMysqli = $isMysqli;
-        $cd = $this->connDetails;
-        if (self::$useMysqli) {
+        if ('mysqli' == $useDriver) {
             $port = isset($cd['port']) ? $cd['port'] : ini_get('mysqli.default_port');
             $res = mysqli_connect($cd['host'], $cd['username'], $cd['password'], $cd['db'], $port, $cd['socket']);
         }
-        else {
+        else if ('mysql' == $useDriver) {
             $host = isset($cd['port']) ? "$cd[host]:$cd[port]" : $cd['host'];
             $res = mysql_connect($host, $cd['username'], $cd['password'], false, $cd['clientFlags']);
+        }
+        else if ('postgresql' == $useDriver) {
+            $connString = "host=$cd[host]";
+            if (!empty($cd['username'])) {
+                $connString .= " user=$cd[username]";
+            }
+            if (!empty($cd['password'])) {
+                $connString .= " password=$cd[password]";
+            }
+            if (isset($cd['port'])) {
+                $connString .= " port=$cd[port]";
+            }
+            if (isset($cd['db'])) {
+                $connString .= " dbname=$cd[db]";
+            }
+            $res = pg_connect($connString);
         }
         if ($res) {
             $this->link = $res;
 
-            if (!$isMysqli && !empty($cd['db'])) {
+            if (('mysql' == $useDriver) && !empty($cd['db'])) {
                 $this->selectDb($cd['db']);
             }
         }
         else {
-            if ($this->isMysqli) {
+            if ('mysqli' == $useDriver) {
                 throw new AMysql_Exception(mysqli_connect_error(), mysqli_connect_errno(),
                     '(connection to mysql)');
             }
-            else {
+            else if ('mysql' == $useDriver) {
                 throw new AMysql_Exception(mysql_error(), mysql_errno(),
                     '(connection to mysql)');
+            }
+            else if ('postgresql' == $useDriver) {
+                throw new AMysql_Exception(pg_error(), pg_errno(),
+                    '(connection to postgresql)');
             }
         }
         return $this;
@@ -907,10 +937,18 @@ abstract class AMysql_Abstract {
                 require_once dirname(__FILE__) . '/Driver/Abstract.php';
             }
             if (is_resource($this->link)) {
-                if (!class_exists('AMysql_Driver_Mysql')) {
-                    require_once dirname(__FILE__) . '/Driver/Mysql.php';
+                if ('pgsql link' == get_resource_type($this->link)) {
+                    if (!class_exists('AMysql_Driver_Postgresql')) {
+                        require_once dirname(__FILE__) . '/Driver/Postgresql.php';
+                    }
+                    $driver = new AMysql_Driver_Postgresql($this->link);
                 }
-                $driver = new AMysql_Driver_Mysql($this->link);
+                else {
+                    if (!class_exists('AMysql_Driver_Mysql')) {
+                        require_once dirname(__FILE__) . '/Driver/Mysql.php';
+                    }
+                    $driver = new AMysql_Driver_Mysql($this->link);
+                }
             }
             else if ($this->link instanceof Mysqli) {
                 if (!class_exists('AMysql_Driver_Mysqli')) {
