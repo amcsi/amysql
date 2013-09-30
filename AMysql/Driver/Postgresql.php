@@ -11,9 +11,12 @@
  */
 class AMysql_Driver_Postgresql extends AMysql_Driver_Abstract
 {
+
+    protected $identifierQuoteChar = '"';
+
     public function selectDb($db)
     {
-        return pg_select_db($db, $this->link);
+        trigger_error("Not implemented yet.", E_USER_WARNING);
     }
 
     public function query($sql) {
@@ -23,21 +26,22 @@ class AMysql_Driver_Postgresql extends AMysql_Driver_Abstract
 
         if ($this->profileQueries) {
             $startTime = microtime(true);
-            $result = pg_query($sql, $link);
+            $result = pg_query($link, $sql);
             $duration = microtime(true) - $startTime;
             $this->lastQueryTime = $duration;
         }
         else {
-            $result = pg_query($sql, $link);
+            $result = pg_query($link, $sql);
         }
 
-        $this->lastAffectedRows = pg_affected_rows($link);
-        $this->lastInsertId = pg_insert_id($link);
+        $this->lastAffectedRows = pg_affected_rows($result);
+        $this->lastInsertId = null; //pg_insert_id($link);
         $this->lastError = '';
         $this->lastErrno = 0;
-        if (false === $result) {
-            $this->lastError = pg_error($link);
-            $this->lastErrno = pg_errno($link);
+        if (!$result) {
+            $this->lastError = pg_last_error($link);
+            $this->lastErrno = -1;
+            $result = false;
         }
         return $result;
     }
@@ -77,12 +81,14 @@ class AMysql_Driver_Postgresql extends AMysql_Driver_Abstract
 
     public function realEscapeString($string)
     {
-        return pg_real_escape_string($string, $this->link);
+        return pg_escape_string($this->link, $string);
     }
 
     public function dataSeek($result, $row)
     {
-        return pg_data_seek($result, $row);
+        // no need to seek in pgsql
+        pg_fetch_row($result, $row);
+        return true;
     }
 
     public function setCharset($charset)

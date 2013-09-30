@@ -10,11 +10,13 @@ class AbstractTest extends PHPUnit_Framework_TestCase {
         if ('mysqli' == SQL_DRIVER) {
             $this->_amysql = new AMysql(
                 AMYSQL_TEST_HOST, AMYSQL_TEST_USER, AMYSQL_TEST_PASS);
+            $this->_amysql->selectDb(AMYSQL_TEST_DB);
         }
         else if ('mysql' == SQL_DRIVER) {
             $conn = mysql_connect(AMYSQL_TEST_HOST, AMYSQL_TEST_USER,
                 AMYSQL_TEST_PASS);
             $this->_amysql = new AMysql($conn);
+            $this->_amysql->selectDb(AMYSQL_TEST_DB);
         }
         else if ('pgsql' == SQL_DRIVER) {
             $config = array (
@@ -26,25 +28,46 @@ class AbstractTest extends PHPUnit_Framework_TestCase {
             );
             $this->_amysql = new AMysql($config);
         }
-        $this->_amysql->selectDb(AMYSQL_TEST_DB);
 
         $this->createTable();
     }
 
     public function createTable() {
-	$sql = <<<EOT
+        if ($this->_amysql->getDriver() instanceof AMysql_Driver_Postgresql) {
+            $sql = <<<EOT
+DROP TABLE IF EXISTS $this->tableName;
+CREATE TABLE abstracttest
+(
+   id serial PRIMARY KEY, 
+   string character varying(255)
+)
+WITH (
+  OIDS = FALSE
+)
+
+TABLESPACE pg_default;
+EOT;
+        }
+        else {
+            $sql = <<<EOT
 CREATE TABLE IF NOT EXISTS `$this->tableName` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `string` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 EOT;
-	$this->_amysql->query($sql);
+        }
+        try {
+            $this->_amysql->query($sql);
+        }
+        catch (Exception $e) {
+            trigger_error($e, E_USER_WARNING);
+        }
     }
 
     public function tearDown() {
         try {
-            $this->_amysql->query("DROP TABLE `$this->tableName`");
+            $this->_amysql->query("DROP TABLE $this->tableName");
         }
         catch (Exception $e) {
 

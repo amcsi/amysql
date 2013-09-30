@@ -353,6 +353,8 @@ class AMysql_Statement implements IteratorAggregate, Countable {
         else {
             $this->error = $driver->lastError;
             $this->errno = $driver->lastErrno;
+            var_dump($this->error);
+            exit;
             try {
                 $this->throwException();
                 $this->lastException = null;
@@ -776,7 +778,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      **/
     public function escapeIdentifier($columnName, $as = null)
     {
-        return AMysql_Abstract::escapeIdentifier($columnName, $as);
+        return $this->amysql->escapeIdentifier($columnName, $as);
     }
 
     /**
@@ -888,7 +890,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
         if (empty($data[0])) {
             // keys are column names
             foreach ($data as $columnName => $values) {
-                $cols[] = $this->escapeIdentifierSimple($columnName);
+                $cols[] = $this->amysql->escapeColumn($columnName);
                 if (!is_array($values)) {
                     // single piece of data here.
                     $values = array($values);
@@ -908,7 +910,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
             $akeys = array_keys($data[0]);
             $cols = array ();
             foreach ($akeys as $col) {
-                $cols[] = $this->escapeIdentifierSimple($col);
+                $cols[] = $this->amysql->escapeColumn($col);
             }
 
             foreach ($data as $row) {
@@ -943,7 +945,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
     {
         $sets = array ();
         foreach ($data as $columnName => $value) {
-            $columnName = $this->escapeIdentifierSimple($columnName);
+            $columnName = $this->amysql->escapeColumn($columnName);
             $sets[] = "$columnName = " . $this->amysql->escape($value);
         }
         $setsString = join(', ', $sets);
@@ -978,7 +980,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
          * Ezt beforeSql-el kell megoldani, különben az értékekben lévő
          * kérdőjelek bezavarnak.         
          **/		         
-        $tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
+        $tableSafe = $this->amysql->escapeTable($tableName);
         $beforeSql = "UPDATE $tableSafe SET $setsString WHERE ";
         $this->prepare($where);
         $this->beforeSql = $beforeSql;
@@ -1018,7 +1020,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
         if (!$data) {
             return false;
         }
-        $tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
+        $tableSafe = $this->amysql->escapeTable($tableName);
         $columnsValues = $this->buildColumnsValues($data);
         $sql = "$type INTO $tableSafe $columnsValues";
         $this->prepare($sql);
@@ -1071,7 +1073,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      **/         
     public function delete($tableName, $where)
     {
-        $tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
+        $tableSafe = $this->amysql->escapeTable($tableName);
         $sql = "DELETE FROM $tableSafe";
         $this->prepare($sql);
         if ($where) {

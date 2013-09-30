@@ -311,12 +311,13 @@ abstract class AMysql_Abstract {
      * Does a simple identifier escape. It should be fail proof for that literal identifier.
      *
      * @param $identifier The identifier
+     * @param $qc           The quote character. Default: `
      *
      * @return The escaped identifier.
      **/
-    public static function escapeIdentifierSimple($identifier)
+    public static function escapeIdentifierSimple($identifier, $qc = '`')
     {
-        return '`' . addcslashes($identifier, '`\\') . '`';
+        return $qc . addcslashes($identifier, "$qc\\") . $qc;
     }
 
     /**
@@ -324,18 +325,19 @@ abstract class AMysql_Abstract {
      * into two identifiers, each escaped, and joined with a dot.
      *
      * @param $identifier The identifier
+     * @param $qc           The quote character. Default: `
      *
      * @return The escaped identifier.
      **/
-    protected static function _escapeIdentifier($identifier)
+    protected static function _escapeIdentifier($identifier, $qc = '`')
     {
         $exploded = explode('.', $identifier);
         $count = count($exploded);
         $identifier = $exploded[$count-1] == '*' ?
             '*' :
-            '`' . $exploded[$count-1] . '`';
+            $qc . $exploded[$count-1] . $qc;
         if (1 < $count) {
-            $identifier = "`$exploded[0]`.$identifier";
+            $identifier = "$qc$exploded[0]$qc.$identifier";
         }
         $ret = $identifier;
         return $ret;
@@ -353,16 +355,20 @@ abstract class AMysql_Abstract {
      * @param string $as (Optional) adds an AS syntax, but only, if it's
      * a string. The value is the alias the identifier should have for
      * the query.
+     * @param $qc           The quote character. Default: `
      *
      * @todo Possibly change the functionality to remove the automatic dot 
      * detection,
      * 	and ask for an array instead?
      *
+     * @deprecated Do not rely on this static method. Its public visibility or name may be changed
+     *  in the future. Use the non-static escapeTable() method instead.
+     *
      * e.g.
      *  echo $amysql->escapeIdentifier('table.order', 'ot');
      *  // `table`.`order` AS ot
      **/
-    public static function escapeIdentifier($identifierName, $as = null)
+    public static function escapeIdentifier($identifierName, $as = null, $qc = null)
     {
         $asString = '';
         $escapeIdentifierName = true;
@@ -379,9 +385,20 @@ abstract class AMysql_Abstract {
             $ret = $identifierName->__toString() . $asString;
         }
         else {
-            $ret = self::_escapeIdentifier($identifierName) . $asString;
+            $ret = self::_escapeIdentifier($identifierName, $qc) . $asString;
         }
         return $ret;
+    }
+
+    public function escapeTable($tableName, $as = null)
+    {
+        $driver = $this->getDriver();
+        return self::escapeIdentifier($tableName, $as, $driver->getIdentifierQuoteChar());
+    }
+
+    public function escapeColumn($columnName, $as = null)
+    {
+        return $this->escapeTable($columnName, $as);
     }
 
     /**

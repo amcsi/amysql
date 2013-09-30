@@ -20,6 +20,8 @@ abstract class AMysql_Driver_Abstract {
     public $lastError;
     public $lastErrno;
 
+    protected $identifierQuoteChar = '`';
+
     public function __construct($link)
     {
         $this->link = $link;
@@ -182,4 +184,9 @@ abstract class AMysql_Driver_Abstract {
      * @return int
      */
     abstract function getConnectionErrno();
+
+    public function getIdentifierQuoteChar()
+    {
+        return $this->identifierQuoteChar;
+    }
 }
