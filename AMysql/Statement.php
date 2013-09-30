@@ -1120,6 +1120,11 @@ class AMysql_Statement implements IteratorAggregate, Countable {
             throw new LogicException ($msg);
         }
         $count = $this->numRows();
+        if (!is_numeric($count) || $count < 0) {
+            $msg = "No SELECT result. ".
+                "Last query: " . $this->query;
+            throw new LogicException ($msg);
+        }
         return $count;
     }
 }

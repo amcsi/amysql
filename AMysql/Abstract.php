@@ -622,7 +622,7 @@ abstract class AMysql_Abstract {
         $tableName, array $data, $column = 'id', $updateSameColumn = false
     ) {
         $successesNeeded = count($data);
-        $where = self::escapeIdentifier($column) . " = ?";
+        $where = $this->escapeColumn($column) . " = ?";
         $affectedRows = 0;
         foreach ($data as $by => $row) {
             if (!$updateSameColumn) {

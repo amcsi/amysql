@@ -449,8 +449,9 @@ EOT;
 	);
 	$this->_amysql->insert($this->tableName, $data);
 	$stmt = $this->_amysql->lastStatement;
-	$this->setExpectedException('LogicException');
-	count($stmt);
+        $this->setExpectedException('LogicException');
+        $count = count($stmt);
+        $this->fail("Count wasn't supposed to be successful: " . print_r($count, true));
     }
 
     public function testFetchAllColumns() {

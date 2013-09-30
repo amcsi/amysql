@@ -22,7 +22,7 @@ class AMysql_Iterator implements SeekableIterator
             throw new LogicException("Statement is not a SELECT statement. ".
                 "Unable to iterate. Query: " . $stmt->query);
         }
-        $count = $stmt->numRows();
+        $count = count($stmt);
         $this->_stmt = $stmt;
         $this->_count = $count;
     }

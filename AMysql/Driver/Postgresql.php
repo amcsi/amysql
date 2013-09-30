@@ -35,7 +35,7 @@ class AMysql_Driver_Postgresql extends AMysql_Driver_Abstract
         }
 
         $this->lastAffectedRows = pg_affected_rows($result);
-        $this->lastInsertId = null; //pg_insert_id($link);
+        $this->lastInsertId = true; //pg_insert_id($link);
         $this->lastError = '';
         $this->lastErrno = 0;
         if (!$result) {
@@ -48,7 +48,7 @@ class AMysql_Driver_Postgresql extends AMysql_Driver_Abstract
 
     public function numRows($result)
     {
-        return pg_num_rows($result);
+        return 0 < pg_num_fields($result) ? pg_num_rows($result) : false;
     }
 
     public function fetchAssoc($result)
@@ -69,9 +69,9 @@ class AMysql_Driver_Postgresql extends AMysql_Driver_Abstract
     public function fetchObject($result, $className, array $params)
     {
         if ($params) {
-            return pg_fetch_object($result, $className, $params);
+            return pg_fetch_object($result, null, $className, $params);
         }
-        return pg_fetch_object($result, $className);
+        return pg_fetch_object($result, null, $className);
     }
 
     public function result($result, $row = 0, $field = 0)

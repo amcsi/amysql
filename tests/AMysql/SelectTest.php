@@ -123,6 +123,9 @@ EOT;
             'LIMIT 100' . "\n" .
             'OFFSET 200'
         ;
+        if ('pgsql' == SQL_DRIVER) {
+            $expected = str_replace('`', '"', $expected);
+        }
         $this->assertEquals($expected, $unboundSql);
     }
 
