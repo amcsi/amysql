@@ -104,8 +104,8 @@ abstract class AMysql_Abstract {
 
         if (
             is_resource($resOrArrayOrHost) &&
-            'mysql link' == get_resource_type($resOrArrayOrHost)) 
-        {
+            0 === strpos(get_resource_type($resOrArrayOrHost), 'mysql link')
+        ) {
             $this->link = $resOrArrayOrHost;
             $this->isMysqli = false;
         }
@@ -765,9 +765,9 @@ abstract class AMysql_Abstract {
     public function escape($value)
     {
         $res = $this->link;
-        $isValidLink = $res instanceof Mysqli || 'mysql link' == get_resource_type($res);
+        $isValidLink = $res instanceof Mysqli || 0 === strpos(get_resource_type($res), 'mysql link');
         if (!$isValidLink) {
-            throw new RuntimeException('Resource is not a mysql resource.', 0, $sql);
+            throw new RuntimeException('Resource is not a mysql resource.', 0);
         }
         $isMysqli = $this->isMysqli;
         // If it's an int, place it there literally
