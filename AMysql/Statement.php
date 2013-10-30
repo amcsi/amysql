@@ -1134,10 +1134,10 @@ class AMysql_Statement implements IteratorAggregate, Countable {
     {
         $tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
         $sql = "DELETE FROM $tableSafe";
-        $this->prepare($sql);
         if ($where) {
-            $this->where($where);
+            $sql .= ' WHERE ' . $where;
         }
+        $this->prepare($sql);
         return $this;
     }
 

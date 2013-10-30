@@ -259,6 +259,32 @@ EOT;
 	$this->assertNull($result);
     }
 
+    public function testDelete() {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	);
+	$this->_amysql->insert($this->tableName, $data);
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName");
+	$results = $stmt->fetchAllAssoc();
+	$expected = array (
+	    array (
+		'id' => '1',
+		'string' => '3'
+	    ),
+	);
+	$this->assertEquals($expected, $results);
+        $success = $this->_amysql->delete($this->tableName, 'id = ?', 2);
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName");
+        $results = $stmt->fetchAllAssoc();
+	$this->assertEquals($expected, $results);
+        $success = $this->_amysql->delete($this->tableName, 'id = ?', 1);
+	$stmt = $this->_amysql->query("SELECT * FROM $this->tableName");
+        $results = $stmt->fetchAllAssoc();
+	$this->assertSame(array (), $results);
+    }
+
     public function testUpdate() {
 	$data = array (
 	    'string' => array (
