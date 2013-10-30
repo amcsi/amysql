@@ -65,7 +65,7 @@ EOT;
             ->orderBy('t3alias.col1')
             ->orderBy('t3alias.col2', true, true)
             ->orderBy('t3alias.col3', true)
-            ->where('3 = 3')
+            ->where('3 = :where3')
             ->where('4 = 4')
             ->limit(100)
             ->offset(200)
@@ -80,7 +80,7 @@ EOT;
             'LEFT JOIN `table5` ON (t2alias.colx = table5.coly)' . "\n" .
             'JOIN `table4` AS `t4alias` ON (t4alias.t1_id = table1.id)' . "\n" .
             'CROSS JOIN `table6` ON (t3alias.colx = table6.coly)' . "\n" .
-            'WHERE 3 = 3 AND 4 = 4' . "\n" .
+            'WHERE 3 = :where3 AND 4 = 4' . "\n" .
             'GROUP BY `t2alias`.`col2` DESC, `t2alias`.`col1`, `t2alias`.`col3` DESC' . "\n" .
             'HAVING 1 = 1 AND 2 = 2' . "\n" .
             'ORDER BY `t3alias`.`col2` DESC, `t3alias`.`col1`, `t3alias`.`col3` DESC' . "\n" .
@@ -96,6 +96,35 @@ EOT;
         $unboundSql = $select->getUnboundSql();
         $expected = 'SELECT ';
         $this->assertEquals($expected, $unboundSql);
+    }
+
+    public function testSelectExecute()
+    {
+        $data = array (
+            array (
+                'string' => 3
+            ),
+            array (
+                'string' => 'blah',
+            )
+        );
+        $this->_amysql->insert($this->tableName, $data);
+
+        $select = $this->_amysql->select();
+        $select
+            ->column('*')
+            ->from($this->tableName)
+            ->where('string = :string')
+            ->bindValue('string', 'blah');
+        $select->execute();
+        $rows = $select->fetchAllAssoc();
+        $expected = array (
+            array (
+                'id' => '2',
+                'string' => 'blah',
+            )
+        );
+        $this->assertSame($expected, $rows);
     }
 }
 ?>

@@ -335,9 +335,10 @@ class AMysql_Select extends AMysql_Statement {
     public function getSql($prepared = null)
     {
         if (!$prepared) {
-            $this->prepare($this->getUnboundSql());
+            $this->prepared = $this->getUnboundSql();
         }
-        parent::getSql($prepared);
+        $ret = parent::getSql($prepared);
+        return $ret;
     }
 
     /**
