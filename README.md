@@ -1,5 +1,3 @@
-Version 1.0.0 is finally out! Now with AMysql_Select!
-
 Requirements
 =
 
@@ -8,23 +6,54 @@ PHP 5.2.4+ is required, and either the MySQLi extension or the mysql_* functions
 Installation
 =
 
+Available on packagist.
+
 See [INSTALL](INSTALL.md) file.
 
 
 Usage
 =
 
+Typically you want to make one instance of AMysql per db connection. AMysql lazy connects by default.
+
 Instantiating AMysql
 -
 
-    $amysql = new AMysql($host, $user, $pass);
-    $amysql->selectDb($db);
+When instantiating AMysql, you can pass in either a mysql link resource or connection details as an array.
 
-    // or
+    $this->_amysql = new AMysql;
+    $this->_amysql->setConnDetails(array (
+        'host' => 'localhost',
+        'username' => 'user',
+        'password' => 'pass',
+        'db'        => 'db',
+    ));
+
+or
+
+    $this->_amysql = new AMysql(array (
+        'host' => 'localhost',
+        'username' => 'user',
+        'password' => 'pass',
+        'db'        => 'db',
+    ));
+
+or
 
     $conn = mysql_connect($host, $user, $pass);
-    mysql_select_db($db, $conn);
     $amysql = new AMysql($conn);
+    $amysql->selectDb($db);
+    
+The full connection details array supports:
+
+* `host` Host to connect to
+* `username` Mysql user username
+* `password` Mysql user password
+* `db` The database to select
+* `port`
+* `clientFlags` mysql_* only. For the `mysql_connect()` `$client_flags` argument
+
+When making a new connection, AMysql tries to use `MySQLi` if it is available, otherwise it falls back to the `mysql_*` functions.
 
 Inserting one row of data
 -
@@ -32,19 +61,27 @@ Inserting one row of data
     $data = array (
         'name' => 'adam',
         'description' => 'blah'
-    );
+    );
     $amysql->insert('tablename', $data);
 
 Inserting mysql expressions
 -
 
+Within prepared statement you can purposefully bind literal strings that will not be escaped or enclosed by quotes. Use it with caution.
+
+To use it, see the example below:
+
+    $date = $amysql->expr('CURRENT_TIMESTAMP');
+    // or new AMysql_Expr($amysql, 'CURRENT_TIMESTAMP');
     $data = array (
         'name' => 'adam',
         'description' => 'blah',
-        'date' => $amysql->expr('CURRENT_TIMESTAMP')
+        'date' => $date
     );
     $insertId = $amysql->insert('tablename', $data);
     // INSERT INTO `tablename` (`name`, `description`, `date`) VALUES ('adam', 'blah', CURRENT_TIMESTAMP);
+
+AMysql_Expr also supports a few predefined special expressions not only consisting of literal values, such as for making an `IN` list or for doing proper escaping for a `LIKE` expression. For more information, check out the [AMysql/Expr.php file](AMysql/Expr.php).
 
 Inserting multiple rows of data
 -
@@ -91,6 +128,8 @@ Updating a single row
 
 Updating multiple rows
 -
+
+You can update multiple rows with the same `insert()` method as for single rows if you pass a multidimensional array. It can be an array or rows, or an array of columns with an array of values.
 
     /**
      * Update the name to bob and the description to blahmodified for all rows
@@ -146,6 +185,10 @@ Selecting (without AMysql_Select)
     $stmt = $amysql->query("SELECT * FROM tablename WHERE id = ? AND state = ?", $binds);
     $results = $stmt->fetchAllAssoc();
     $numRows = $stmt->numRows();
+    
+Note that if there is only 1 question mark in the prepared string, you may also pass the `$binds` as a scalar value and it will be treated as if it were the within an array. If you are expecting a possible `null` value to be bound, do not use the scalar method though (always use an array in that case).
+
+P.S. this is also true for every method that expects a `$binds` array.
 
 Preparing select first, executing later (without AMysql_Select)
 -
