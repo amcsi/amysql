@@ -1,5 +1,10 @@
 Version 1.0.0 is finally out! Now with AMysql_Select!
 
+Requirements
+=
+
+PHP 5.2.4+ is required, and either the MySQLi extension or the mysql_* functions must be available.
+
 Installation
 =
 

@@ -1,7 +1,7 @@
 {
     "name": "amcsi/amysql",
-    "description": "Database abstraction library",
-    "keywords": ["database", "mysql"],
+    "description": "A MySQL(i) wrapper for PHP 5.2+ with useful tools and no extension dependencies.",
+    "keywords": ["database", "mysql", "mysqli"],
     "homepage": "https://github.com/amcsi/amysql",
     "license": "MIT",
     "authors": [
