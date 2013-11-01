@@ -29,6 +29,7 @@ abstract class AMysql_Abstract {
     public $result; // last mysql result
     public $query; // last used query string
     public $affectedRows; // last affected rows count
+
     /**
      * Contains the number of total affected rows by the last multiple statement deploying
      * method, such as updateMultipleByData and updateMultipleByKey
@@ -36,8 +37,26 @@ abstract class AMysql_Abstract {
      * @var int
      */
     public $multipleAffectedRows;
-    public $throwExceptions = true; // whether to throw exceptions
+
+    /**
+     * Whether to throw AMysql_Exceptions on mysql errors. If false, trigger_error is called instead.
+     * It is recommended to leave this on TRUE.
+     * 
+     * @var boolean
+     * @access public
+     */
+    public $throwExceptions = true;
     public $totalTime = 0.0;
+
+    /**
+     * Whether AMysql_Exceptions should trigger errors by default on construction.
+     * This is for legacy behavior (before v1.1.0). It is recommended to keep
+     * is at FALSE.
+     * 
+     * @var int
+     * @access public
+     */
+    public $triggerErrorOnException = false;
 
     /**
      * Whether the time all the queries take should be recorded.
@@ -78,7 +97,7 @@ abstract class AMysql_Abstract {
     const FETCH_ASSOC	= 'assoc';
     const FETCH_OBJECT	= 'object';
     const FETCH_ARRAY	= 'array';
-    const FETCH_ROW	= 'row';
+    const FETCH_ROW	    = 'row';
 
     /**
      * @constructor
@@ -201,11 +220,11 @@ abstract class AMysql_Abstract {
         }
         else {
             if ($this->isMysqli) {
-                throw new AMysql_Exception(mysqli_connect_error(), mysqli_connect_errno(),
+                $this->handleError(mysqli_connect_error(), mysqli_connect_errno(),
                     '(connection to mysql)');
             }
             else {
-                throw new AMysql_Exception(mysql_error(), mysql_errno(),
+                $this->handleError(mysql_error(), mysql_errno(),
                     '(connection to mysql)');
             }
         }
@@ -230,12 +249,7 @@ abstract class AMysql_Abstract {
         if (!$result) {
             $error = $isMysqli ? $this->link->error : mysql_error($this->link);
             $errno = $isMysqli ? $this->link->errno : mysql_errno($this->link);
-            if ($this->throwExceptions) {
-                throw new AMysql_Exception($error, $errno, 'USE ' . $db);
-            }
-            else {
-                trigger_error($error, E_USER_WARNING);
-            }
+            $this->handleError($error, $errno, 'USE ' . $db);
         }
         return $this;
     }
@@ -263,12 +277,7 @@ abstract class AMysql_Abstract {
         if (!$result) {
             $error = $isMysqli ? $this->link->error : mysql_error($this->link);
             $errno = $isMysqli ? $this->link->errno : mysql_errno($this->link);
-            if ($this->throwExceptions) {
-                throw new AMysql_Exception($error, $errno, "(setting charset)");
-            }
-            else {
-                trigger_error($error, E_USER_WARNING);
-            }
+            $this->handleError($error, $errno, "(setting charset)");
         }
         return $this;
     }
@@ -907,5 +916,26 @@ abstract class AMysql_Abstract {
     {
         return $this->_queriesData;
     }
+
+    /**
+     * handleError 
+     * 
+     * @param mixed $msg 
+     * @param mixed $code 
+     * @param mixed $query 
+     * @access public
+     * @throws AMysql_Exception
+     * @return void
+     */
+    public function handleError($msg, $code, $query)
+    {
+        $ex = new AMysql_Exception($msg, $code, $query);
+        if ($this->triggerErrorOnException) {
+            $ex->triggerErrorOnce();
+        }
+        if ($this->throwExceptions) {
+            throw $ex;
+        }
+        $ex->triggerErrorOnce();
+    }
 }
-?>

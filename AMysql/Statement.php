@@ -315,6 +315,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
      * 
      * @param string $sql       The SQL string.
      * @access protected
+     * @throws AMysql_Exception on error
      * @return $this
      */
     protected function _query($sql)
@@ -387,19 +388,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
         else {
             $this->error = $isMysqli ? $link->error : mysql_error($link);
             $this->errno = $isMysqli ? $link->errno : mysql_errno($link);
-            try {
-                $this->throwException();
-                $this->lastException = null;
-            }
-            catch (AMysql_Exception $e) {
-                $this->lastException = $e;
-                if ($this->throwExceptions) {
-                    throw $e;
-                }
-                else {
-                    trigger_error($e, E_USER_WARNING);
-                }
-            }
+            $this->handleError($this->error, $this->errno, $this->query);
         }
         return $this;
     }
@@ -1181,6 +1170,21 @@ class AMysql_Statement implements IteratorAggregate, Countable {
         }
         $count = $this->numRows();
         return $count;
+    }
+
+    /**
+     * handleError 
+     * 
+     * @param mixed $msg 
+     * @param mixed $code 
+     * @param mixed $query 
+     * @access protected
+     * @throws AMysql_Exception
+     * @return void
+     */
+    protected function handleError($msg, $code, $query)
+    {
+        return $this->amysql->handleError($msg, $code, $query);
     }
 }
 ?>
