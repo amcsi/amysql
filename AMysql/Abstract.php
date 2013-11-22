@@ -18,7 +18,8 @@ require_once $dir . '/Statement.php';
 require_once $dir . '/Iterator.php';
 require_once $dir . '/Select.php';
 
-abstract class AMysql_Abstract {
+abstract class AMysql_Abstract
+{
 
     public $insertId; // last insert id
     public $lastStatement; // last AMysql_Statement
@@ -92,7 +93,7 @@ abstract class AMysql_Abstract {
 
     protected $connDetails = array ();
 
-    static $useMysqli;
+    public static $useMysqli;
 
     const FETCH_ASSOC	= 'assoc';
     const FETCH_OBJECT	= 'object';
@@ -117,25 +118,24 @@ abstract class AMysql_Abstract {
      *
      **/
     public function __construct(
-        $resOrArrayOrHost = null, $username = null,
-        $password = null, $newLink = false, $clientFlags = 0
+        $resOrArrayOrHost = null,
+        $username = null,
+        $password = null,
+        $newLink = false,
+        $clientFlags = 0
     ) {
 
-        if (
-            is_resource($resOrArrayOrHost) &&
+        if (is_resource($resOrArrayOrHost) &&
             0 === strpos(get_resource_type($resOrArrayOrHost), 'mysql link')
         ) {
             $this->link = $resOrArrayOrHost;
             $this->isMysqli = false;
-        }
-        else if ($resOrArrayOrHost instanceof Mysqli) {
+        } elseif ($resOrArrayOrHost instanceof Mysqli) {
             $this->link = $resOrArrayOrHost;
             $this->isMysqli = true;
-        }
-        else if (is_array ($resOrArrayOrHost)) {
+        } elseif (is_array($resOrArrayOrHost)) {
             $this->setConnDetails($resOrArrayOrHost);
-        }
-        else if (is_string($resOrArrayOrHost)) {
+        } elseif (is_string($resOrArrayOrHost)) {
             $this->oldSetConnDetails($resOrArrayOrHost, $username, $password, $newLink, $clientFlags);
             $this->connect();
         }
@@ -156,7 +156,8 @@ abstract class AMysql_Abstract {
      * @access public
      * @return void
      */
-    public function setConnDetails(array $cd) {
+    public function setConnDetails(array $cd)
+    {
         // use mysqli if available and PHP is at least of version 5.3.0 (required)
         self::$useMysqli = class_exists('Mysqli', false) && function_exists('mysqli_stmt_get_result');
 
@@ -174,7 +175,11 @@ abstract class AMysql_Abstract {
      * @see mysql_connect() 
      */
     public function oldSetConnDetails(
-        $host = null, $username = null, $password = null, $newLink = false, $clientFlags = 0
+        $host = null,
+        $username = null,
+        $password = null,
+        $newLink = false,
+        $clientFlags = 0
     ) {
         $port = null;
         $cd = array ();
@@ -206,8 +211,7 @@ abstract class AMysql_Abstract {
         if (self::$useMysqli) {
             $port = isset($cd['port']) ? $cd['port'] : ini_get('mysqli.default_port');
             $res = mysqli_connect($cd['host'], $cd['username'], $cd['password'], $cd['db'], $port, $cd['socket']);
-        }
-        else {
+        } else {
             $host = isset($cd['port']) ? "$cd[host]:$cd[port]" : $cd['host'];
             $res = mysql_connect($host, $cd['username'], $cd['password'], false, $cd['clientFlags']);
         }
@@ -217,15 +221,19 @@ abstract class AMysql_Abstract {
             if (!$isMysqli && !empty($cd['db'])) {
                 $this->selectDb($cd['db']);
             }
-        }
-        else {
+        } else {
             if ($this->isMysqli) {
-                $this->handleError(mysqli_connect_error(), mysqli_connect_errno(),
-                    '(connection to mysql)');
-            }
-            else {
-                $this->handleError(mysql_error(), mysql_errno(),
-                    '(connection to mysql)');
+                $this->handleError(
+                    mysqli_connect_error(),
+                    mysqli_connect_errno(),
+                    '(connection to mysql)'
+                );
+            } else {
+                $this->handleError(
+                    mysql_error(),
+                    mysql_errno(),
+                    '(connection to mysql)'
+                );
             }
         }
         return $this;
@@ -265,10 +273,10 @@ abstract class AMysql_Abstract {
         $isMysqli = $this->isMysqli;
         if ($isMysqli) {
             $result = $this->link->set_charset($charset);
-        }
-        else {
+        } else {
             if (!function_exists('mysql_set_charset')) {
-                function mysql_set_charset($charset, $link = null) {
+                function mysql_set_charset($charset, $link = null)
+                {
                     return mysql_query("SET CHARACTER SET '$charset'", $link);
                 }
             }
@@ -356,17 +364,16 @@ abstract class AMysql_Abstract {
         $escapeIdentifierName = true;
         if ($as and !is_numeric($as)) {
             $asString = ' AS ' . $as;
+        } elseif (is_string($identifierName) and (false !==
+            strpos($identifierName, ' AS '))
+        ) {
+            $exploded = explode(' AS ', $identifierName);
+            $identifierName = $exploded[0];
+            $asString = ' AS ' . $exploded[1];
         }
-        else if (is_string($identifierName) and (false !== 
-            strpos($identifierName, ' AS '))) {
-                $exploded = explode(' AS ', $identifierName);
-                $identifierName = $exploded[0];
-                $asString = ' AS ' . $exploded[1];
-            }
         if ($identifierName instanceof AMysql_Expr) {
             $ret = $identifierName->__toString() . $asString;
-        }
-        else {
+        } else {
             $ret = self::_escapeIdentifier($identifierName) . $asString;
         }
         return $ret;
@@ -545,7 +552,9 @@ abstract class AMysql_Abstract {
      * @return boolean
      **/
     public function updateMultipleByData(
-        $tableName, array $data, $column = 'id'
+        $tableName,
+        array $data,
+        $column = 'id'
     ) {
         $successesNeeded = count($data);
         $where = self::escapeIdentifier($column) . " = ?";
@@ -590,7 +599,10 @@ abstract class AMysql_Abstract {
      * @return boolean
      **/
     public function updateMultipleByKey(
-        $tableName, array $data, $column = 'id', $updateSameColumn = false
+        $tableName,
+        array $data,
+        $column = 'id',
+        $updateSameColumn = false
     ) {
         $successesNeeded = count($data);
         $where = self::escapeIdentifier($column) . " = ?";
@@ -637,8 +649,7 @@ abstract class AMysql_Abstract {
         $success = $stmt->execute();
         if ($success) {
             return $stmt->insertId ? $stmt->insertId : true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -685,8 +696,7 @@ abstract class AMysql_Abstract {
             $where = AMysql_Abstract::escapeIdentifier($columnName) . ' = ?';
             $this->update($tableName, $data, $where, array ($value));
             return $value;
-        }
-        else {
+        } else {
             $id = $this->insert($tableName, $data);
             return $id;
         }
@@ -757,8 +767,8 @@ abstract class AMysql_Abstract {
     public static function escapeLike($s, $escapeStr = '=')
     {
         return str_replace(
-            array($escapeStr, '_', '%'), 
-            array($escapeStr.$escapeStr, $escapeStr.'_', $escapeStr.'%'), 
+            array($escapeStr, '_', '%'),
+            array($escapeStr.$escapeStr, $escapeStr.'_', $escapeStr.'%'),
             $s
         );
     }
@@ -850,8 +860,7 @@ abstract class AMysql_Abstract {
                 foreach ($arraySub as $key2 => $value) {
                     $ret[$key2] = array ($key1 => $value);
                 }
-            }
-            else {
+            } else {
                 foreach ($arraySub as $key2 => $value) {
                     $ret[$key2][$key1] = $value;
                 }

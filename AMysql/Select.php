@@ -24,7 +24,8 @@
  * @author      Szerémi Attila
  * @license     MIT License; http://www.opensource.org/licenses/mit-license.php
  */
-class AMysql_Select extends AMysql_Statement {
+class AMysql_Select extends AMysql_Statement
+{
 
     protected $selectOptions = array ();
     protected $columnLiteral;
@@ -99,8 +100,7 @@ class AMysql_Select extends AMysql_Statement {
         foreach ($columns as $alias => $columnName) {
             if ('*' == $columnName[strlen($columnName)- 1]) {
                 $key = '*';
-            }
-            else {
+            } else {
                 $key = $alias && !is_numeric($alias) ? $alias : $columnName;
             }
             $this->columns[$key] = $this->formatSelectColumn("$columnPrefix$columnName", $alias);
@@ -119,8 +119,7 @@ class AMysql_Select extends AMysql_Statement {
     {
         if ($this->columnLiteral) {
             $this->columnLiteral .= ", $columnLiteral";
-        }
-        else {
+        } else {
             $this->columnLiteral = $columnLiteral;
         }
         return $this;
@@ -208,8 +207,7 @@ class AMysql_Select extends AMysql_Statement {
         $text = "$joinText $tableText ON ($on)";
         if ($prepend) {
             array_unshift($this->joins, $text);
-        }
-        else {
+        } else {
             $this->joins[] = $text;
         }
         if ($columns) {
@@ -253,8 +251,7 @@ class AMysql_Select extends AMysql_Statement {
         }
         if ($prepend) {
             array_unshift($this->groupBys, $what);
-        }
-        else {
+        } else {
             $this->groupBys[] = $what;
         }
         return $this;
@@ -292,8 +289,7 @@ class AMysql_Select extends AMysql_Statement {
         }
         if ($prepend) {
             array_unshift($this->orderBys, $what);
-        }
-        else {
+        } else {
             $this->orderBys[] = $what;
         }
         return $this;
@@ -351,7 +347,7 @@ class AMysql_Select extends AMysql_Statement {
     {
         $parts = array ('SELECT');
         if ($this->selectOptions) {
-            $parts[] = join (', ', $this->selectOptions);
+            $parts[] = join(', ', $this->selectOptions);
         }
 
         $columns = $this->columns;
