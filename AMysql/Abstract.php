@@ -97,8 +97,15 @@ abstract class AMysql_Abstract
      */
     protected $_fetchMode = self::FETCH_ASSOC;
 
-    protected $connDetails = array ();
+    protected $connDetails = array();
 
+    /**
+     * Whether Mysqli is considered able to use.
+     * Do not change; it is automatically set. 
+     * To force a specific mysql driver to be used, use
+     * $this->setConnDetails()
+     * @var boolean
+     */
     public static $useMysqli;
 
     const FETCH_ASSOC	= 'assoc';
@@ -130,6 +137,9 @@ abstract class AMysql_Abstract
         $newLink = false,
         $clientFlags = 0
     ) {
+        // Use mysqli by default if available and PHP is at least of version 5.3.0 (required).
+        // Can be overridden by connection details.
+        self::$useMysqli = class_exists('Mysqli', false) && function_exists('mysqli_stmt_get_result');
 
         if (is_resource($resOrArrayOrHost) &&
             0 === strpos(get_resource_type($resOrArrayOrHost), 'mysql link')
@@ -156,6 +166,7 @@ abstract class AMysql_Abstract
      *                                  password - password
      *                                  db - db to auto connect to
      *                                  port - port
+     *                                  driver - force 'mysql' or 'mysqli'
      *                                  socket - socket
      *
      *
@@ -164,9 +175,6 @@ abstract class AMysql_Abstract
      */
     public function setConnDetails(array $cd)
     {
-        // use mysqli if available and PHP is at least of version 5.3.0 (required)
-        self::$useMysqli = class_exists('Mysqli', false) && function_exists('mysqli_stmt_get_result');
-
         $defaults = array (
             'socket' => ini_get('mysqli.default_socket'),
             'db' => null,
@@ -211,15 +219,36 @@ abstract class AMysql_Abstract
      */
     public function connect()
     {
-        $isMysqli = self::$useMysqli;
-        $this->isMysqli = $isMysqli;
+        $this->error = null;
+        $this->errno = null;
+
         $cd = $this->connDetails;
-        if (self::$useMysqli) {
+        if (!$cd) {
+            throw new LogicException("No connection details set. Could not connect.");
+        }
+        if (isset($cd['driver'])) {
+            switch ($cd['driver']) {
+                case 'mysqli':
+                    $isMysqli = true;
+                    break;
+                case 'mysql':
+                    $isMysqli = false;
+                    break;
+                default:
+                    throw new LogicException ("Unknown driver: `$cd[driver]`");
+                    break;
+            }
+        } else {
+            $isMysqli = self::$useMysqli;
+        }
+        $this->isMysqli = $isMysqli;
+        $newLink = !empty($cd['newLink']);
+        if ($isMysqli) {
             $port = isset($cd['port']) ? $cd['port'] : ini_get('mysqli.default_port');
             $res = mysqli_connect($cd['host'], $cd['username'], $cd['password'], $cd['db'], $port, $cd['socket']);
         } else {
             $host = isset($cd['port']) ? "$cd[host]:$cd[port]" : $cd['host'];
-            $res = mysql_connect($host, $cd['username'], $cd['password'], false, $cd['clientFlags']);
+            $res = mysql_connect($host, $cd['username'], $cd['password'], $newLink, $cd['clientFlags']);
         }
         if ($res) {
             $this->link = $res;
