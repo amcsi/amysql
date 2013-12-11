@@ -16,16 +16,19 @@ set_include_path(
 /**
  * Make sure you have a mysql user and database preprepared for the tests
  **/
-$mysqlHost  = 'localhost';
-$mysqlUser  = 'amysql';
-$mysqlPass  = '';
-$mysqlDb    = 'amysql';
+$conf = array();
+if (file_exists($filename = dirname(__FILE__) . '/config/conf.dist.php')) {
+    include $filename;
+}
+if (file_exists($filename = dirname(__FILE__) . '/config/conf.php')) {
+    include $filename;
+}
 
-define('AMYSQL_TEST_HOST', $mysqlHost);
-define('AMYSQL_TEST_USER', $mysqlUser);
-define('AMYSQL_TEST_PASS', $mysqlPass);
-define('AMYSQL_TEST_DB', $mysqlDb);
-define('SQL_DRIVER', 'mysqli'); // change to test different sql drivers
+define('AMYSQL_TEST_HOST', $conf['amysqlTestHost']);
+define('AMYSQL_TEST_USER', $conf['amysqlTestUser']);
+define('AMYSQL_TEST_PASS', $conf['amysqlTestPass']);
+define('AMYSQL_TEST_DB', $conf['amysqlTestDb']);
+define('SQL_DRIVER', $conf['amysqlTestDriver']);
 
 require_once APPLICATION_PATH . '/AMysql.php';
 ?>
