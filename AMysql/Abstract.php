@@ -5,6 +5,12 @@
  * For information on binding placeholders, @see AMysql_Statement::execute()
  *
  * @todo Maybe remove automatic dot detection for identifier escaping.
+ * @todo Allow for latest profiling data to be available from early requesting with
+ *      the help of references or a new profiling class.
+ * @todo Profile template
+ * @todo Recommend custom enum offset for AMysql_Expr, and allow it to be expandable
+ * @todo New Abstract methods that only return stmt
+ * @todo auto-reconnect attempt on 2006 server gone away error
  *
  * Visit https://github.com/amcsi/amysql
  * @author      Szerémi Attila
