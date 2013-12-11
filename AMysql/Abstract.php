@@ -9,7 +9,6 @@
  *      the help of references or a new profiling class.
  * @todo Profile template
  * @todo Recommend custom enum offset for AMysql_Expr, and allow it to be expandable
- * @todo New Abstract methods that only return stmt
  *
  * Visit https://github.com/amcsi/amysql
  * @author      Szerémi Attila
@@ -598,6 +597,27 @@ abstract class AMysql_Abstract
     }
 
     /**
+     * Performs an instant UPDATE returning the statement.
+     *
+     * @param string $tableName 	The table name.
+     * @param array $data 		The array of data changes. A
+     *					    one-dimensional array
+     * 					with keys as column names and values
+     *					    as their values.
+     * @param string $where		An SQL substring of the WHERE clause.
+     * @param mixed $binds		(Optional) The binds or a single bind for the WHERE clause.
+     *
+     * @return AMysql_Statement
+     **/
+    public function upd($tableName, array $data, $where, $binds = array())
+    {
+        $stmt = new AMysql_Statement($this);
+        $stmt->update($tableName, $data, $where);
+        $stmt->execute($binds);
+        return $stmt;
+    }
+
+    /**
      * Performs an instant UPDATE returning its success.
      *
      * @param string $tableName 	The table name.
@@ -612,10 +632,7 @@ abstract class AMysql_Abstract
      **/
     public function update($tableName, array $data, $where, $binds = array())
     {
-        $stmt = new AMysql_Statement($this);
-        $stmt->update($tableName, $data, $where);
-        $result = $stmt->execute($binds);
-        return $stmt->result;
+        return $this->upd($tableName, $data, $where, $binds)->result;
     }
 
     /**
@@ -724,14 +741,30 @@ abstract class AMysql_Abstract
      * 					values are numerical arrays, where each value represents the
      * 					value for the new row of that key.
      *
-     * @return mixed The mysql_insert_id(), if the query succeeded and there exists a primary
-     * key. Otherwise the boolean of whether the insert was successful.
+     * @return AMysql_Statement
      **/
-    public function insert($tableName, array $data)
+    public function ins($tableName, array $data)
     {
         $stmt = new AMysql_Statement($this);
         $stmt->insert($tableName, $data);
-        $success = $stmt->execute();
+        $stmt->execute();
+        return $stmt;
+    }
+
+    /**
+     * Performs an instant INSERT, but tries to return the last insert id straight away.
+     * 
+     * @param string $tableName 	The table name.
+     * @param array $data           @see $this->ins()
+     * @access public
+     *
+     * @return mixed The mysql_insert_id(), if the query succeeded and there exists a primary
+     * key. Otherwise the boolean of whether the insert was successful.
+     */
+    public function insert($tableName, array $data)
+    {
+        $stmt = $this->ins($tableName, $data);
+        $success = $stmt->result;
         if ($success) {
             return $stmt->insertId ? $stmt->insertId : true;
         } else {
@@ -740,7 +773,22 @@ abstract class AMysql_Abstract
     }
 
     /**
-     * Performs an instant REPLACE.
+     * Performs an instant REPLACE, returning the statement.
+     *
+     * @see $this->insert()
+     *
+     * @return AMysql_Statement
+     **/
+    public function rep($tableName, array $data)
+    {
+        $stmt = new AMysql_Statement($this);
+        $stmt->replace($tableName, $data);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    /**
+     * Performs an instant REPLACE, returning the success.
      *
      * @see $this->insert()
      *
@@ -748,9 +796,7 @@ abstract class AMysql_Abstract
      **/
     public function replace($tableName, array $data)
     {
-        $stmt = new AMysql_Statement($this);
-        $stmt->replace($tableName, $data);
-        $success = $stmt->execute();
+        $success = $this->rep($tableName, $data)->result;
         return $success;
     }
 
@@ -788,7 +834,24 @@ abstract class AMysql_Abstract
     }
 
     /**
-     * Performs an instant DELETE.
+     * Performs an instant DELETE, returning the statement.
+     *
+     * @param string $tableName 	The table name.
+     * @param string $where		An SQL substring of the WHERE clause.
+     * @param mixed $binds		(Optional) The binds or a single bind for the WHERE clause.
+     *
+     * @return AMysql_Statement
+     **/
+    public function del($tableName, $where, $binds = array ())
+    {
+        $stmt = new AMysql_Statement($this);
+        $stmt->delete($tableName, $where);
+        $stmt->execute($binds);
+        return $stmt;
+    }
+
+    /**
+     * Performs an instant DELETE, returning whether it succeeded.
      *
      * @param string $tableName 	The table name.
      * @param string $where		An SQL substring of the WHERE clause.
@@ -798,10 +861,7 @@ abstract class AMysql_Abstract
      **/
     public function delete($tableName, $where, $binds = array ())
     {
-        $stmt = new AMysql_Statement($this);
-        $stmt->delete($tableName, $where);
-        $result = $stmt->execute($binds);
-        return $result;
+        return $this->del($tableName, $where, $binds)->result;
     }
 
     /**
