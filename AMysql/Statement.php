@@ -66,7 +66,6 @@ class AMysql_Statement implements IteratorAggregate, Countable {
     {
         $amysql->lastStatement = $this;
         $this->amysql = $amysql;
-        $this->link = $amysql->link;
         $this->isMysqli = $amysql->isMysqli;
         $this->profileQueries = $amysql->profileQueries;
         $this->throwExceptions = $this->amysql->throwExceptions;
@@ -176,6 +175,9 @@ class AMysql_Statement implements IteratorAggregate, Countable {
             $this->binds = is_array($binds) ? $binds : array ($binds);
         }
         $sql = $this->getSql();
+        if ($this->amysql->autoPing) {
+            $this->amysql->autoPing();
+        }
         $result = $this->_query($sql);
         return $this;
     }
@@ -333,7 +335,7 @@ class AMysql_Statement implements IteratorAggregate, Countable {
         if ($isMysqli) {
             if ($this->profileQueries) {
                 $startTime = microtime(true);
-                $stmt = $link->prepare($sql);
+                $stmt = @$link->prepare($sql);
                 if ($stmt) {
                     $success = $stmt->execute();
                 }

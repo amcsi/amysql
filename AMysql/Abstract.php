@@ -79,6 +79,35 @@ abstract class AMysql_Abstract
      */
     public $includeBacktrace = false;
 
+    /**
+     * Amount of seconds needed to pass by to automatically call mysql_ping before
+     * any query. This helps prevent "2006: Server has gone away" errors that may
+     * be caused by mysql queries being performed after other long, blocking requests.
+     * Change to FALSE to disable.
+     * Can be overridden in the connection details array.
+     * 
+     * @var int
+     * @access public
+     */
+    public $autoPingSeconds = 20;
+
+    /**
+     * This is set automatically by the script. No need to change this value.
+     * 
+     * @var mixed
+     * @access public
+     */
+    public $autoPing;
+
+    /**
+     * Last time a query has been executed or a mysql connection has been made.
+     * No need to modify externally.
+     * 
+     * @var int
+     * @access public
+     */
+    public $lastPingTime;
+
     protected $_queries = array ();
     protected $_queriesData = array ();
 
@@ -137,6 +166,8 @@ abstract class AMysql_Abstract
         $newLink = false,
         $clientFlags = 0
     ) {
+        $this->autoPing = is_numeric($this->autoPingSeconds);
+
         // Use mysqli by default if available and PHP is at least of version 5.3.0 (required).
         // Can be overridden by connection details.
         self::$useMysqli = class_exists('Mysqli', false) && function_exists('mysqli_stmt_get_result');
@@ -168,6 +199,7 @@ abstract class AMysql_Abstract
      *                                  port - port
      *                                  driver - force 'mysql' or 'mysqli'
      *                                  socket - socket
+     *                                  autoPingSeconds - @see $this->autoPingSeconds
      *
      *
      * @access public
@@ -182,6 +214,10 @@ abstract class AMysql_Abstract
             'clientFlags' => 0,
         );
         $this->connDetails = array_merge($defaults, $cd);
+        if (array_key_exists('autoPingSeconds', $cd)) {
+            $this->autoPingSeconds = $cd['autoPingSeconds'];
+        }
+        $this->autoPing = is_numeric($this->autoPingSeconds);
         return $this;
     }
 
@@ -251,6 +287,9 @@ abstract class AMysql_Abstract
             $res = mysql_connect($host, $cd['username'], $cd['password'], $newLink, $cd['clientFlags']);
         }
         if ($res) {
+            if ($this->autoPing) {
+                $this->lastPingTime = time(); // otherwise can cause infinite recursion.
+            }
             $this->link = $res;
 
             if (!$isMysqli && !empty($cd['db'])) {
@@ -274,6 +313,14 @@ abstract class AMysql_Abstract
         return $this;
     }
 
+    public function forceReconnect()
+    {
+        $oldConnDetails = (array) $this->connDetails;
+        $this->connDetails['newLink'] = true;
+        $this->connect();
+        $this->connDetails = $oldConnDetails;
+    }
+
     public function getFetchMode()
     {
         return $this->_fetchMode;
@@ -288,6 +335,9 @@ abstract class AMysql_Abstract
     public function selectDb($db)
     {
         $isMysqli = $this->isMysqli;
+        if ($this->autoPing) {
+            $this->autoPing();
+        }
         $result = $isMysqli ? $this->link->select_db($db) : mysql_select_db($db, $this->link);
         if (!$result) {
             $error = $isMysqli ? $this->link->error : mysql_error($this->link);
@@ -306,6 +356,7 @@ abstract class AMysql_Abstract
     public function setCharset($charset)
     {
         $isMysqli = $this->isMysqli;
+        $this->autoPing();
         if ($isMysqli) {
             $result = $this->link->set_charset($charset);
         } else {
@@ -935,6 +986,61 @@ abstract class AMysql_Abstract
     }
 
     /**
+     * Pings the mysql server to see if it's still alive;
+     * attempts to reconnect otherwise.
+     * 
+     * @param boolean $handleError    (Optional) If TRUE, on failure, this will be handled as
+     *                              any other AMysql error. Defaults to FALSE (no errors or
+     *                              exceptions).
+     * @access public
+     * @return boolean          TRUE if the connection is still there or reconnection
+     *                          was successful.
+     *                          FALSE if reconnection wasn't successful.
+     */
+    public function pingReconnect()
+    {
+        $isMysqli = $this->isMysqli;
+        if ($isMysqli) {
+            $success = @mysqli_ping($this->link);
+        } else {
+            $success = @mysql_ping($this->link);
+        }
+        if (!$success) {
+            try {
+                $this->forceReconnect();
+                if (!$this->error) {
+                    $success = true;
+                }
+            } catch (Exception $e) {
+                // do nothing
+            }
+        }
+        return $success;
+    }
+
+    /**
+     * Pings if the set amount of auto ping time has passed.
+     * 
+     * @access public
+     * @return void
+     */
+    public function autoPing()
+    {
+        if ($this->autoPing) {
+            if (!$this->link) {
+                $this->connect();
+            } elseif (
+                !$this->lastPingTime ||
+                $this->autoPingSeconds <= (time() - $this->lastPingTime)
+            ) {
+                $this->pingReconnect();
+                $this->lastPingTime = time();
+            }
+        }
+        return $this;
+    }
+
+    /**
      * Gets the list of SQL queries performed so far by AMysql_Statement
      * objects connected by this object.
      * 
@@ -973,6 +1079,8 @@ abstract class AMysql_Abstract
      */
     public function handleError($msg, $code, $query)
     {
+        $this->error = $msg;
+        $this->errno = $code;
         $ex = new AMysql_Exception($msg, $code, $query);
         if ($this->triggerErrorOnException) {
             $ex->triggerErrorOnce();

@@ -13,16 +13,17 @@ $connDetails = array(
     'password' => AMYSQL_TEST_PASS,
     'db' => AMYSQL_TEST_DB,
     'driver' => SQL_DRIVER,
-    'autoPingSeconds' => 8,
+    'autoPingSeconds' => 9,
 );
 $amysql->setConnDetails($connDetails);
 $amysql->connect();
 
-sleep(10); // stop the mysql service here quickly
+sleep(10); // restart the mysql service here quickly
 
 try {
     $amysql->setNames('utf8');
     echo "success\n";
 } catch (Exception $e) {
+    echo "failure\n";
     trigger_error($e);
 }
