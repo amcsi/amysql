@@ -124,7 +124,7 @@ EOT;
                 'string' => 'blah',
             )
         );
-        $this->assertSame($expected, $rows);
+        $this->assertEquals($expected, $rows);
     }
 }
 ?>

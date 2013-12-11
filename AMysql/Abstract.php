@@ -10,7 +10,6 @@
  * @todo Profile template
  * @todo Recommend custom enum offset for AMysql_Expr, and allow it to be expandable
  * @todo New Abstract methods that only return stmt
- * @todo auto-reconnect attempt on 2006 server gone away error
  *
  * Visit https://github.com/amcsi/amysql
  * @author      Szerémi Attila
