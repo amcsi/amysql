@@ -1,6 +1,7 @@
 <?php /* vim: set expandtab : */
 /**
- * Mysql abstraction which only uses mysql_* functions
+ * Mysql abstraction which only uses mysql_* functions, but can use
+ * Mysqli also.
  *
  * For information on binding placeholders, @see AMysql_Statement::execute()
  *
@@ -8,7 +9,6 @@
  * @todo Allow for latest profiling data to be available from early requesting with
  *      the help of references or a new profiling class.
  * @todo Profile template
- * @todo Recommend custom enum offset for AMysql_Expr, and allow it to be expandable
  *
  * Visit https://github.com/amcsi/amysql
  * @author      Szerémi Attila

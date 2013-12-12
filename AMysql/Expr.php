@@ -6,12 +6,20 @@
  * statements, such as being able to call mysql functions to
  * set values.
  *
+ * This class can be extended and is recommended to do so if you want
+ * custom expressions; in which case you would have to manually
+ * instatiate that class each time, rather than using AMysql::expr()
+ *
+ * Expression codes 0-999 should be considered reserved to this class;
+ * if you extend this class, please use at least 1000 as expression code ints.
+ *
  * Visit https://github.com/amcsi/amysql
  * @author Szerémi Attila
  * @created 2011.06.10. 13:26:56  
  * @license     MIT License; http://www.opensource.org/licenses/mit-license.php
  **/ 
-class AMysql_Expr {
+class AMysql_Expr
+{
 
     public $prepared;
 
@@ -55,8 +63,8 @@ class AMysql_Expr {
      * @constructor
      * This constructor accepts different parameters in different cases.
      * Before everything, if the first parameter is an AMysql instance, it
-     * is saved, and is shifted from the arguments array, and the following applies
-     * in either case:
+     * is saved, and is shifted from the arguments array, and the following
+     * applies in either case:
      * The first parameter is mandatory: the one that gives the type of
      * expression. The types of expressions can be found as constants on this
      * class, and their documentation can be found above each constant type
@@ -79,12 +87,30 @@ class AMysql_Expr {
     public function set()
     {
         $args = func_get_args();
-        // literál
+        // literal
         if (is_string($args[0])) {
             $prepared = $args[0];
+        } else {
+            $prepared = $this->setByArray($args);
         }
-        else {
-            switch ($args[0]) {
+        $this->prepared = $prepared;
+    }
+
+    /**
+     * This method performs the logic of determining what the
+     * expression should result in.
+     * When extending this class, it is recommended that you
+     * override this method, determine whether the expression code
+     * is something that you want to handle, otherwise call and return
+     * the parent's setByArray() method
+     * 
+     * @param array $args 
+     * @access protected
+     * @return string               The literal string to use
+     */
+    protected function setByArray(array $args)
+    {
+        switch ($args[0]) {
             case self::EXPR_LITERAL:
                 $prepared = $args[1];
                 break;
@@ -96,8 +122,7 @@ class AMysql_Expr {
                     }
                     $prepared = AMysql::escapeIdentifier($args[1]) . ' IN 
                         (' . join(', ', $args[2]) . ') ';
-                }
-                else {
+                } else {
                     // If the array is empty, don't break the WHERE syntax
                     $prepared = 0;
                 }
@@ -111,13 +136,16 @@ class AMysql_Expr {
                 $formatted = sprintf($format, $likeEscaped);
                 if ($this->amysql) {
                     if ('mysqli' == $this->amysql->linkType) {
-                        $escaped = $this->amysql->link->real_escape_string($formatted);
+                        $escaped = $this->amysql->link->real_escape_string(
+                            $formatted
+                        );
+                    } else {
+                        $escaped = mysql_real_escape_string(
+                            $formatted,
+                            $this->amysql->link
+                        );
                     }
-                    else {
-                        $escaped = mysql_real_escape_string($formatted, $this->amysql->link);
-                    }
-                }
-                else {
+                } else {
                     $escaped = mysql_real_escape_string($formatted);
                 }
                 $prepared = "'$escaped'";
@@ -126,15 +154,14 @@ class AMysql_Expr {
             default:
                 throw new Exception("No such expression type: `$args[0]`.");
                 break;
-            }
         }
-        $this->prepared = $prepared;
+        return $prepared;
     }
 
     public function toString()
     {
         if (!isset($this->prepared)) {
-            throw new Exception ("No prepared string for mysql expression.");
+            throw new Exception("No prepared string for mysql expression.");
         }
         return $this->prepared;
     }
@@ -144,4 +171,3 @@ class AMysql_Expr {
         return $this->toString();
     }
 } 
-?>
