@@ -6,21 +6,11 @@
  * For information on binding placeholders, @see AMysql_Statement::execute()
  *
  * @todo Maybe remove automatic dot detection for identifier escaping.
- * @todo Profile template
  *
  * Visit https://github.com/amcsi/amysql
  * @author      Szerémi Attila
  * @license     MIT License; http://www.opensource.org/licenses/mit-license.php
  **/
-
-$dir = dirname(realpath(__FILE__));
-require_once $dir . '/Exception.php';
-require_once $dir . '/Expr.php';
-require_once $dir . '/Statement.php';
-require_once $dir . '/Iterator.php';
-require_once $dir . '/Select.php';
-require_once $dir . '/Profiler.php';
-
 abstract class AMysql_Abstract
 {
 
@@ -176,6 +166,17 @@ abstract class AMysql_Abstract
         $newLink = false,
         $clientFlags = 0
     ) {
+        if (!class_exists('AMysql_Statement')) {
+            // Assume no autoloader, and load everything manually
+            $dir = dirname(realpath(__FILE__));
+            require_once $dir . '/Exception.php';
+            require_once $dir . '/Expr.php';
+            require_once $dir . '/Statement.php';
+            require_once $dir . '/Iterator.php';
+            require_once $dir . '/Select.php';
+            require_once $dir . '/Profiler.php';
+        }
+
         $this->autoPing = is_numeric($this->autoPingSeconds);
 
         // Use mysqli by default if available and PHP is at least of version 5.3.0 (required).
