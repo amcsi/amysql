@@ -6,8 +6,6 @@
  * For information on binding placeholders, @see AMysql_Statement::execute()
  *
  * @todo Maybe remove automatic dot detection for identifier escaping.
- * @todo Allow for latest profiling data to be available from early requesting with
- *      the help of references or a new profiling class.
  * @todo Profile template
  *
  * Visit https://github.com/amcsi/amysql
@@ -21,6 +19,7 @@ require_once $dir . '/Expr.php';
 require_once $dir . '/Statement.php';
 require_once $dir . '/Iterator.php';
 require_once $dir . '/Select.php';
+require_once $dir . '/Profiler.php';
 
 abstract class AMysql_Abstract
 {
@@ -51,7 +50,21 @@ abstract class AMysql_Abstract
      * @access public
      */
     public $throwExceptions = true;
+
+    /**
+     * The total time all the queries have taken so far.
+     * $this->profileQueries must be enabled before any queries
+     * are performed to keep track of query durations.
+     * Please do not overwrite this value yourself. The reason
+     * it is kept public is so that AMysql_Statement objects can
+     * write to it. 
+     *
+     * @var float
+     * @access public
+     */
     public $totalTime = 0.0;
+    protected $_queries = array ();
+    protected $_queriesData = array ();
 
     /**
      * Whether AMysql_Exceptions should trigger errors by default on construction.
@@ -69,6 +82,7 @@ abstract class AMysql_Abstract
      * @var boolean
      */
     public $profileQueries = false;
+
     /**
      * Whether backtraces should be added to each array for getQueriesData(). If true,
      * backtraces will be found under the 'backtrace' key.
@@ -106,9 +120,6 @@ abstract class AMysql_Abstract
      */
     public $lastPingTime;
 
-    protected $_queries = array ();
-    protected $_queriesData = array ();
-
     /**
      * Let AMysql_Statement::bindParam() and AMysql_Statement::bindValue()
      * use indexes starting from 1 instead of 0 in case of unnamed placeholders.
@@ -125,6 +136,7 @@ abstract class AMysql_Abstract
     protected $_fetchMode = self::FETCH_ASSOC;
 
     protected $connDetails = array();
+    protected $profiler;
 
     /**
      * Whether Mysqli is considered able to use.
@@ -1028,7 +1040,8 @@ abstract class AMysql_Abstract
         $this->_queries[] = $query;
         $data = array (
             'query' => $query,
-            'time' => $queryTime
+            'time' => $queryTime,
+            'backtrace' => array(),
         );
         if ($this->includeBacktrace) {
             $opts = 0;
@@ -1124,6 +1137,21 @@ abstract class AMysql_Abstract
     public function getQueriesData()
     {
         return $this->_queriesData;
+    }
+
+    /**
+     * Returns the profiler object. Pass it to your templates
+     * to retrieve the profiler results.
+     * 
+     * @access public
+     * @return AMysql_Profiler
+     */
+    public function getProfiler()
+    {
+        if (!$this->profiler) {
+            $this->profiler = new AMysql_Profiler($this);
+        }
+        return $this->profiler;
     }
 
     /**

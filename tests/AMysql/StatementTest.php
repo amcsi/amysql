@@ -497,5 +497,47 @@ EOT;
         $this->assertSame($this->_amysql->totalTime,
             $this->_amysql->lastStatement->queryTime);
     }
+
+    public function testProfilingClass() {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	    array (
+		'string' => 'blah',
+	    )
+	);
+        $profiler = $this->_amysql->getProfiler();
+        $profiler->setEnabled(true);
+        $this->_amysql->insert($this->tableName, $data);
+        $this->assertInternalType('float', 
+            $this->_amysql->lastStatement->queryTime
+        );
+        $this->assertGreaterThan(0.0, $profiler['totalTime']);
+        $this->assertSame(
+            $profiler['totalTime'],
+            $this->_amysql->lastStatement->queryTime
+        );
+    }
+
+    public function testProfilingClassQueriesData() {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	    array (
+		'string' => 'blah',
+	    )
+	);
+        $profiler = $this->_amysql->getProfiler();
+        $profiler->setEnabled(true);
+        $this->_amysql->insert($this->tableName, $data);
+        $lastQueryData = $profiler['queriesData'][count($profiler['queriesData']) - 1];
+        $this->assertInternalType('array', $lastQueryData);
+        $keys = array('query', 'time', 'backtrace');
+        $this->assertEquals($keys, array_keys($lastQueryData));
+        $this->assertSame($profiler['totalTime'], $lastQueryData['time']);
+        $this->assertSame($this->_amysql->lastStatement->query, $lastQueryData['query']);
+    }
 }
 ?>
