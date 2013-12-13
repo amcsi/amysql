@@ -41,10 +41,9 @@ EOT;
 
     public function testComplexQuery()
     {
-        $select = $this->_amysql->select();
+        $select = $this->_amysql->select('t2alias.*');
         $select 
             ->option('DISTINCT')
-            ->column('t2alias.*')
             ->from(array ('table1', 't2alias' => 'table2'))
             ->from(array ('t3alias' => 'table3'), array ('t3_col1' => 'col1', 't3_col2' => 'col2'))
             ->column (array ('t1_col1' => 'table1.col1'))

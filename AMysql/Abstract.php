@@ -590,12 +590,19 @@ abstract class AMysql_Abstract
 
     /**
      * Returns a new instance of AMysql_Select.
+     * By passing parameters, you can now have $select->column() invoked
+     * straight away (e.g. $amysql->select('*')->...)
+     *
+     * @param mixed $columns    (Optional) @see AMysql_Select::column()
      *
      * @return AMysql_Select
      **/
-    public function select()
+    public function select($columns = null)
     {
         $select = new AMysql_Select($this);
+        if ($columns) {
+            $select->column($columns);
+        }
         return $select;
     }
 
