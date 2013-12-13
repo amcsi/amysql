@@ -84,7 +84,7 @@ class AMysql_Select extends AMysql_Statement
     /**
      * Adds one or more COLUMN to the list of columns to select. 
      * 
-     * @param string|AMysql_Expr|array $columns          The column name. Can be an array or column
+     * @param string|AMysql_Expr|array $columns         The column name. Can be an array of column
      *                                                  names in which case the key can mark the
      *                                                  optional alias of the column.
      * @param array $options                            (Options) an array of config options
@@ -297,6 +297,9 @@ class AMysql_Select extends AMysql_Statement
 
     /**
      * Adds a LIMIT
+     * You can only limit the number of rows returned here (e.g. LIMIT 10).
+     * To set the offset (e.g. LIMIT 20, 10), you must do:
+     * $select->limit(10)->offset(20);
      * 
      * @param int $limit    The LIMIT
      * @access public
