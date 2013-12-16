@@ -60,6 +60,16 @@ class AMysql_Expr
     const ESCAPE_LIKE = 2;
 
     /**
+     * Escapes a table name and encloses it in quotes. The second parameter is the table name. 
+     */
+    const EXPR_TABLE = 3;
+
+    /**
+     * Escapes a column name and encloses it in quotes. The second parameter is the column name. 
+     */
+    const EXPR_COLUMN = 4;
+
+    /**
      * @constructor
      * This constructor accepts different parameters in different cases.
      * Before everything, if the first parameter is an AMysql instance, it
@@ -150,6 +160,12 @@ class AMysql_Expr
                 }
                 $prepared = "'$escaped'";
                 $prepared .= " ESCAPE '='";
+                break;
+            case self::ESCAPE_TABLE:
+                $prepared = $this->amysql->escapeTable($args[1]);
+                break;
+            case self::ESCAPE_COLUMN:
+                $prepared = $this->amysql->escapeColumn($args[1]);
                 break;
             default:
                 throw new Exception("No such expression type: `$args[0]`.");

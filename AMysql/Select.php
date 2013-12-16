@@ -70,13 +70,13 @@ class AMysql_Select extends AMysql_Statement
     {
         if ('*' == $columnName[strlen($columnName) - 1]) {
             return '*' === $columnName ? '*'
-                : AMysql_Abstract::escapeIdentifierSimple(substr($columnName, 0, -2)) .
+                : $this->amysql->escapeColumn(substr($columnName, 0, -2)) .
                 '.*'
             ;
         }
-        $ret = AMysql_Abstract::escapeIdentifier($columnName);
+        $ret = $this->amysql->escapeColumn($columnName);
         if ($alias && !is_numeric($alias)) {
-            $ret .= ' AS ' . AMysql_Abstract::escapeIdentifierSimple($alias);
+            $ret .= ' AS ' . $this->amysql->escapeColumn($alias);
         }
         return $ret;
     }
@@ -136,9 +136,9 @@ class AMysql_Select extends AMysql_Statement
      */
     public function formatFrom($tableName, $alias = null)
     {
-        $ret = AMysql_Abstract::escapeIdentifier($tableName);
+        $ret = $this->amysql->escapeTable($tableName);
         if ($alias && !is_numeric($alias)) {
-            $ret .= ' AS ' . AMysql_Abstract::escapeIdentifierSimple($alias);
+            $ret .= ' AS ' . $this->amysql->escapeTable($alias);
         }
         return $ret;
     }
@@ -245,7 +245,7 @@ class AMysql_Select extends AMysql_Statement
      */
     public function groupBy($col, $desc = false, $prepend = false)
     {
-        $what = AMysql_Abstract::escapeIdentifier($col);
+        $what = $this->amysql->escapeColumn($col);
         if ($desc) {
             $what .= ' DESC';
         }
@@ -283,7 +283,7 @@ class AMysql_Select extends AMysql_Statement
      */
     public function orderBy($col, $desc = false, $prepend = false)
     {
-        $what = AMysql_Abstract::escapeIdentifier($col);
+        $what = $this->amysql->escapeColumn($col);
         if ($desc) {
             $what .= ' DESC';
         }
