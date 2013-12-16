@@ -136,12 +136,12 @@ class AMysql_Expr {
         if (!isset($this->prepared)) {
             throw new Exception ("No prepared string for mysql expression.");
         }
-        return $this->prepared;
+        return (string) $this->prepared;
     }
 
     public function __toString()
     {
-        return $this->toString();
+        return (string) $this->toString();
     }
 } 
 ?>
