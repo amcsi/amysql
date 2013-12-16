@@ -76,7 +76,7 @@ class AMysql_Expr
     public function __construct(/* args */)
     {
         $args = func_get_args();
-        if ($args[0] instanceof AMysql) {
+        if ($args[0] instanceof AMysql_Abstract) {
             $this->amysql = array_shift($args);
         }
         if ($args) {
@@ -120,7 +120,7 @@ class AMysql_Expr
                     foreach ($args[2] as &$val) {
                         $val = $this->amysql->escape($val);
                     }
-                    $prepared = AMysql::escapeIdentifier($args[1]) . ' IN 
+                    $prepared = AMysql_Abstract::escapeIdentifier($args[1]) . ' IN 
                         (' . join(', ', $args[2]) . ') ';
                 } else {
                     // If the array is empty, don't break the WHERE syntax
@@ -132,7 +132,7 @@ class AMysql_Expr
                 if (!empty($args[2])) {
                     $format = $args[2];
                 }
-                $likeEscaped = AMysql::escapeLike($args[1]);
+                $likeEscaped = AMysql_Abstract::escapeLike($args[1]);
                 $formatted = sprintf($format, $likeEscaped);
                 if ($this->amysql) {
                     if ('mysqli' == $this->amysql->linkType) {
