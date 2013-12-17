@@ -1,7 +1,7 @@
 Requirements
 =
 
-PHP 5.2.4+ is required, and either the MySQLi extension or the mysql_* functions must be available.
+PHP 5.1.0+ is required, and either the MySQLi extension or the mysql_* functions must be available.
 
 Installation
 =

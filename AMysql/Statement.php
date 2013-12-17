@@ -974,7 +974,10 @@ class AMysql_Statement implements IteratorAggregate, Countable {
 
             foreach ($data as $row) {
                 $vals[$i] = array ();
-                $row2 = array_fill_keys($akeys, null);
+                $row2 = array();
+                foreach ($akeys as $key) {
+                    $row2[$key] = null;
+                }
                 foreach ($row as $columnName => $value) {
                     $row2[$columnName] = $this->amysql->escape($value);
 
