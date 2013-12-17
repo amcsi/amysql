@@ -1010,8 +1010,8 @@ class AMysql_Statement implements IteratorAggregate, Countable
         $setsString = $this->buildSet($data);
 
         /**
-         * Ezt beforeSql-el kell megoldani, különben az értékekben lévő
-         * kérdőjelek bezavarnak.         
+         * This must be solved by beforeSql, otherwise bind substrings
+         * could cause problems within the SET string.
          **/
         $tableSafe = $this->amysql->escapeTable($tableName);
         $beforeSql = "UPDATE $tableSafe SET $setsString WHERE ";
