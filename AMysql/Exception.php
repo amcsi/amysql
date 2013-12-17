@@ -6,13 +6,25 @@
  * @author      Szerémi Attila 
  * @license     MIT License; http://www.opensource.org/licenses/mit-license.php
  **/ 
-class AMysql_Exception extends RuntimeException {
+class AMysql_Exception extends RuntimeException
+{
 
     /**
      * @var string The query string mysql had a problem with (if there is one).
      **/         
     public $query;
     protected $errorTriggered = 0;
+    protected $properties;
+
+    /**
+     * Duplicate entry '(0)' for key '(1)'
+     */
+    const CODE_DUPLICATE_ENTRY = 1062; 
+
+    /**
+     * Mysql server has gone away
+     */
+    const CODE_SERVER_GONE_AWAY = 2006;
 
     public function __construct($msg, $errno, $query)
     {
@@ -28,6 +40,25 @@ class AMysql_Exception extends RuntimeException {
     public function getLogMessage()
     {
         return $this->__toString();
+    }
+
+    public function getProperties()
+    {
+        if (!isset($this->properties)) {
+            switch ($this->getCode()) {
+                case self::CODE_DUPLICATE_ENTRY:
+                    $pattern = "@Duplicate entry '(.*)' for key '(.*)'@";
+                    $message = $this->getMessage();
+                    preg_match($pattern, $message, $props);
+                    array_shift($props);
+                    break;
+                default:
+                    $props = array();
+                    break;
+            }
+            $this->properties = $props;
+        }
+        return $this->properties;
     }
 
     /**
