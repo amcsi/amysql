@@ -1,42 +1,5 @@
 <?php /* vim: set tabstop=8 expandtab : */
-class IteratorTest extends PHPUnit_Framework_TestCase {
-
-    protected $_conn;
-    protected $_amysql;
-
-    public $tableName = 'abstracttest';
-
-    public function setUp() {
-        if ('mysqli' == SQL_DRIVER) {
-            $this->_amysql = new AMysql(
-                AMYSQL_TEST_HOST, AMYSQL_TEST_USER, AMYSQL_TEST_PASS);
-            $this->_amysql->selectDb(AMYSQL_TEST_DB);
-        }
-        else if ('mysql' == SQL_DRIVER) {
-            $conn = mysql_connect(AMYSQL_TEST_HOST, AMYSQL_TEST_USER,
-                AMYSQL_TEST_PASS);
-            $this->_amysql = new AMysql($conn);
-            $this->_amysql->selectDb(AMYSQL_TEST_DB);
-        }
-
-        $this->createTable();
-    }
-
-    public function createTable() {
-	$sql = <<<EOT
-CREATE TABLE IF NOT EXISTS `$this->tableName` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `string` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-EOT;
-	$this->_amysql->query($sql);
-    }
-
-    public function tearDown() {
-	$this->_amysql->query("DROP TABLE `$this->tableName`");
-	$this->_amysql = null;
-    }
+class IteratorTest extends AMysql_TestCase {
 
     public function testIterate() {
 	$data = array (

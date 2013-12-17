@@ -30,5 +30,6 @@ define('AMYSQL_TEST_PASS', $conf['amysqlTestPass']);
 define('AMYSQL_TEST_DB', $conf['amysqlTestDb']);
 define('SQL_DRIVER', $conf['amysqlTestDriver']);
 
+require_once dirname(__FILE__) . '/AMysql_TestCase.php';
+
 require_once APPLICATION_PATH . '/AMysql.php';
-?>
