@@ -127,6 +127,7 @@ abstract class AMysql_Abstract
 
     protected $connDetails = array();
     protected $profiler;
+    protected $inTransaction = false;
 
     /**
      * Whether Mysqli is considered able to use.
@@ -482,45 +483,72 @@ abstract class AMysql_Abstract
         return $ret;
     }
 
+    /**
+     * Escapes a table name.
+     *
+     * @see self::escapeIdentifier
+     */
     public function escapeTable($tableName, $as = null)
     {
         return self::escapeIdentifier($tableName, $as);
     }
 
+    /**
+     * Escapes a column name.
+     *
+     * @see self::escapeIdentifier
+     */
     public function escapeColumn($columnName, $as = null)
     {
         return $this->escapeTable($columnName, $as);
     }
 
     /**
-     * Performs an InnoDB rollback.
+     * Returns whether a MySQL TRANSACTION is in progress,
+     * based off method calls.
+     * 
+     * @access public
+     * @return boolean
+     */
+    public function inTransaction()
+    {
+        return $this->inTransaction;
+    }
+
+    /**
+     * Performs a mysql ROLLBACK.
      *
-     * @todo Checks (such as for whether we have already started a
-     * transaction)
+     * @todo checks
      **/
     public function startTransaction()
     {
-        return $this->query('START TRANSACTION');
+        $ret = $this->query('START TRANSACTION');
+        $this->inTransaction = true;
+        return $ret;
     }
 
     /**
-     * Performs an InnoDB commit.
+     * Performs a mysql COMMIT.
      *
-     * @todo Checks
+     * @todo checks
      **/
     public function commit()
     {
-        return $this->query('COMMIT');
+        $ret = $this->query('COMMIT');
+        $this->inTransaction = false;
+        return $ret;
     }
 
     /**
-     * Performs an InnoDB rollback.
+     * Performs a mysql ROLLBACK.
      *
-     * @todo Checks
+     * @todo checks
      **/
     public function rollback()
     {
-        return $this->query('ROLLBACK');
+        $ret = $this->query('ROLLBACK');
+        $this->inTransaction = false;
+        return $ret;
     }
 
     /**
