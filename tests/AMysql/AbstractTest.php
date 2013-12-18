@@ -553,6 +553,54 @@ class AbstractTest extends AMysql_TestCase
 	$this->assertGreaterThan($totalTimeSoFar, $this->_amysql->totalTime);
     }
 
+    public function testAnsi()
+    {
+        $this->_amysql->setAnsi(true);
+        $actual = $this->_amysql->escapeColumn('column');
+        $expected = '"column"';
+        $this->assertEquals($expected, $actual);
+        $this->_amysql->setAnsi(false);
+        $actual = $this->_amysql->escapeColumn('column');
+        $expected = '`column`';
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testInTransaction()
+    {
+        $amysql = $this->_amysql;
+        $this->assertFalse($amysql->inTransaction());
+        $amysql->startTransaction();
+        $this->assertTrue($amysql->inTransaction());
+        $amysql->startTransaction();
+        $this->assertTrue($amysql->inTransaction());
+        $amysql->commit();
+        $this->assertFalse($amysql->inTransaction());
+        $amysql->startTransaction();
+        $this->assertTrue($amysql->inTransaction());
+        $amysql->rollback();
+        $this->assertFalse($amysql->inTransaction());
+    }
+
+    public function testUtf8()
+    {
+        $amysql = $this->_amysql;
+        $amysql->setCharset('latin1')->setNames('latin1');
+        $string = 'aéó';
+        $data = array ('string' => $string);
+        $amysql->insert($this->tableName, array('string' => $data));
+        $amysql->setUtf8();
+        $row = $amysql->select('*')->from($this->tableName)->execute()->fetchAssoc();
+        $this->assertEquals('aÃ©Ã³', $row['string']); // text garbled.
+        $amysql->delete($this->tableName, 1, array());
+
+        $amysql->setUtf8();
+        $string = 'aéőŰ';
+        $data = array ('string' => $string);
+        $amysql->insert($this->tableName, array('string' => $data));
+        $row = $amysql->select('*')->from($this->tableName)->execute()->fetchAssoc();
+        $this->assertEquals($string, $row['string']);
+    }
+
     /**
      * 
      **/

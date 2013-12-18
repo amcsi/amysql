@@ -129,6 +129,9 @@ abstract class AMysql_Abstract
     protected $profiler;
     protected $inTransaction = false;
 
+    protected $isAnsi = false;
+    protected $identifierQuoteChar = '`';
+
     /**
      * Whether Mysqli is considered able to use.
      * Do not change; it is automatically set. 
@@ -360,6 +363,17 @@ abstract class AMysql_Abstract
     }
 
     /**
+     * Takes care of setting everything to utf-8
+     * 
+     * @access public
+     * @return $this
+     */
+    public function setUtf8()
+    {
+        return $this->setCharset('utf8')->setNames('utf8');
+    }
+
+    /**
      * Changes the character set of the connection.
      * 
      * @param string $charset Example: utf8
@@ -399,6 +413,32 @@ abstract class AMysql_Abstract
     {
         $stmt = $this->query("SET NAMES $names");
         return $this;
+    }
+
+    /**
+     * Sets whether ANSI mode is on. Does not change the database's mode,
+     * you just have to call this method when you know ANSI mode is being
+     * used in the mysql connection, so that escaping is done according
+     * to the correct mode.
+     * ANSI mode is off my default on most mysql installations.
+     * 
+     * @param boolean $isAnsi 
+     * @access public
+     * @return $this
+     */
+    public function setAnsi($isAnsi)
+    {
+        $this->isAnsi = $isAnsi;
+        $this->identifierQuoteChar = $isAnsi ? '"' : '`';
+        return $this;
+    }
+
+    /**
+     * Returns whether ANSI mode is being used by this instance (not the database)
+     **/
+    public function isAnsi()
+    {
+        return $this->isAnsi;
     }
 
     /**
@@ -490,7 +530,7 @@ abstract class AMysql_Abstract
      */
     public function escapeTable($tableName, $as = null)
     {
-        return self::escapeIdentifier($tableName, $as);
+        return self::escapeIdentifier($tableName, $as, $this->identifierQuoteChar);
     }
 
     /**
@@ -500,7 +540,7 @@ abstract class AMysql_Abstract
      */
     public function escapeColumn($columnName, $as = null)
     {
-        return $this->escapeTable($columnName, $as);
+        return $this->escapeTable($columnName, $as, $this->identifierQuoteChar);
     }
 
     /**
