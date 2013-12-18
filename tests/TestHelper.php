@@ -1,6 +1,10 @@
 <?php
 /**
- * To run these tests, have a mysql user of amysql with no password
+ * It is recommended that while testing AMysql, you set this in your
+ * MySQL's my.ini file and restart mysqld afterwards:
+ * innodb_flush_log_at_trx_commit=2
+ *
+ * It makes all the tests run a lot faster.
  **/
 ob_start();
 define('BASE_PATH', realpath(dirname(__FILE__) . '/../'));

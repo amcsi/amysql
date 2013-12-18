@@ -2,6 +2,23 @@
 /**
  * MySQL exception class
  *
+ * A list of error codes can be found below. Anything in ($#), where # is a number which
+ * represents the index the substring is captured in in the array $this->getParams()
+ * returns.
+ *
+ *  CODE_DUPLICATE_ENTRY (1062):
+ *      Duplicate entry '($0)' for key '($1)'
+ *  CODE_PARENT_FOREIGN_KEY_CONSTRAINT_FAILS (1451):
+ *      Cannot delete or update a parent row: a foreign key constraint fails ($0)
+ *  CODE_CHILD_FOREIGN_KEY_CONSTRAINT_FAILS (1452):
+ *      Cannot add or update a child row: a foreign key constraint fails (%0)
+ *  CODE_SERVER_GONE_AWAY (2006):
+ *      Mysql server has gone away
+ *
+ * List of official MySQL error codes can be found on these links:
+ * @link http://dev.mysql.com/doc/refman/5.7/en/error-messages-server.html
+ * @link http://dev.mysql.com/doc/refman/5.7/en/error-messages-client.html
+ *
  * Visit https://github.com/amcsi/amysql
  * @author      Szerémi Attila 
  * @license     MIT License; http://www.opensource.org/licenses/mit-license.php
@@ -14,16 +31,11 @@ class AMysql_Exception extends RuntimeException
      **/         
     public $query;
     protected $errorTriggered = 0;
-    protected $properties;
+    protected $params;
 
-    /**
-     * Duplicate entry '(0)' for key '(1)'
-     */
     const CODE_DUPLICATE_ENTRY = 1062; 
-
-    /**
-     * Mysql server has gone away
-     */
+    const CODE_PARENT_FOREIGN_KEY_CONSTRAINT_FAILS = 1451;
+    const CODE_CHILD_FOREIGN_KEY_CONSTRAINT_FAILS = 1452;
     const CODE_SERVER_GONE_AWAY = 2006;
 
     public function __construct($msg, $errno, $query)
@@ -42,23 +54,70 @@ class AMysql_Exception extends RuntimeException
         return $this->__toString();
     }
 
-    public function getProperties()
+    /**
+     * Parses the mysql error message for variables based on the error code.
+     * Only a subset of error codes/messages are supported.
+     * It is recommended that you always check the exception's error code before
+     * calling this method.
+     *
+     * For requests for including support for specific error codes/messages
+     * in the codebase, please visit @link https://github.com/amcsi/amysql/issues
+     * 
+     * @param int $index            (Optional) Returns the $index element of the returning
+     *                              array instead
+     * @access public
+     * @return array|string         An array of the parsed variables.
+     *                              Empty array if the error code's message doesn't have
+     *                              variables, or if the error code/message is not supported.
+     *                              If $index was set, a string will be returned if found,
+     *                              otherwise NULL is returned and an E_NOTICE is raised.
+     */
+    /**
+     * getParams 
+     * 
+     * @param mixed $index 
+     * @access public
+     * @return void
+     */
+    public function getParams($index = null)
     {
-        if (!isset($this->properties)) {
+        if (!isset($this->params)) {
             switch ($this->getCode()) {
                 case self::CODE_DUPLICATE_ENTRY:
                     $pattern = "@Duplicate entry '(.*)' for key '(.*)'@";
                     $message = $this->getMessage();
-                    preg_match($pattern, $message, $props);
-                    array_shift($props);
+                    preg_match($pattern, $message, $params);
+                    array_shift($params);
+                    break;
+                case self::CODE_PARENT_FOREIGN_KEY_CONSTRAINT_FAILS:
+                    $pattern = "@Cannot delete or update a parent row: a foreign key constraint fails \((.*)\)$@";
+                    $message = $this->getMessage();
+                    preg_match($pattern, $message, $params);
+                    array_shift($params);
+                    break;
+                case self::CODE_CHILD_FOREIGN_KEY_CONSTRAINT_FAILS:
+                    $pattern = "@Cannot add or update a child row: a foreign key constraint fails \((.*)\)$@";
+                    /*
+                    $pattern = '@Cannot add or update a child row: ' .
+                        'a foreign key constraint fails \((.*), CONSTRAINT ' .
+                        '[`"]?(.*?)[`"]? FOREIGN KEY \([`"](.*)[`"]\) REFERENCES '
+                        .'[`"]?(.*?)[`"]? \([`"]?(.*?)[`"]?\)(?: (.*))?\)$@';
+                     */
+                    $message = $this->getMessage();
+                    preg_match($pattern, $message, $params);
+                    array_shift($params);
                     break;
                 default:
-                    $props = array();
+                    $params = array();
                     break;
             }
-            $this->properties = $props;
+            $this->params = $params;
         }
-        return $this->properties;
+        $ret = $this->params;
+        if (isset($index)) {
+            $ret = $ret[$index];
+        }
+        return $ret;
     }
 
     /**
