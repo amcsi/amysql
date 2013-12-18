@@ -130,7 +130,7 @@ class AMysql_Expr
                     foreach ($args[2] as &$val) {
                         $val = $this->amysql->escape($val);
                     }
-                    $prepared = AMysql_Abstract::escapeIdentifier($args[1]) . ' IN 
+                    $prepared = $this->escapeColumn($args[1]) . ' IN 
                         (' . join(', ', $args[2]) . ') ';
                 } else {
                     // If the array is empty, don't break the WHERE syntax
@@ -172,6 +172,22 @@ class AMysql_Expr
                 break;
         }
         return $prepared;
+    }
+
+    public function escapeTable($table)
+    {
+        if ($this->amysql instanceof AMysql_Abstract) {
+            return $this->amysql->escapeTable($table);
+        }
+        return AMysql_Abstract::escapeIdentifier($table);
+    }
+
+    public function escapeColumn($column)
+    {
+        if ($this->amysql instanceof AMysql_Abstract) {
+            return $this->amysql->escapeColumn($column);
+        }
+        return AMysql_Abstract::escapeIdentifier($column);
     }
 
     public function toString()
