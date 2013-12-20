@@ -527,7 +527,7 @@ class AbstractTest extends AMysql_TestCase
 	);
         $this->_amysql->profileQueries = true;
 	$this->_amysql->insert($this->tableName, $data);
-        $this->assertInternalType('float', $this->_amysql->totalTime);
+        $this->assertTrue(is_float($this->_amysql->totalTime));
 	$this->assertGreaterThan(0.0, $this->_amysql->totalTime);
     }
 
@@ -545,11 +545,11 @@ class AbstractTest extends AMysql_TestCase
 
 	$this->_amysql->insert($this->tableName, $data);
         $totalTimeSoFar = $this->_amysql->totalTime;
-        $this->assertInternalType('float', $this->_amysql->totalTime);
+        $this->assertTrue(is_float($this->_amysql->totalTime));
         $this->assertGreaterThan(0.0, $this->_amysql->totalTime);
 
 	$this->_amysql->insert($this->tableName, $data);
-        $this->assertInternalType('float', $this->_amysql->totalTime);
+        $this->assertTrue(is_float($this->_amysql->totalTime));
 	$this->assertGreaterThan($totalTimeSoFar, $this->_amysql->totalTime);
     }
 
