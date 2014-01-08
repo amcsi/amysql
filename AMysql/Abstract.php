@@ -85,16 +85,16 @@ abstract class AMysql_Abstract
      * Amount of seconds needed to pass by to automatically call mysql_ping before
      * any query. This helps prevent "2006: Server has gone away" errors that may
      * be caused by mysql queries being performed after other long, blocking requests.
-     * Change to FALSE to disable.
-     * Can be overridden in the connection details array.
+     *
+     * Can be set in the connection details array or $this->setAutoPingSeconds()
      * 
-     * @var int
-     * @access public
+     * @var int|false
+     * @access protected
      */
-    public $autoPingSeconds = 20;
+    protected $autoPingSeconds = false;
 
     /**
-     * This is set automatically by the script. No need to change this value.
+     * This is set automatically by the script. Do not change this value manually!
      * 
      * @var mixed
      * @access public
@@ -181,7 +181,7 @@ abstract class AMysql_Abstract
             require_once $dir . '/Profiler.php';
         }
 
-        $this->autoPing = is_numeric($this->autoPingSeconds);
+        $this->setAutoPingSeconds($this->autoPingSeconds);
 
         // Use mysqli by default if available and PHP is at least of version 5.3.0 (required).
         // Can be overridden by connection details.
@@ -230,9 +230,8 @@ abstract class AMysql_Abstract
         );
         $this->connDetails = array_merge($defaults, $cd);
         if (array_key_exists('autoPingSeconds', $cd)) {
-            $this->autoPingSeconds = $cd['autoPingSeconds'];
+            $this->setAutoPingSeconds($cd['autoPingSeconds']);
         }
-        $this->autoPing = is_numeric($this->autoPingSeconds);
         return $this;
     }
 
@@ -334,6 +333,13 @@ abstract class AMysql_Abstract
         $this->connDetails['newLink'] = true;
         $this->connect();
         $this->connDetails = $oldConnDetails;
+    }
+
+    public function setAutoPingSeconds($autoPingSeconds)
+    {
+        $this->autoPingSeconds = $autoPingSeconds;
+        $this->autoPing = is_numeric($this->autoPingSeconds);
+        return $this;
     }
 
     public function getFetchMode()
