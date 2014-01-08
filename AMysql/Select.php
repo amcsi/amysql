@@ -222,6 +222,10 @@ class AMysql_Select extends AMysql_Statement
     /**
      * Adds a WHERE fragment. All fragments are joined by an AND
      * at the end. 
+     * When binding a WHERE part that is an AMysql_Expr, you shouldn't
+     * pass it to this method. You should instead pass a new bind string
+     * (e.g. :wherePart) and then make a bind to the expression using
+     * "wherePart" as the key.
      * 
      * @param string $where     Unbound WHERE fragment
      * @access public
@@ -231,6 +235,20 @@ class AMysql_Select extends AMysql_Statement
     {
         $this->wheres[] = $where;
         return $this;
+    }
+
+    /**
+     * Syntactic sugar for $this->where($where)->bindValue($key, $val);
+     * 
+     * @param string $where     Unbound WHERE fragment
+     * @param mixed $key        @see AMysql_Statement
+     * @param mixed $val        @see AMysql_Statement
+     * @access public
+     * @return $this
+     */
+    public function whereBind($where, $key, $val)
+    {
+        return $this->where($where)->bindValue($key, $val);
     }
 
     /**

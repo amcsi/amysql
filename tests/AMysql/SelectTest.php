@@ -75,8 +75,7 @@ class SelectTest extends AMysql_TestCase {
         $select
             ->column('*')
             ->from($this->tableName)
-            ->where('string = :string')
-            ->bindValue('string', 'blah');
+            ->whereBind('string = :string', 'string', 'blah');
         $select->execute();
         $rows = $select->fetchAllAssoc();
         $expected = array (
