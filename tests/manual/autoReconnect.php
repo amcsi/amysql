@@ -1,6 +1,6 @@
 <?php
 /**
- * Test the 2006 "server has gone away" error here using autoPing
+ * Test the 2006 "server has gone away" error here using autoReconnect
  **/
 
 include dirname(__FILE__) . '/../TestHelper.php';
@@ -13,7 +13,7 @@ $connDetails = array(
     'password' => AMYSQL_TEST_PASS,
     'db' => AMYSQL_TEST_DB,
     'driver' => SQL_DRIVER,
-    'autoPingSeconds' => 9,
+    'autoReconnect' => true,
 );
 $amysql->setConnDetails($connDetails);
 $amysql->connect();
