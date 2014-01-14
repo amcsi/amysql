@@ -102,6 +102,18 @@ abstract class AMysql_Abstract
     public $autoPing;
 
     /**
+     * If a "2006: Server has gone away" error would occur, attempt to reconnect
+     * once, resending the same query before giving up.
+     *
+     * Can be set in the config with the "autoReconnect" key, or by using the
+     * $this->setAutoReconnect() method.
+     * 
+     * @var false
+     * @access protected
+     */
+    protected $autoReconnect = false;
+
+    /**
      * Last time a query has been executed or a mysql connection has been made.
      * No need to modify externally.
      * 
@@ -215,6 +227,7 @@ abstract class AMysql_Abstract
      *                                  driver - force 'mysql' or 'mysqli'
      *                                  socket - socket
      *                                  autoPingSeconds - @see $this->autoPingSeconds
+     *                                  autoReconnect - @see $this->autoReconnect
      *
      *
      * @access public
@@ -231,6 +244,9 @@ abstract class AMysql_Abstract
         $this->connDetails = array_merge($defaults, $cd);
         if (array_key_exists('autoPingSeconds', $cd)) {
             $this->setAutoPingSeconds($cd['autoPingSeconds']);
+        }
+        if (array_key_exists('autoReconnect', $cd)) {
+            $this->setAutoReconnect($cd['autoReconnect']);
         }
         return $this;
     }
@@ -340,6 +356,29 @@ abstract class AMysql_Abstract
         $this->autoPingSeconds = $autoPingSeconds;
         $this->autoPing = is_numeric($this->autoPingSeconds);
         return $this;
+    }
+    /**
+     * @see $this->autoReconnect 
+     * 
+     * @param boolean
+     * @access public
+     * @return $this
+     */
+    public function setAutoReconnect($autoReconnect)
+    {
+        $this->autoReconnect = $autoReconnect == true;
+        return $this;
+    }
+
+    /**
+     * getAutoReconnect 
+     * 
+     * @access public
+     * @return boolean
+     */
+    public function getAutoReconnect()
+    {
+        return $this->autoReconnect;
     }
 
     public function getFetchMode()
@@ -1267,6 +1306,29 @@ abstract class AMysql_Abstract
         $this->error = $msg;
         $this->errno = $code;
         $ex = new AMysql_Exception($msg, $code, $query);
+        if ($this->triggerErrorOnException) {
+            $ex->triggerErrorOnce();
+        }
+        if ($this->throwExceptions) {
+            throw $ex;
+        }
+        $ex->triggerErrorOnce();
+    }
+
+    /**
+     * handleException 
+     * 
+     * @param mixed $msg 
+     * @param mixed $code 
+     * @param mixed $query 
+     * @access public
+     * @throws AMysql_Exception
+     * @return void
+     */
+    public function handleException(AMysql_Exception $ex)
+    {
+        $this->error = $ex->getMessage();
+        $this->errno = $ex->getCode();
         if ($this->triggerErrorOnException) {
             $ex->triggerErrorOnce();
         }

@@ -181,7 +181,29 @@ class AMysql_Statement implements IteratorAggregate, Countable
         if ($this->amysql->autoPing) {
             $this->amysql->autoPing();
         }
-        $result = $this->_query($sql);
+        try {
+            $result = $this->_query($sql);
+        } catch (AMysql_Exception $e) {
+            /**
+             * If the error is "2006 mysql server has gone away" and
+             * autoReconnect is set, try to reconnect and execute the
+             * query again before giving up.
+             */
+            if (AMysql_Exception::CODE_SERVER_GONE_AWAY == $e->getCode()) {
+                $this->link = null; // clear the db link cache.
+
+                if ($this->amysql->getAutoReconnect()) {
+                    try {
+                        $this->amysql->pingReconnect();
+                        $result = $this->_query($sql);
+                        return $this;
+                    } catch (AMysql_Exception $e2) {
+                        // failed to reconnect
+                    }
+                }
+            }
+            $this->handleException($e);
+        }
         return $this;
     }
 
@@ -323,14 +345,8 @@ class AMysql_Statement implements IteratorAggregate, Countable
      */
     protected function _query($sql)
     {
-        if ($this->_executed) {
-            throw new LogicException(
-                "This statement has already been executed.\nQuery: $sql"
-            );
-        }
         $link = $this->getLink();
         $isMysqli = $this->isMysqli();
-        $this->_executed = true;
         $this->query = $sql;
         $success = false;
         if ($isMysqli) {
@@ -384,10 +400,16 @@ class AMysql_Statement implements IteratorAggregate, Countable
             $this->amysql->affectedRows = $this->affectedRows;
             $this->amysql->insertId = $this->insertId;
         } else {
-            $this->error = $isMysqli ? $link->error : mysql_error($link);
-            $this->errno = $isMysqli ? $link->errno : mysql_errno($link);
-            $this->handleError($this->error, $this->errno, $this->query);
+            $error = $isMysqli ? $link->error : mysql_error($link);
+            $errno = $isMysqli ? $link->errno : mysql_errno($link);
+            throw new AMysql_Exception($error, $errno, $this->query);
         }
+        if ($this->_executed) {
+            throw new LogicException(
+                "This statement has already been executed.\nQuery: $sql"
+            );
+        }
+        $this->_executed = true;
         return $this;
     }
 
@@ -1173,6 +1195,21 @@ class AMysql_Statement implements IteratorAggregate, Countable
      */
     protected function handleError($msg, $code, $query)
     {
+        $this->error = $msg;
+        $this->errno = $code;
         return $this->amysql->handleError($msg, $code, $query);
+    }
+
+    /**
+     * handleException
+     * 
+     * @param AMysql_Exception 
+     * @access protected
+     * @throws AMysql_Exception
+     * @return void
+     */
+    protected function handleException(AMysql_Exception $ex)
+    {
+        return $this->amysql->handleException($ex);
     }
 }
