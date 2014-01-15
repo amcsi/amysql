@@ -54,6 +54,12 @@ class AbstractTest extends AMysql_TestCase
     }
 
     public function testForceMysql() {
+        if (!function_exists('mysql_connect')) {
+            $this->markTestIncomplete("mysql_* isn't available on this PHP build.");
+        }
+        if ($mysqlDeprecated = (version_compare(PHP_VERSION, '5.5.0') >= 0)) {
+            error_reporting(error_reporting() & ~E_DEPRECATED);
+        }
         $this->tearDown();
         $this->_amysql = new AMysql;
         $this->_amysql->setConnDetails(array (
@@ -67,6 +73,9 @@ class AbstractTest extends AMysql_TestCase
         $this->createTable();
         $this->assertEquals('resource', gettype($this->_amysql->link));
         AMysql_Abstract::$useMysqli = true;
+        if ($mysqlDeprecated) {
+            error_reporting(error_reporting() | E_DEPRECATED);
+        }
     }
 
     public function testInsertSingleRow() {

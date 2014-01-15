@@ -12,6 +12,12 @@ class AMysql_TestCase extends PHPUnit_Framework_TestCase
             $this->_amysql->selectDb(AMYSQL_TEST_DB);
         }
         else if ('mysql' == SQL_DRIVER) {
+            if (
+                version_compare(PHP_VERSION, '5.5.0') >= 0 &&
+                function_exists('mysql_connect')
+            ) {
+                error_reporting(error_reporting() & ~E_DEPRECATED);
+            }
             $conn = mysql_connect(AMYSQL_TEST_HOST, AMYSQL_TEST_USER,
                 AMYSQL_TEST_PASS);
             $this->_amysql = new AMysql($conn);
