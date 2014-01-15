@@ -93,6 +93,10 @@ abstract class AMysql_Abstract
      * Amount of seconds needed to pass by to automatically call mysql_ping before
      * any query. This helps prevent "2006: Server has gone away" errors that may
      * be caused by mysql queries being performed after other long, blocking requests.
+     * 
+     * Mysql pinging isn't guaranteed to automatically reconnect if the connection
+     * actually gets lost, so it is recommended to set the connection details with
+     * setConnDetails even if you are using a preexisting mysql(i) resource.
      *
      * Can be set in the connection details array or $this->setAutoPingSeconds()
      * 
@@ -112,6 +116,10 @@ abstract class AMysql_Abstract
     /**
      * If a "2006: Server has gone away" error would occur, attempt to reconnect
      * once, resending the same query before giving up.
+     * 
+     * Mysql pinging isn't guaranteed to automatically reconnect if the connection
+     * actually gets lost, so it is recommended to set the connection details with
+     * setConnDetails even if you are using a preexisting mysql(i) resource.
      *
      * Can be set in the config with the "autoReconnect" key, or by using the
      * $this->setAutoReconnect() method.
@@ -321,17 +329,31 @@ abstract class AMysql_Abstract
         }
         $this->isMysqli = $isMysqli;
         $newLink = !empty($cd['newLink']);
-        if ($isMysqli) {
-            $port = isset($cd['port']) ? $cd['port'] : ini_get('mysqli.default_port');
-            $res = mysqli_connect($cd['host'], $cd['username'], $cd['password'], $cd['db'], $port, $cd['socket']);
-        } else {
-            $host = isset($cd['port']) ? "$cd[host]:$cd[port]" : $cd['host'];
-            $res = mysql_connect($host, $cd['username'], $cd['password'], $newLink, $cd['clientFlags']);
+        $res = null;
+        if (isset($cd['host'], $cd['username'], $cd['password'])) {
+            if ($isMysqli) {
+                $port = isset($cd['port']) ? $cd['port'] : ini_get('mysqli.default_port');
+                $res = mysqli_connect(
+                    $cd['host'],
+                    $cd['username'],
+                    $cd['password'],
+                    $cd['db'],
+                    $port,
+                    $cd['socket']
+                );
+            } else {
+                $host = isset($cd['port']) ? "$cd[host]:$cd[port]" : $cd['host'];
+                $res = mysql_connect(
+                    $host,
+                    $cd['username'],
+                    $cd['password'],
+                    $newLink,
+                    $cd['clientFlags']
+                );
+            }
         }
         if ($res) {
-            if ($this->autoPing) {
-                $this->lastPingTime = time(); // otherwise can cause infinite recursion.
-            }
+            $this->lastPingTime = time(); // otherwise can cause infinite recursion.
             $this->link = $res;
 
             if (!$isMysqli && !empty($cd['db'])) {
@@ -352,6 +374,18 @@ abstract class AMysql_Abstract
                 );
             }
         }
+        return $this;
+    }
+
+    public function close()
+    {
+        if ($this->link instanceof Mysqli) {
+            $this->link->close();
+        }
+        else if (is_resource($this->link)) {
+            mysql_close($this->link);
+        }
+        $this->link = null;
         return $this;
     }
 
@@ -435,6 +469,7 @@ abstract class AMysql_Abstract
      */
     public function selectDb($db)
     {
+        $this->connDetails['db'] = $db; // for reconnecting later
         $isMysqli = $this->isMysqli;
         if ($this->autoPing) {
             $this->autoPing();

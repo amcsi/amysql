@@ -349,9 +349,31 @@ class AMysql_Statement implements IteratorAggregate, Countable
         $isMysqli = $this->isMysqli();
         $this->query = $sql;
         $success = false;
+        $stmt = null;
         if ($isMysqli) {
             if ($this->profileQueries) {
                 $startTime = microtime(true);
+
+                /*
+                set_error_handler(array($this, 'errorHandlerCallback'));
+                try {
+                    $stmt = $link->prepare($sql);
+                    if ($stmt) {
+                        $success = $stmt->execute();
+                    }
+                    $duration = microtime(true) - $startTime;
+                    $this->queryTime = $duration;
+                    restore_error_handler();
+                } catch (Exception $e) {
+                    restore_error_handler();
+                    if ($e instanceof ErrorException) {
+                        $this->reportErrorException($e);
+                    } else {
+                        throw $e;
+                    }
+                }
+                 */
+
                 $stmt = @$link->prepare($sql);
                 if ($stmt) {
                     $success = $stmt->execute();
@@ -359,7 +381,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
                 $duration = microtime(true) - $startTime;
                 $this->queryTime = $duration;
             } else {
-                $stmt = $link->prepare($sql);
+                $stmt = @$link->prepare($sql);
                 if ($stmt) {
                     $success = $stmt->execute();
                 }
@@ -367,11 +389,13 @@ class AMysql_Statement implements IteratorAggregate, Countable
         } else {
             if ($this->profileQueries) {
                 $startTime = microtime(true);
-                $result = mysql_query($sql, $link);
+
+                $result = @mysql_query($sql, $link);
+
                 $duration = microtime(true) - $startTime;
                 $this->queryTime = $duration;
             } else {
-                $result = mysql_query($sql, $link);
+                $result = @mysql_query($sql, $link);
             }
         }
         if ($isMysqli) {
@@ -1181,6 +1205,20 @@ class AMysql_Statement implements IteratorAggregate, Countable
         }
         $count = $this->numRows();
         return $count;
+    }
+
+    public function reportErrorException(ErrorException $ex)
+    {
+    }
+
+    public function errorHandlerCallback(
+        $errno,
+        $errstr,
+        $errfile = null,
+        $errline = null,
+        $errcontext = null
+    ) {
+        throw new ErrorException($errstr, $errno, 1, $errfile, $errline);
     }
 
     /**

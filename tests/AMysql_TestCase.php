@@ -20,7 +20,14 @@ class AMysql_TestCase extends PHPUnit_Framework_TestCase
             }
             $conn = mysql_connect(AMYSQL_TEST_HOST, AMYSQL_TEST_USER,
                 AMYSQL_TEST_PASS);
+            // for reconnecting
             $this->_amysql = new AMysql($conn);
+            $this->_amysql->setConnDetails(array(
+                'host' => AMYSQL_TEST_HOST,
+                'username' => AMYSQL_TEST_USER,
+                'password' => AMYSQL_TEST_PASS,
+                'driver' => 'mysql',
+            ));
             $this->_amysql->selectDb(AMYSQL_TEST_DB);
         }
 
@@ -28,6 +35,7 @@ class AMysql_TestCase extends PHPUnit_Framework_TestCase
     }
 
     public function createTable() {
+        $this->_amysql->query("DROP TABLE IF EXISTS `$this->tableName`");
         $sql = <<<EOT
 CREATE TABLE IF NOT EXISTS `$this->tableName` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -40,7 +48,7 @@ EOT;
 
     public function tearDown()
     {
-        $this->_amysql->query("DROP TABLE `$this->tableName`");
+        $this->_amysql->close();
         $this->_amysql = null;
     }
 }

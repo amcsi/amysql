@@ -610,6 +610,49 @@ class AbstractTest extends AMysql_TestCase
         $this->assertEquals($string, $row['string']);
     }
 
+    public function testAutoPing()
+    {
+        $amysql = $this->_amysql;
+
+        $amysql->setAutoPingSeconds(1);
+        $amysql->query('SET wait_timeout=1');
+        sleep(2);
+
+        $amysql->setNames('utf8');
+        $this->assertTrue(true);
+    }
+
+    public function testNoAutoPing()
+    {
+        try {
+            $amysql = $this->_amysql;
+
+            $amysql->query('SET wait_timeout=1');
+            sleep(2);
+
+            $amysql->setNames('utf8');
+            $amysql->query('SET wait_timeout=30');
+            $this->fail();
+        } catch (AMysql_Exception $e) {
+            $this->assertEquals(
+                AMysql_Exception::CODE_SERVER_GONE_AWAY,
+                $e->getCode()
+            );
+        }
+    }
+
+    public function testAutoReconnect()
+    {
+        $amysql = $this->_amysql;
+        $amysql->setAutoReconnect(true);
+
+        $amysql->query('SET wait_timeout=1');
+        sleep(2);
+
+        $amysql->setNames('utf8');
+        $this->assertTrue(true);
+    }
+
     /**
      * 
      **/
