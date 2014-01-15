@@ -28,11 +28,19 @@ if (file_exists($filename = dirname(__FILE__) . '/config/conf.php')) {
     include $filename;
 }
 
+$sqlDriver = $conf['amysqlTestDriver'];
+if (!$sqlDriver) {
+    $sqlDriver = getenv('AMYSQL_DRIVER');
+}
+if (!$sqlDriver) {
+    $sqlDriver = 'mysqli';
+}
+
 define('AMYSQL_TEST_HOST', $conf['amysqlTestHost']);
 define('AMYSQL_TEST_USER', $conf['amysqlTestUser']);
 define('AMYSQL_TEST_PASS', $conf['amysqlTestPass']);
 define('AMYSQL_TEST_DB', $conf['amysqlTestDb']);
-define('SQL_DRIVER', $conf['amysqlTestDriver']);
+define('SQL_DRIVER', $sqlDriver);
 
 if (class_exists('PHPUnit_Framework_TestCase')) {
     require_once dirname(__FILE__) . '/AMysql_TestCase.php';

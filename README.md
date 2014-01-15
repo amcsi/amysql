@@ -1,3 +1,10 @@
+AMysql
+======
+[![Build Status](https://travis-ci.org/amcsi/amysql.png?branch=next)](https://travis-ci.org/amcsi/amysql)
+
+A MySQL wrapper guaranteed to work on any PHP 5.1+ configuration with the mysqli extension or `mysql_*` functions available.
+Also contains many tools to help build queries, manage them, profile them.
+
 Requirements
 =
 

@@ -23,6 +23,14 @@ abstract class AMysql_Abstract
     public $result; // last mysql result
     public $query; // last used query string
     public $affectedRows; // last affected rows count
+    /**
+     * What value to reset autocommit to after a rollback or commit when
+     * using Mysqli.
+     * 
+     * @var boolean
+     * @access public
+     */
+    public $defaultAutoCommit = true;
 
     /**
      * Contains the number of total affected rows by the last multiple statement deploying
@@ -226,6 +234,7 @@ abstract class AMysql_Abstract
      *                                  port - port
      *                                  driver - force 'mysql' or 'mysqli'
      *                                  socket - socket
+     *                                  defaultAutoCommit - @see $this->autoReconnect
      *                                  autoPingSeconds - @see $this->autoPingSeconds
      *                                  autoReconnect - @see $this->autoReconnect
      *
@@ -247,6 +256,9 @@ abstract class AMysql_Abstract
         }
         if (array_key_exists('autoReconnect', $cd)) {
             $this->setAutoReconnect($cd['autoReconnect']);
+        }
+        if (array_key_exists('defaultAutoCommit', $cd)) {
+            $this->setDefaultAutoCommit($cd['defaultAutoCommit']);
         }
         return $this;
     }
@@ -343,6 +355,21 @@ abstract class AMysql_Abstract
         return $this;
     }
 
+    /**
+     * Returns the DB connection link. Connects to the DB if not connected.
+     * Does not check if the connection has since been broken.
+     * 
+     * @access public
+     * @return mixed            Connection resource or object
+     */
+    public function autoConnect()
+    {
+        if (!$this->link) {
+            $this->connect();
+        }
+        return $this->link;
+    }
+
     public function forceReconnect()
     {
         $oldConnDetails = (array) $this->connDetails;
@@ -357,6 +384,7 @@ abstract class AMysql_Abstract
         $this->autoPing = is_numeric($this->autoPingSeconds);
         return $this;
     }
+
     /**
      * @see $this->autoReconnect 
      * 
@@ -379,6 +407,19 @@ abstract class AMysql_Abstract
     public function getAutoReconnect()
     {
         return $this->autoReconnect;
+    }
+
+    /**
+     * @see $this->defaultAutoCommit 
+     * 
+     * @param boolean
+     * @access public
+     * @return $this
+     */
+    public function setDefaultAutoCommit($defaultAutoCommit)
+    {
+        $this->defaultAutoCommit = $defaultAutoCommit == true;
+        return $this;
     }
 
     public function getFetchMode()
@@ -607,7 +648,13 @@ abstract class AMysql_Abstract
      **/
     public function startTransaction()
     {
-        $ret = $this->query('START TRANSACTION');
+        $link = $this->autoConnect();
+        if ($link instanceof Mysqli) {
+            $link->autocommit(false);
+            $ret = true;
+        } else {
+            $ret = $this->query('START TRANSACTION');
+        }
         $this->inTransaction = true;
         return $ret;
     }
@@ -619,7 +666,12 @@ abstract class AMysql_Abstract
      **/
     public function commit()
     {
+        $link = $this->autoConnect();
         $ret = $this->query('COMMIT');
+        if ($link instanceof Mysqli) {
+            $link->autocommit($this->defaultAutoCommit);
+        }
+
         $this->inTransaction = false;
         return $ret;
     }
@@ -631,7 +683,12 @@ abstract class AMysql_Abstract
      **/
     public function rollback()
     {
+        $link = $this->autoConnect();
         $ret = $this->query('ROLLBACK');
+        if ($link instanceof Mysqli) {
+            $link->autocommit($this->defaultAutoCommit);
+        }
+
         $this->inTransaction = false;
         return $ret;
     }
