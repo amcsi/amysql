@@ -38,7 +38,7 @@ class ExceptionTest extends AMysql_TestCase
                 AMysql_Exception::CODE_CHILD_FOREIGN_KEY_CONSTRAINT_FAILS,
                 $e->getCode()
             );
-            $expected = '`amysql`.`child`, CONSTRAINT `bla` FOREIGN KEY (`parent_id`) REFERENCES `parent` (`id`)';
+            $expected = '`' . AMYSQL_TEST_DB . '`.`child`, CONSTRAINT `bla` FOREIGN KEY (`parent_id`) REFERENCES `parent` (`id`)';
             $this->assertEquals($expected, $e->getParams(0));
         }
         $this->tearDownConstraintTables();
@@ -64,7 +64,7 @@ class ExceptionTest extends AMysql_TestCase
                 AMysql_Exception::CODE_PARENT_FOREIGN_KEY_CONSTRAINT_FAILS,
                 $e->getCode()
             );
-            $expected = '`amysql`.`child`, CONSTRAINT `bla` FOREIGN KEY (`parent_id`) REFERENCES `parent` (`id`)';
+            $expected = '`' . AMYSQL_TEST_DB . '`.`child`, CONSTRAINT `bla` FOREIGN KEY (`parent_id`) REFERENCES `parent` (`id`)';
             $this->assertEquals($expected, $e->getParams(0));
         }
         $this->tearDownConstraintTables();
