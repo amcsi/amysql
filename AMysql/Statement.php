@@ -64,6 +64,8 @@ class AMysql_Statement implements IteratorAggregate, Countable
      */
     public $queryTime;
 
+    const CODE_QUERY_NOT_SUCCESSFUL = 120000;
+
     public function __construct(AMysql_Abstract $amysql)
     {
         $amysql->lastStatement = $this;
@@ -350,90 +352,94 @@ class AMysql_Statement implements IteratorAggregate, Countable
         $this->query = $sql;
         $success = false;
         $stmt = null;
-        if ($isMysqli) {
-            if ($this->profileQueries) {
-                $startTime = microtime(true);
+        try {
+            set_error_handler(array($this, 'errorHandlerCallback'), E_WARNING);
+            if ($this->_executed) {
+                throw new LogicException(
+                    "This statement has already been executed.\nQuery: $sql"
+                );
+            }
+            if ($isMysqli) {
+                if ($this->profileQueries) {
+                    $startTime = microtime(true);
 
-                /*
-                set_error_handler(array($this, 'errorHandlerCallback'));
-                try {
                     $stmt = $link->prepare($sql);
                     if ($stmt) {
                         $success = $stmt->execute();
                     }
+
                     $duration = microtime(true) - $startTime;
                     $this->queryTime = $duration;
-                    restore_error_handler();
-                } catch (Exception $e) {
-                    restore_error_handler();
-                    if ($e instanceof ErrorException) {
-                        $this->reportErrorException($e);
-                    } else {
-                        throw $e;
+                } else {
+                    $stmt = $link->prepare($sql);
+                    if ($stmt) {
+                        $success = $stmt->execute();
                     }
                 }
-                 */
-
-                $stmt = @$link->prepare($sql);
-                if ($stmt) {
-                    $success = $stmt->execute();
-                }
-                $duration = microtime(true) - $startTime;
-                $this->queryTime = $duration;
             } else {
-                $stmt = @$link->prepare($sql);
-                if ($stmt) {
-                    $success = $stmt->execute();
+                if ($this->profileQueries) {
+                    $startTime = microtime(true);
+
+                    $result = mysql_query($sql, $link);
+
+                    $duration = microtime(true) - $startTime;
+                    $this->queryTime = $duration;
+                } else {
+                    $result = mysql_query($sql, $link);
                 }
             }
-        } else {
-            if ($this->profileQueries) {
-                $startTime = microtime(true);
-
-                $result = @mysql_query($sql, $link);
-
-                $duration = microtime(true) - $startTime;
-                $this->queryTime = $duration;
-            } else {
-                $result = @mysql_query($sql, $link);
-            }
-        }
-        if ($isMysqli) {
-            $result = $stmt ? $stmt->get_result() : false;
-            if (!$result && $success) {
-                /**
-                 * In mysqli, result_metadata will return a falsy value
-                 * even for successful SELECT queries, so for compatibility
-                 * let's set the result to true if it isn't an object
-                 * (is false), but the query was successful.
-                 */
-                $result = true;
-            }
-        }
-        $this->amysql->addQuery($sql, $this->queryTime);
-        if (false !== $result) {
             if ($isMysqli) {
-                $this->affectedRows = $stmt->affected_rows;
-                $this->insertId = $stmt->insert_id;
-            } else {
-                $this->affectedRows = mysql_affected_rows($link);
-                $this->insertId = mysql_insert_id($link);
+                $result = $stmt ? $stmt->get_result() : false;
+                if (!$result && $success) {
+                    /**
+                     * In mysqli, result_metadata will return a falsy value
+                     * even for successful SELECT queries, so for compatibility
+                     * let's set the result to true if it isn't an object
+                     * (is false), but the query was successful.
+                     */
+                    $result = true;
+                }
             }
-            $this->result = $result;
-            $this->results[] = $result;
-            $this->amysql->affectedRows = $this->affectedRows;
-            $this->amysql->insertId = $this->insertId;
-        } else {
+            $this->amysql->addQuery($sql, $this->queryTime);
+            if (false !== $result) {
+                if ($isMysqli) {
+                    $this->affectedRows = $stmt->affected_rows;
+                    $this->insertId = $stmt->insert_id;
+                } else {
+                    $this->affectedRows = mysql_affected_rows($link);
+                    $this->insertId = mysql_insert_id($link);
+                }
+                $this->result = $result;
+                $this->results[] = $result;
+                $this->amysql->affectedRows = $this->affectedRows;
+                $this->amysql->insertId = $this->insertId;
+                $this->_executed = true;
+            } else {
+                throw new RuntimeException(
+                    "Query was not successful.",
+                    self::CODE_QUERY_NOT_SUCCESSFUL
+                );
+            }
+            restore_error_handler();
+        } catch (Exception $e) {
+            restore_error_handler();
+            if ($e instanceof ErrorException) {
+                $this->reportErrorException($e);
+            } elseif ($e instanceof RuntimeException) {
+                if (self::CODE_QUERY_NOT_SUCCESSFUL == $e->getCode()) {
+                    // continue on reporting the error
+                } else {
+                    // unexpected RuntimeException should be thrown.
+                    throw $e;
+                }
+            } else {
+                // throw the unexpected exception
+                throw $e;
+            }
             $error = $isMysqli ? $link->error : mysql_error($link);
             $errno = $isMysqli ? $link->errno : mysql_errno($link);
-            throw new AMysql_Exception($error, $errno, $this->query);
+            throw new AMysql_Exception($error, $errno, $this->query, $e);
         }
-        if ($this->_executed) {
-            throw new LogicException(
-                "This statement has already been executed.\nQuery: $sql"
-            );
-        }
-        $this->_executed = true;
         return $this;
     }
 
@@ -1207,10 +1213,24 @@ class AMysql_Statement implements IteratorAggregate, Countable
         return $count;
     }
 
+    /**
+     * Handle an ErrorException thrown with the help of
+     * $this->errorHandlerCallback. For now, just suppress the
+     * error.
+     * 
+     * @param ErrorException $ex 
+     * @access public
+     * @return void
+     */
     public function reportErrorException(ErrorException $ex)
     {
     }
 
+    /**
+     * Changes warnings into exceptions. 
+     *
+     * Mainly for handling warnings generated by mysql functions/methods.
+     */
     public function errorHandlerCallback(
         $errno,
         $errstr,
