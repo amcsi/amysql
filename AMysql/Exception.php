@@ -94,6 +94,12 @@ class AMysql_Exception extends RuntimeException
                     array_shift($params);
                     break;
                 case self::CODE_PARENT_FOREIGN_KEY_CONSTRAINT_FAILS:
+                    /**
+                     * @todo Grab more specific parameters here.
+                     * Would anyone help me find a guaranteed-to-work regex solution?
+                     * I couldn't find any reliable documentation on the exact format
+                     * of this among the MySQL docs.
+                     **/
                     $pattern = "@Cannot delete or update a parent row: a foreign key constraint fails \((.*)\)$@";
                     $message = $this->getMessage();
                     preg_match($pattern, $message, $params);

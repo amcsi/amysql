@@ -222,10 +222,15 @@ class AMysql_Select extends AMysql_Statement
     /**
      * Adds a WHERE fragment. All fragments are joined by an AND
      * at the end. 
-     * When binding a WHERE part that is an AMysql_Expr, you shouldn't
+     * WARNING: When binding a WHERE part that is an AMysql_Expr, you shouldn't
      * pass it to this method. You should instead pass a new bind string
      * (e.g. :wherePart) and then make a bind to the expression using
-     * "wherePart" as the key.
+     * "wherePart" as the key. If you ignore this and the expression contains 
+     * any bind-related substrings, unexpected results will happen when 
+     * placeholders are bound.
+     * Note that this object cannot automatically place
+     * it in for you as a bind due to not knowing whether named or unnamed 
+     * binds are being used.
      * 
      * @param string $where     Unbound WHERE fragment
      * @access public
