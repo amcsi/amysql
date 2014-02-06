@@ -512,19 +512,6 @@ class AbstractTest extends AMysql_TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testNoProfiling () {
-	$data = array (
-	    array (
-		'string' => 3
-	    ),
-	    array (
-		'string' => 'blah',
-	    )
-	);
-	$this->_amysql->insert($this->tableName, $data);
-	$this->assertSame(0.0, $this->_amysql->totalTime);
-    }
-
     public function testProfiling () {
 	$data = array (
 	    array (

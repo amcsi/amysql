@@ -22,14 +22,31 @@ class AMysql_Profiler implements ArrayAccess
 {
     protected $amysql;
 
+    /**
+     * The total time all the queries have taken so far.
+     *
+     * @var float
+     * @access protected
+     */
+    protected $totalTime = 0.0;
+    protected $queries = array();
+    protected $queriesData = array();
+
     public function __construct(AMysql_Abstract $amysql)
     {
         $this->amysql = $amysql;
     }
 
+    /**
+     * @deprecated Profiling is always enabled and cannot be turned off.
+     * 
+     * @param mixed $enabled 
+     * @access public
+     * @return $this
+     */
     public function setEnabled($enabled)
     {
-        $this->amysql->profileQueries = !!$enabled;
+        return $this;
     }
 
     /**
@@ -79,14 +96,74 @@ class AMysql_Profiler implements ArrayAccess
         );
     }
 
+    /**
+     * Adds a query and a profile for it to the list of queries.
+     * Used by AMysql_Statement. Do not call externally!
+     * 
+     * @param string $query         The SQL query.
+     * @param float $queryTime      The time the query took.
+     * @access public
+     * @return $this
+     */
+    public function addQuery($query, $queryTime)
+    {
+        $this->queries[] = $query;
+        $data = array (
+            'query' => $query,
+            'time' => $queryTime,
+            'backtrace' => array(),
+        );
+        if ($this->amysql->includeBacktrace) {
+            $opts = 0;
+            if (defined('DEBUG_BACKTRACE_IGNORE_ARGS')) {
+                $opts |= DEBUG_BACKTRACE_IGNORE_ARGS;
+            }
+            $data['backtrace'] = debug_backtrace($opts);
+        }
+        $this->queriesData[] = $data;
+        if (is_numeric($queryTime)) {
+            $this->totalTime += $queryTime;
+        }
+        return $this;
+    }
+
+    /**
+     * Returns an arrays of profiled query data. Each value is an array that consists
+     * of:
+     *  - query - The SQL query performed
+     *  - time - The amount of seconds the query took (float)
+     *
+     * If profileQueries wss off at any query, its time value will be null.
+     * 
+     * @return array[]
+     */
+    public function getQueriesData()
+    {
+        return $this->queriesData;
+    }
+
+    /**
+     * Resets the data in the profiler. Not recommended.
+     * Use AMysql_Abstract::useNewProfiler() instead if possible.
+     * 
+     * @access public
+     * @return void
+     */
+    public function reset()
+    {
+        $this->totalTime = 0.0;
+        $this->queriesData = array();
+        return $this;
+    }
+
     public function offsetGet($key)
     {
         switch ($key) {
             case 'totalTime':
-                return $this->amysql->totalTime;
+                return $this->totalTime;
                 break;
             case 'queriesData':
-                return $this->amysql->getQueriesData();
+                return $this->getQueriesData();
                 break;
             case 'asHtml':
                 return $this->getAsHtml();

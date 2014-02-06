@@ -50,21 +50,6 @@ abstract class AMysql_Abstract
     public $throwExceptions = true;
 
     /**
-     * The total time all the queries have taken so far.
-     * $this->profileQueries must be enabled before any queries
-     * are performed to keep track of query durations.
-     * Please do not overwrite this value yourself. The reason
-     * it is kept public is so that AMysql_Statement objects can
-     * write to it. 
-     *
-     * @var float
-     * @access public
-     */
-    public $totalTime = 0.0;
-    protected $_queries = array ();
-    protected $_queriesData = array ();
-
-    /**
      * Whether AMysql_Exceptions should trigger errors by default on construction.
      * This is for legacy behavior (before v1.1.0). It is recommended to keep
      * is at FALSE.
@@ -73,13 +58,6 @@ abstract class AMysql_Abstract
      * @access public
      */
     public $triggerErrorOnException = false;
-
-    /**
-     * Whether the time all the queries take should be recorded.
-     *
-     * @var boolean
-     */
-    public $profileQueries = false;
 
     /**
      * Whether backtraces should be added to each array for getQueriesData(). If true,
@@ -1266,23 +1244,7 @@ abstract class AMysql_Abstract
      */
     public function addQuery($query, $queryTime)
     {
-        $this->_queries[] = $query;
-        $data = array (
-            'query' => $query,
-            'time' => $queryTime,
-            'backtrace' => array(),
-        );
-        if ($this->includeBacktrace) {
-            $opts = 0;
-            if (defined('DEBUG_BACKTRACE_IGNORE_ARGS')) {
-                $opts |= DEBUG_BACKTRACE_IGNORE_ARGS;
-            }
-            $data['backtrace'] = debug_backtrace($opts);
-        }
-        $this->_queriesData[] = $data;
-        if (is_numeric($queryTime)) {
-            $this->totalTime += $queryTime;
-        }
+        $this->getProfiler()->addQuery($query, $queryTime);
         return $this;
     }
 
@@ -1384,6 +1346,18 @@ abstract class AMysql_Abstract
     }
 
     /**
+     * Force using a new profiler.
+     * 
+     * @access public
+     * @return $this
+     */
+    public function useNewProfiler()
+    {
+        $this->profiler = new AMysql_Profiler($this);
+        return $this;
+    }
+
+    /**
      * handleError 
      * 
      * @param mixed $msg 
@@ -1428,5 +1402,15 @@ abstract class AMysql_Abstract
             throw $ex;
         }
         $ex->triggerErrorOnce();
+    }
+
+    public function __get($name)
+    {
+        switch ($name) {
+            case 'totalTime':
+                $profiler = $this->getProfiler();
+                return $profiler->totalTime;
+        }
+        trigger_error("Undefined property: `$name`");
     }
 }

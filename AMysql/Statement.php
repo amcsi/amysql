@@ -37,6 +37,8 @@ class AMysql_Statement implements IteratorAggregate, Countable
     /**
      * Whether the time all the queries take should be recorded.
      *
+     * @deprecated Queries are now always being profiled
+     *
      * @var boolean
      */
     public $profileQueries;
@@ -71,7 +73,6 @@ class AMysql_Statement implements IteratorAggregate, Countable
         $amysql->lastStatement = $this;
         $this->amysql = $amysql;
         $this->isMysqli = $amysql->isMysqli;
-        $this->profileQueries = $amysql->profileQueries;
         $this->throwExceptions = $this->amysql->throwExceptions;
         $this->setFetchMode($amysql->getFetchMode());
     }
@@ -360,33 +361,22 @@ class AMysql_Statement implements IteratorAggregate, Countable
                 );
             }
             if ($isMysqli) {
-                if ($this->profileQueries) {
-                    $startTime = microtime(true);
+                $startTime = microtime(true);
 
-                    $stmt = $link->prepare($sql);
-                    if ($stmt) {
-                        $success = $stmt->execute();
-                    }
-
-                    $duration = microtime(true) - $startTime;
-                    $this->queryTime = $duration;
-                } else {
-                    $stmt = $link->prepare($sql);
-                    if ($stmt) {
-                        $success = $stmt->execute();
-                    }
+                $stmt = $link->prepare($sql);
+                if ($stmt) {
+                    $success = $stmt->execute();
                 }
+
+                $duration = microtime(true) - $startTime;
+                $this->queryTime = $duration;
             } else {
-                if ($this->profileQueries) {
-                    $startTime = microtime(true);
+                $startTime = microtime(true);
 
-                    $result = mysql_query($sql, $link);
+                $result = mysql_query($sql, $link);
 
-                    $duration = microtime(true) - $startTime;
-                    $this->queryTime = $duration;
-                } else {
-                    $result = mysql_query($sql, $link);
-                }
+                $duration = microtime(true) - $startTime;
+                $this->queryTime = $duration;
             }
             if ($isMysqli) {
                 $result = $stmt ? $stmt->get_result() : false;

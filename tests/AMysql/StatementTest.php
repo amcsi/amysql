@@ -430,19 +430,6 @@ class StatementTest extends AMysql_TestCase {
         $this->assertEquals($expected, $result);
     }
 
-    public function testNoProfiling() {
-	$data = array (
-	    array (
-		'string' => 3
-	    ),
-	    array (
-		'string' => 'blah',
-	    )
-	);
-	$this->_amysql->insert($this->tableName, $data);
-        $this->assertNull($this->_amysql->lastStatement->queryTime);
-    }
-
     public function testProfiling() {
 	$data = array (
 	    array (
@@ -452,7 +439,7 @@ class StatementTest extends AMysql_TestCase {
 		'string' => 'blah',
 	    )
 	);
-        $this->_amysql->profileQueries = true;
+        $this->_amysql->useNewProfiler();
         $this->_amysql->insert($this->tableName, $data);
         $this->assertTrue(is_float( 
             $this->_amysql->lastStatement->queryTime
@@ -471,8 +458,8 @@ class StatementTest extends AMysql_TestCase {
 		'string' => 'blah',
 	    )
 	);
+        $this->_amysql->useNewProfiler();
         $profiler = $this->_amysql->getProfiler();
-        $profiler->setEnabled(true);
         $this->_amysql->insert($this->tableName, $data);
         $this->assertInternalType('float', 
             $this->_amysql->lastStatement->queryTime
@@ -493,8 +480,8 @@ class StatementTest extends AMysql_TestCase {
 		'string' => 'blah',
 	    )
 	);
+        $this->_amysql->useNewProfiler();
         $profiler = $this->_amysql->getProfiler();
-        $profiler->setEnabled(true);
         $this->_amysql->insert($this->tableName, $data);
         $lastQueryData = $profiler['queriesData'][count($profiler['queriesData']) - 1];
         $this->assertInternalType('array', $lastQueryData);
