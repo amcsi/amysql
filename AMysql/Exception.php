@@ -76,13 +76,6 @@ class AMysql_Exception extends RuntimeException
      *                              If $index was set, a string will be returned if found,
      *                              otherwise NULL is returned and an E_NOTICE is raised.
      */
-    /**
-     * getParams 
-     * 
-     * @param mixed $index 
-     * @access public
-     * @return void
-     */
     public function getParams($index = null)
     {
         if (!isset($this->params)) {
