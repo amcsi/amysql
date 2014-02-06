@@ -38,10 +38,14 @@ class AMysql_Exception extends RuntimeException
     const CODE_CHILD_FOREIGN_KEY_CONSTRAINT_FAILS = 1452;
     const CODE_SERVER_GONE_AWAY = 2006;
 
-    public function __construct($msg, $errno, $query)
+    public function __construct($msg, $errno, $query, $previous = null)
     {
         $this->query = $query;
-        parent::__construct($msg, $errno);
+        if (version_compare(PHP_VERSION, '5.3.0') >= 0) {
+            parent::__construct($msg, $errno, $previous);
+        } else {
+            parent::__construct($msg, $errno);
+        }
     }
 
     public function getDetails()
