@@ -490,5 +490,47 @@ class StatementTest extends AMysql_TestCase {
         $this->assertSame($profiler['totalTime'], $lastQueryData['time']);
         $this->assertSame($this->_amysql->lastStatement->query, $lastQueryData['query']);
     }
+
+    public function testProfilingMethodsInAbstract()
+    {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	    array (
+		'string' => 'blah',
+	    )
+	);
+        $this->_amysql->useNewProfiler();
+        $profiler = $this->_amysql->getProfiler();
+        $this->_amysql->insert($this->tableName, $data);
+        $queriesData = $this->_amysql->getQueriesData();
+        $lastQueryData = $queriesData[count($profiler['queriesData']) - 1];
+        $this->assertInternalType('array', $lastQueryData);
+        $keys = array('query', 'time', 'backtrace');
+        $this->assertEquals($keys, array_keys($lastQueryData));
+    }
+
+    public function testProfilingGetQueries()
+    {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	    array (
+		'string' => 'blah',
+	    )
+	);
+        $this->_amysql->useNewProfiler();
+        $profiler = $this->_amysql->getProfiler();
+        $stmt = $this->_amysql->ins($this->tableName, $data);
+        $queryString = "INSERT INTO `abstracttest` (`string`) VALUES (3), ('blah')";
+
+        $queriesInProfiler = $this->_amysql->getProfiler()->getQueries();
+        $this->assertSame($queryString, $queriesInProfiler[0]);
+
+        $queries = $this->_amysql->getQueries();
+        $this->assertSame($queryString, $queries[0]);
+    }
 }
 ?>

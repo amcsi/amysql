@@ -1312,7 +1312,7 @@ abstract class AMysql_Abstract
      */
     public function getQueries()
     {
-        return $this->_queries;
+        return $this->getProfiler()->getQueries();
     }
 
     /**
@@ -1327,7 +1327,7 @@ abstract class AMysql_Abstract
      */
     public function getQueriesData()
     {
-        return $this->_queriesData;
+        return $this->getProfiler()->getQueriesData();
     }
 
     /**

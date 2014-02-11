@@ -128,6 +128,18 @@ class AMysql_Profiler implements ArrayAccess
     }
 
     /**
+     * Gets the list of SQL queries performed so far by AMysql_Statement
+     * objects connected by this object.
+     * 
+     * @access public
+     * @return array
+     */
+    public function getQueries()
+    {
+        return $this->queries;
+    }
+
+    /**
      * Returns an arrays of profiled query data. Each value is an array that consists
      * of:
      *  - query - The SQL query performed
