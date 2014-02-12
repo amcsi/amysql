@@ -568,7 +568,7 @@ abstract class AMysql_Abstract
         $count = count($exploded);
         $identifier = $exploded[$count-1] == '*' ?
             '*' :
-            $qc . $exploded[$count-1] . $qc;
+            self::escapeIdentifierSimple($exploded[$count-1], $qc);
         if (1 < $count) {
             $identifier = "$qc$exploded[0]$qc.$identifier";
         }

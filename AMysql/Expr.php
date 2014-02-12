@@ -62,11 +62,13 @@ class AMysql_Expr
     /**
      * Escapes a table name and encloses it in quotes. The second parameter is the table name. 
      */
+    const ESCAPE_TABLE = 3;
     const EXPR_TABLE = 3;
 
     /**
      * Escapes a column name and encloses it in quotes. The second parameter is the column name. 
      */
+    const ESCAPE_COLUMN = 4;
     const EXPR_COLUMN = 4;
 
     /**
@@ -130,8 +132,8 @@ class AMysql_Expr
                     foreach ($args[2] as &$val) {
                         $val = $this->amysql->escape($val);
                     }
-                    $prepared = $this->escapeColumn($args[1]) . ' IN 
-                        (' . join(', ', $args[2]) . ') ';
+                    $prepared = ' ' . $this->escapeColumn($args[1]) . ' IN ' .
+                        '(' . join(', ', $args[2]) . ') ';
                 } else {
                     // If the array is empty, don't break the WHERE syntax
                     $prepared = 0;
@@ -145,7 +147,7 @@ class AMysql_Expr
                 $likeEscaped = AMysql_Abstract::escapeLike($args[1]);
                 $formatted = sprintf($format, $likeEscaped);
                 if ($this->amysql) {
-                    if ('mysqli' == $this->amysql->linkType) {
+                    if ('mysqli' == $this->amysql->isMysqli) {
                         $escaped = $this->amysql->link->real_escape_string(
                             $formatted
                         );
