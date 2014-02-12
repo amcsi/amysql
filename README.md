@@ -68,11 +68,11 @@ The full connection details array supports:
 * `db` The database to select
 * `port`
 * `clientFlags` mysql_* only. For the `mysql_connect()` `$client_flags` argument
-
-When making a new connection, AMysql tries to use `MySQLi` if it is available, otherwise it falls back to the `mysql_*` functions.
-
-Inserting one row of data
--
+* `driver` `mysql` or `mysqli`. Prefer a specific driver. By default when making a new connection, AMysql tries to use `MySQLi` if it is available, otherwise it falls back to the `mysql_*` functions
+* `socket` - socket
+* `defaultAutoCommit` Specify here whether autocommit is on. When using mysqli and autocommit is off on the MySQL server, this should be set to false.
+* `autoPingSeconds` Each time a query is executed, it is checked if the given amount of seconds has passed since the last query, and if so, pings the server and reconnects if the connection has been lost. It is recommended that this is set to 20 seconds and prevents the script from dying from a 2006 error. Off (NULL) by default.
+* `autoReconnect` If this is TRUE and an executed query fails with a 2006 mysql error, try to reconnect with the connection details and attempt to reexecute the query once before giving up. It is recommended that you set this to TRUE.
 
 ```php
 <?php

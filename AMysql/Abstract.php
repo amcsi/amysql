@@ -220,7 +220,7 @@ abstract class AMysql_Abstract
      *                                  port - port
      *                                  driver - force 'mysql' or 'mysqli'
      *                                  socket - socket
-     *                                  defaultAutoCommit - @see $this->autoReconnect
+     *                                  defaultAutoCommit - @see $this->defaultAutoCommit
      *                                  autoPingSeconds - @see $this->autoPingSeconds
      *                                  autoReconnect - @see $this->autoReconnect
      *

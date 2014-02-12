@@ -1,24 +1,24 @@
 Changelog
 =========
-1.1.0-beta (2014-02-06)
+1.1.0-beta2 (2014-02-12)
 --
 * Backwards incompatible: AMysql_Exceptions do not trigger errors by default.
+* HHVM and PHP 5.6 now supported
+* New Auto Ping feature to automatically ping/reconnect to mysql at given intervals when querying. Should prevent all 2006 Mysql Server Has Gone Away errors. Off by default, but turning it on is recommended.
+* New Auto Reconnect feature to attempt reconnection and reexecution of the query once if a 2006 Mysql Server Has Gone Away error occured. Off by default, but turning it on is recommmended.
 * Support for ANSI mode, resulting in quotation identifier escaping.
-* HHVM now supported
-* Microtime profiling now on by default and cannot be disabled.
 * New AMysql_Profiler class, to separate profiling, and for assignment to view.
 * AMysql_Profiler ships with an HTML template and a method to fill it up, for those too lazy to make their own. It is customizable by CSS. Retreive it with `$profiler->getAsHtml()`
-* Do not manually load dependencies if composer autoloading appears to be available
 * In `AMysql::select()`, allow for `$amysql->select($columns)` new shorthand for `$amysql->select()->column($columns)`
 * New common MySQL error codes as constants in AMysql_Exception
 * Logic for easily parsing common MySQL error messages such as "Duplicate entry"
-* Source code mostly follows PSR-2
 * There is now a conf file for changing mysql details for PHPUnit testing
-* New Auto Ping feature to automatically ping/reconnect to mysql at given intervals when querying. Should prevent all 2006 Mysql Server Has Gone Away errors. Off by default, but turning it on is recommended.
-* New Auto Reconnect feature to attempt reconnection and reexecution of the query once if a 2006 Mysql Server Has Gone Away error occured. Off by default, but turning it on is recommmended.
 * Made AMysql_Expr easier to understand, and made it extendable.
 * New AMysql short name methods (ins, upd, rep, del) which do the same as their full name counterparts, but return AMysql_Statement
 * Transactions are kept track of locally and can be checked with `$amysql->inTransaction()`
+* Microtime profiling now on by default and cannot be disabled.
+* Do not manually load dependencies if composer autoloading appears to be available
+* Source code mostly follows PSR-2
 
 1.0.3 (2013-12-17)
 --
