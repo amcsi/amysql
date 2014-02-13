@@ -5,6 +5,25 @@ AMysql
 A MySQL wrapper guaranteed to work on any PHP 5.1+ configuration with the mysqli extension or `mysql_*` functions available.
 Also contains many tools to help build queries, manage them, profile them.
 
+
+### Is AMysql for you?
+
+* Feel like Zend_Db is way too bulky, but on the other hand does not give you useful tools for common problems?
+* Afraid of using PDO or Mysqli as it might not be available on the production server?
+* Do not like the boring task of assembling INSERTs and UPDATEs?
+
+Then AMysql is the library for your project!
+
+### What AMysql tries to be/do
+
+* A library that allows you to work with mysql with any PHP configuration without requiring any extensions.
+* A practical library that provides great tools for common situations in MySQL. This includes tools not available in any MySQL API (extension level or PHP level), or the combination of tools that would otherwise only be available separately in several different APIs, but never together.
+
+### What AMysql is not
+
+* **It's not an abstraction library.** Although I might add PostgreSQL support, the main focus is on MySQL, as abstraction takes focus away from being able to make good tools specifically for a type of database. Also, it would be too much work for me alone to look into how all the other databases function.
+* **It's not an ORM.** There is support for fetching data into new instances of classes, but the focus is on ease of building queries.
+
 Requirements
 =
 
@@ -303,3 +322,9 @@ Read the commented [AMysql_Select](AMysql/Select.php) file for more details.
 A documentation on binding parameters can be found in the comments for [AMysql_Statement](AMysql/Statement.php)::execute(). Be sure to check it out.
 
 Many other useful methods are available as well. Check out the source files and read the documentation for the methods.
+
+## Contribution
+
+If anything doesn't work the way you expect it to, please report in as an issue on github.
+
+If you can provide pull requests to fixes, that would be even better. Work from the `master` or `develop` branch, whichever is the latest.
