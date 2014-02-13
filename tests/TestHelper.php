@@ -37,6 +37,7 @@ if (!$sqlDriver) {
 }
 
 define('AMYSQL_TEST_HOST', $conf['amysqlTestHost']);
+define('AMYSQL_TEST_PORT', $conf['amysqlTestPort']);
 define('AMYSQL_TEST_USER', $conf['amysqlTestUser']);
 define('AMYSQL_TEST_PASS', $conf['amysqlTestPass']);
 define('AMYSQL_TEST_DB', $conf['amysqlTestDb']);

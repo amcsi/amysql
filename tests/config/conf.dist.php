@@ -1,6 +1,7 @@
 <?php
 // Overrides go in conf.php
 $conf['amysqlTestHost'] = 'localhost';
+$conf['amysqlTestPort'] = 3306;
 $conf['amysqlTestUser'] = 'travis';
 $conf['amysqlTestPass'] = '';
 $conf['amysqlTestDb'] = 'amysql';

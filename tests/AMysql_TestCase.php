@@ -8,7 +8,10 @@ class AMysql_TestCase extends PHPUnit_Framework_TestCase
     public function setUp() {
         if ('mysqli' == SQL_DRIVER) {
             $this->_amysql = new AMysql(
-                AMYSQL_TEST_HOST, AMYSQL_TEST_USER, AMYSQL_TEST_PASS);
+                AMYSQL_TEST_HOST . ':' . AMYSQL_TEST_PORT,
+                AMYSQL_TEST_USER,
+                AMYSQL_TEST_PASS
+            );
             $this->_amysql->selectDb(AMYSQL_TEST_DB);
         }
         else if ('mysql' == SQL_DRIVER) {
@@ -24,6 +27,7 @@ class AMysql_TestCase extends PHPUnit_Framework_TestCase
             $this->_amysql = new AMysql($conn);
             $this->_amysql->setConnDetails(array(
                 'host' => AMYSQL_TEST_HOST,
+                'port' => AMYSQL_TEST_PORT,
                 'username' => AMYSQL_TEST_USER,
                 'password' => AMYSQL_TEST_PASS,
                 'driver' => 'mysql',
@@ -48,7 +52,9 @@ EOT;
 
     public function tearDown()
     {
-        $this->_amysql->close();
-        $this->_amysql = null;
+        if ($this->_amysql) {
+            $this->_amysql->close();
+            $this->_amysql = null;
+        }
     }
 }
