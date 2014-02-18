@@ -18,12 +18,12 @@ class SelectTest extends AMysql_TestCase {
             )
             ->join('left', array ('table5'), 't2alias.colx = table5.coly', array (), true)
             ->join('cross', array ('table6'), 't3alias.colx = table6.coly', array ())
-            ->groupBy('t2alias.col1')
+            ->groupByLiteral('t2alias.col1')
             ->groupBy('t2alias.col2', true, true)
             ->groupBy('t2alias.col3', true)
             ->having('1 = 1')
             ->having('2 = 2')
-            ->orderBy('t3alias.col1')
+            ->orderByLiteral('t3alias.col1')
             ->orderBy('t3alias.col2', true, true)
             ->orderBy('t3alias.col3', true)
             ->where('3 = :where3')
@@ -42,9 +42,9 @@ class SelectTest extends AMysql_TestCase {
             'JOIN `table4` AS `t4alias` ON (t4alias.t1_id = table1.id)' . "\n" .
             'CROSS JOIN `table6` ON (t3alias.colx = table6.coly)' . "\n" .
             'WHERE 3 = :where3 AND 4 = 4' . "\n" .
-            'GROUP BY `t2alias`.`col2` DESC, `t2alias`.`col1`, `t2alias`.`col3` DESC' . "\n" .
+            'GROUP BY `t2alias`.`col2` DESC, t2alias.col1, `t2alias`.`col3` DESC' . "\n" .
             'HAVING 1 = 1 AND 2 = 2' . "\n" .
-            'ORDER BY `t3alias`.`col2` DESC, `t3alias`.`col1`, `t3alias`.`col3` DESC' . "\n" .
+            'ORDER BY `t3alias`.`col2` DESC, t3alias.col1, `t3alias`.`col3` DESC' . "\n" .
             'LIMIT 100' . "\n" .
             'OFFSET 200'
         ;

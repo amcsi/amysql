@@ -10,6 +10,7 @@ Changelog
 * New AMysql_Profiler class, to separate profiling, and for assignment to view.
 * AMysql_Profiler ships with an HTML template and a method to fill it up, for those too lazy to make their own. It is customizable by CSS. Retreive it with `$profiler->getAsHtml()`
 * In `AMysql::select()`, allow for `$amysql->select($columns)` new shorthand for `$amysql->select()->column($columns)`
+* `AMysql_Select` orderByLiteral() and groupByLiteral()
 * New common MySQL error codes as constants in AMysql_Exception
 * Logic for easily parsing common MySQL error messages such as "Duplicate entry"
 * There is now a conf file for changing mysql details for PHPUnit testing

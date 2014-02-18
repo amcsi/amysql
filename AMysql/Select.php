@@ -281,6 +281,25 @@ class AMysql_Select extends AMysql_Statement
     }
 
     /**
+     * Adds an GROUP BY parameter with no escaping.
+     * 
+     * @param name $col         What to group by. Can list multiple literals separated by commas.
+     * @param int $prepend      (Optional) Whether to prepend this parameter.
+     *                              Default: false
+     * @access public
+     * @return $this;
+     */
+    public function groupByLiteral($what, $prepend = false)
+    {
+        if ($prepend) {
+            array_unshift($this->groupBys, $what);
+        } else {
+            $this->groupBys[] = $what;
+        }
+        return $this;
+    }
+
+    /**
      * Adds a HAVING fragment. All fragments are joined by an AND
      * at the end. 
      * 
@@ -310,6 +329,25 @@ class AMysql_Select extends AMysql_Statement
         if ($desc) {
             $what .= ' DESC';
         }
+        if ($prepend) {
+            array_unshift($this->orderBys, $what);
+        } else {
+            $this->orderBys[] = $what;
+        }
+        return $this;
+    }
+
+    /**
+     * Adds an ORDER BY parameter with no escaping.
+     * 
+     * @param name $col         What to order by. Can list multiple literals separated by commas.
+     * @param int $prepend      (Optional) Whether to prepend this parameter.
+     *                              Default: false
+     * @access public
+     * @return $this;
+     */
+    public function orderByLiteral($what, $prepend = false)
+    {
         if ($prepend) {
             array_unshift($this->orderBys, $what);
         } else {
