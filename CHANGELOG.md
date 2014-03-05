@@ -1,6 +1,6 @@
 Changelog
 =========
-1.1.0-beta2 (2014-02-12)
+1.1.0 (2014-03-05)
 --
 * Backwards incompatible: AMysql_Exceptions do not trigger errors by default.
 * HHVM and PHP 5.6 now supported

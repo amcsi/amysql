@@ -2,7 +2,7 @@ AMysql
 ======
 [![Build Status](https://travis-ci.org/amcsi/amysql.png?branch=next)](https://travis-ci.org/amcsi/amysql)
 
-A MySQL wrapper guaranteed to work on any PHP 5.1+ configuration with the mysqli extension or `mysql_*` functions available.
+A MySQL wrapper guaranteed to work on any PHP 5.2+ or HHVM configuration with the mysqli extension or `mysql_*` functions available.
 Also contains many tools to help build queries, manage them, profile them.
 
 
@@ -25,12 +25,12 @@ Then AMysql is the library for your project!
 * **It's not an ORM.** There is support for fetching data into new instances of classes, but the focus is on ease of building queries.
 
 Requirements
-=
+============
 
-PHP 5.1.0+ is required, and either the MySQLi extension or the mysql_* functions must be available.
+PHP 5.1.0+ is required, although this has only been tested on 5.2 and higher, and either the MySQLi extension or the mysql_* functions must be available.
 
 Installation
-=
+============
 
 Available on packagist.
 
@@ -38,12 +38,11 @@ See [INSTALL](INSTALL.md) file.
 
 
 Usage
-=
+=====
 
 Typically you want to make one instance of AMysql per db connection. AMysql lazy connects by default.
 
-Instantiating AMysql
--
+#### Instantiating AMysql
 
 When instantiating AMysql, you can pass in either a mysql link resource or connection details as an array.
 
@@ -91,7 +90,7 @@ The full connection details array supports:
 * `socket` - socket
 * `defaultAutoCommit` Specify here whether autocommit is on. When using mysqli and autocommit is off on the MySQL server, this should be set to false.
 * `autoPingSeconds` Each time a query is executed, it is checked if the given amount of seconds has passed since the last query, and if so, pings the server and reconnects if the connection has been lost. It is recommended that this is set to 20 seconds and prevents the script from dying from a 2006 error. Off (NULL) by default.
-* `autoReconnect` If this is TRUE and an executed query fails with a 2006 mysql error, try to reconnect with the connection details and attempt to reexecute the query once before giving up. It is recommended that you set this to TRUE.
+* `autoReconnect` If this is TRUE and an executed query fails with a 2006 mysql error, try to reconnect with the connection details and attempt to reexecute the query once before giving up. It is recommended that you set this to TRUE. WARNING: there might be edge cases related to writing data and the max packets setting which may result in 2006 mysql errors even if though the INSERT/UPDATE want through, resulting in a double write. I don't quite understand this, but it's never happened to me before. If you want to be extra careful, don't set this to TRUE, and only rely on `autoPingSeconds` instead.
 
 ```php
 <?php
@@ -102,8 +101,7 @@ $data = array (
 $amysql->insert('tablename', $data);
 ```
 
-Inserting mysql expressions
--
+#### Inserting mysql expressions
 
 Within prepared statement you can purposefully bind literal strings that will not be escaped or enclosed by quotes. Use it with caution.
 
@@ -124,8 +122,51 @@ $insertId = $amysql->insert('tablename', $data);
 
 AMysql_Expr also supports a few predefined special expressions not only consisting of literal values, such as for making an `IN` list or for doing proper escaping for a `LIKE` expression. For more information, check out the [AMysql/Expr.php file](AMysql/Expr.php).
 
-Inserting multiple rows of data
--
+Example for an `IN` list:
+
+```php
+<?php
+$materialsIn = $amysql->expr(
+    AMysql_Expr::COLUMN_IN,
+    'material',
+    array('wood', 'metal', 'paper', 'plastic')
+);
+$sql = "SELECT * FROM tableName WHERE :materialsIn";
+
+$amysql->query($sql, array('materialsIn' => $materialsIn));
+// SELECT * FROM tableName WHERE `material` IN ('wood', 'metal', 'paper', 'plastic')
+```
+
+Example for escaping LIKE. Note the automatic escaping handling with the = sign ( http://stackoverflow.com/a/3683868/1381550 ). Do not worry about actual percent and underscore lines, as they will properly be escaped and will be treated as literal characters. The default LIKE pattern is wrapping your search string between two (%) signs for a "contains" match. This is represented internally with a `sprintf()` pattern of `%%%s%s` meaning (literal %), (the string), (literal %). You can change this in the 3rd parameter of `AMysql_Expr::__construct`
+
+```php
+<?php
+$descriptionLike = $amysql->expr(
+    AMysql_Expr::ESCAPE_LIKE,
+    'part'
+));
+
+$sql = "SELECT * FROM articles WHERE description LIKE :descriptionLike";
+$amysql->query($sql, array('descriptionLike' => descriptionLike));
+// SELECT * FROM articles WHERE description LIKE '%part%' ESCAPE '='
+
+
+
+// "begins with" example
+
+$descriptionLike = $amysql->expr(
+    AMysql_Expr::ESCAPE_LIKE,
+    '100% success',
+    '%%%s', // begins with
+));
+
+$sql = "SELECT * FROM articles WHERE description LIKE :descriptionLike";
+$amysql->query($sql, array('descriptionLike' => descriptionLike));
+// SELECT * FROM articles WHERE description LIKE '%100=% success' ESCAPE '='
+// note the automatic escaping of the (%) sign
+```
+
+#### Inserting multiple rows of data
 
 ```php
 <?php
@@ -156,8 +197,7 @@ $id = $amysql->insert('tablename', $data);
 $affectedRows = $amysql->lastStatement->affectedRows();
 ```
 
-Updating a single row
--
+#### Updating a single row
 
 ```php
 <?php
@@ -173,8 +213,7 @@ $success = $amysql->update('tablename', $data, 'id = ?', array('2'));
 $affectedRows = $amysql->lastStatement->affectedRows();
 ```
 
-Updating multiple rows
--
+#### Updating multiple rows
 
 You can update multiple rows with the same `insert()` method as for single rows if you pass a multidimensional array. It can be an array or rows, or an array of columns with an array of values.
 
@@ -201,8 +240,7 @@ $success = $amysql->updateMultipleByData('tablename', $data, 'id');
 $affectedRows = $amysql->multipleAffectedRows;
 ```
 
-Deleting rows
--
+#### Deleting rows
 
 ```php
 <?php
@@ -211,8 +249,7 @@ $success = $amysql->delete('tablename', $where, array ('2'));
 $affectedRows = $amysql->lastStatement->affectedRows();
 ```
 
-Queries throw AMysql_Exceptions by default
--
+#### Queries throw AMysql_Exceptions by default.
 
 ```php
 <?php
@@ -222,11 +259,35 @@ try {
 catch (AMysql_Exception $e) {
     trigger_error($e, E_USER_WARNING); // the exception converted to string
     // contains the mysql error code, the error message, and the query string used.
+    // $e->getCode() contains the mysql error code
 }
 ```
 
-Selecting (without AMysql_Select)
--
+#### AMysql_Exceptions can be checked for several constraint related rejections in a fairly simple and not too error prone way.
+
+```php
+<?php
+try {
+    $data = array('passwordHash' => $passwordHash, 'email' => 'myemail@email.com');
+    $amysql->insert('tableName', $data);
+} catch (AMysql_Exception $e) {
+    if (AMysql_Exception::CODE_DUPLICATE_ENTRY === $e->getCode()) {
+        // $e->getProps(0) === 'myemail@email.com'
+        if ('emailUniqueIndexName' === $e->getProps(1)) {
+            $formError = 'A user with this email has already registered';
+        } else {
+            // code shouldn't get to here
+            $formError = 'An unknown error has occured';
+            trigger_error($e, E_USER_WARNING);
+        }
+    } else {
+        $formError = 'An unknown error has occured';
+        trigger_error($e, E_USER_WARNING);
+    }
+}
+```
+
+#### Selecting (without AMysql_Select)
 
 ```php
 <?php
@@ -249,8 +310,7 @@ Note that if there is only 1 question mark in the prepared string, you may also 
 
 P.S. this is also true for every method that expects a `$binds` array.
 
-Preparing select first, executing later (without AMysql_Select)
--
+#### Preparing select first, executing later (without AMysql_Select)
 ```php
 <?php
 $binds = array (
@@ -262,8 +322,7 @@ $stmt->execute($binds);
 $results = $stmt->fetchAllAssoc();
 ```
 
-And now with a new AMysql_Select class to help assemble a SELECT SQL string:
--
+####And now with a new AMysql_Select class to help assemble a SELECT SQL string:
 
 ```php
 <?php
@@ -320,6 +379,37 @@ $foundRows = $amysql->foundRows(); // resolves "SELECT FOUND_ROWS()" for "SQL_CA
 Read the commented [AMysql_Select](AMysql/Select.php) file for more details.
 
 A documentation on binding parameters can be found in the comments for [AMysql_Statement](AMysql/Statement.php)::execute(). Be sure to check it out.
+
+#### Profiling
+
+A simple example without having to make your own HTML template:
+
+```php
+$profiler = $amysql->getProfiler();
+
+// ... execute a bunch of MySQL queries
+
+$view->profiler = $profiler; // add it to your view.
+$view->render('layout.phtml');
+
+// layout.phtml:
+
+<html>
+    <head>
+    </head>
+    <body>
+        <?php include 'content.phtml' ?>
+
+        <?php if ('dev' == APP_ENV): ?>
+        <?php echo $this->profiler->getAsHtml() ?>
+    </body>
+</html>
+
+```
+
+Alternatively, check out [AMysql_Profiler](AMysql/Profiler.php) for more options.
+
+#### Other methods
 
 Many other useful methods are available as well. Check out the source files and read the documentation for the methods.
 
