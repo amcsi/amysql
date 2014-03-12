@@ -449,13 +449,11 @@ abstract class AMysql_Abstract
     {
         $this->connDetails['db'] = $db; // for reconnecting later
         $isMysqli = $this->isMysqli;
-        if ($this->autoPing) {
-            $this->autoPing();
-        }
-        $result = $isMysqli ? $this->link->select_db($db) : mysql_select_db($db, $this->link);
+        $link = $this->autoPingConnect();
+        $result = $isMysqli ? $link->select_db($db) : mysql_select_db($db, $link);
         if (!$result) {
-            $error = $isMysqli ? $this->link->error : mysql_error($this->link);
-            $errno = $isMysqli ? $this->link->errno : mysql_errno($this->link);
+            $error = $isMysqli ? $link->error : mysql_error($link);
+            $errno = $isMysqli ? $link->errno : mysql_errno($link);
             $this->handleError($error, $errno, 'USE ' . $db);
         }
         return $this;
@@ -1147,7 +1145,7 @@ abstract class AMysql_Abstract
      **/
     public function escape($value)
     {
-        $res = $this->link;
+        $res = $this->autoConnect();
         $isValidLink = $res instanceof Mysqli || 0 === strpos(get_resource_type($res), 'mysql link');
         if (!$isValidLink) {
             throw new RuntimeException('Resource is not a mysql resource.', 0);
@@ -1301,6 +1299,19 @@ abstract class AMysql_Abstract
             }
         }
         return $this;
+    }
+
+    /**
+     * Auto connects and auto pings (if on), returning the mysql link.
+     * 
+     * @access public
+     * @return Mysqli|resource
+     */
+    public function autoPingConnect()
+    {
+        $link = $this->autoConnect();
+        $this->autoPing();
+        return $link;
     }
 
     /**
