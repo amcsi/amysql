@@ -78,7 +78,7 @@ abstract class AMysql_Abstract
      *
      * Can be set in the connection details array or $this->setAutoPingSeconds()
      * 
-     * @var int|false
+     * @var int|FALSE
      * @access protected
      */
     protected $autoPingSeconds = false;
@@ -226,7 +226,7 @@ abstract class AMysql_Abstract
      *
      *
      * @access public
-     * @return void
+     * @return AMysql_Abstract (chainable)
      */
     public function setConnDetails(array $cd)
     {
@@ -251,6 +251,14 @@ abstract class AMysql_Abstract
 
     /**
      * @see mysql_connect() 
+     * 
+     * @param string $host (optional)
+     * @param string $username (optional)
+     * @param string $password (optional)
+     * @param boolean $newLink (optional)
+     * @param int $clientFlags (optional)
+     * @access public
+     * @return AMysql_Abstract (chainable)
      */
     public function oldSetConnDetails(
         $host = null,
@@ -279,7 +287,7 @@ abstract class AMysql_Abstract
      * Sets $this->link and $this->isMysqli
      * 
      * @access public
-     * @return $this
+     * @return AMysql_Abstract (chainable)
      */
     public function connect()
     {
@@ -355,6 +363,12 @@ abstract class AMysql_Abstract
         return $this;
     }
 
+    /**
+     * Closes the connection and unsets its link.
+     * 
+     * @access public
+     * @return AMysql_Abstract (chainable)
+     */
     public function close()
     {
         if ($this->link instanceof Mysqli) {
@@ -372,7 +386,7 @@ abstract class AMysql_Abstract
      * Does not check if the connection has since been broken.
      * 
      * @access public
-     * @return mixed            Connection resource or object
+     * @return resource|mysqli            Connection resource or object
      */
     public function autoConnect()
     {
@@ -382,6 +396,12 @@ abstract class AMysql_Abstract
         return $this->link;
     }
 
+    /**
+     * Reconnects to the database with the last saved connection details. 
+     * 
+     * @access public
+     * @return void
+     */
     public function forceReconnect()
     {
         $oldConnDetails = (array) $this->connDetails;
@@ -390,6 +410,17 @@ abstract class AMysql_Abstract
         $this->connDetails = $oldConnDetails;
     }
 
+    /**
+     * Sets the amount of seconds needed to pass - since last communicating
+     * with the database - before communicating again, to ping the
+     * database server beforehand and also reconnect if the connection has
+     * been since lost.
+     * 
+     * @param int|FALSE $autoPingSeconds        The amount of seconds, or
+     *                                          FALSE if it should be disabled
+     * @access public
+     * @return AMysql_Statement (chainable)
+     */
     public function setAutoPingSeconds($autoPingSeconds)
     {
         $this->autoPingSeconds = $autoPingSeconds;
@@ -402,7 +433,7 @@ abstract class AMysql_Abstract
      * 
      * @param boolean
      * @access public
-     * @return $this
+     * @return AMysql_Abstract (chainable)
      */
     public function setAutoReconnect($autoReconnect)
     {
@@ -411,7 +442,7 @@ abstract class AMysql_Abstract
     }
 
     /**
-     * getAutoReconnect 
+     * getAutoReconnect
      * 
      * @access public
      * @return boolean
@@ -422,11 +453,11 @@ abstract class AMysql_Abstract
     }
 
     /**
-     * @see $this->defaultAutoCommit 
+     * @see $this->defaultAutoCommit
      * 
      * @param boolean
      * @access public
-     * @return $this
+     * @return AMysql_Abstract (chainable)
      */
     public function setDefaultAutoCommit($defaultAutoCommit)
     {
@@ -434,6 +465,12 @@ abstract class AMysql_Abstract
         return $this;
     }
 
+    /**
+     * Returns the default fetch mode. See the FETCH_ class constants.
+     * 
+     * @access public
+     * @return string
+     */
     public function getFetchMode()
     {
         return $this->_fetchMode;
@@ -443,7 +480,7 @@ abstract class AMysql_Abstract
      * Selects the given database.
      * 
      * @param string $db 
-     * @return $this
+     * @return AMysql_Abstract (chainable)
      */
     public function selectDb($db)
     {
@@ -463,7 +500,7 @@ abstract class AMysql_Abstract
      * Takes care of setting everything to utf-8
      * 
      * @access public
-     * @return $this
+     * @return AMysql_Abstract (chainable)
      */
     public function setUtf8()
     {
@@ -474,7 +511,7 @@ abstract class AMysql_Abstract
      * Changes the character set of the connection.
      * 
      * @param string $charset Example: utf8
-     * @return $this
+     * @return AMysql_Abstract (chainable)
      */
     public function setCharset($charset)
     {
@@ -504,7 +541,7 @@ abstract class AMysql_Abstract
      * enough to use $this->setCharset().
      * 
      * @param string $names Example: utf8
-     * @return $this
+     * @return AMysql_Abstract (chainable)
      */
     public function setNames($names)
     {
@@ -521,7 +558,7 @@ abstract class AMysql_Abstract
      * 
      * @param boolean $isAnsi 
      * @access public
-     * @return $this
+     * @return AMysql_Abstract (chainable)
      */
     public function setAnsi($isAnsi)
     {
@@ -532,6 +569,8 @@ abstract class AMysql_Abstract
 
     /**
      * Returns whether ANSI mode is being used by this instance (not the database)
+     *
+     * @return boolean
      **/
     public function isAnsi()
     {
@@ -541,10 +580,10 @@ abstract class AMysql_Abstract
     /**
      * Does a simple identifier escape. It should be fail proof for that literal identifier.
      *
-     * @param $identifier The identifier
-     * @param $qc           The quote character. Default: `
+     * @param string $identifier    The identifier
+     * @param string $qc            The quote character. Default: `
      *
-     * @return The escaped identifier.
+     * @return string               The escaped identifier.
      **/
     public static function escapeIdentifierSimple($identifier, $qc = '`')
     {
@@ -555,10 +594,10 @@ abstract class AMysql_Abstract
      * Escapes an identifier. If there's a dot in it, it is split
      * into two identifiers, each escaped, and joined with a dot.
      *
-     * @param $identifier The identifier
-     * @param $qc           The quote character. Default: `
+     * @param string $identifier    The identifier
+     * @param string $qc            The quote character. Default: `
      *
-     * @return The escaped identifier.
+     * @return string               The escaped identifier.
      **/
     protected static function _escapeIdentifier($identifier, $qc)
     {
@@ -578,22 +617,23 @@ abstract class AMysql_Abstract
      * Escapes an identifier, such as a column or table name.
      * Includes functionality for making an AS syntax.
      *
-     * @param string $identifierName The identifier name. If it has a dot in 
-     * it,
-     * it'll automatically split the identifier name into the 
-     * `tableName`.`columnName`
-     * syntax.
-     * @param string $as (Optional) adds an AS syntax, but only, if it's
-     * a string. The value is the alias the identifier should have for
-     * the query.
-     * @param $qc           The quote character. Default: `
+     * @deprecated Do not rely on this static method. Its public visibility or name may be changed
+     *  in the future. Use the non-static escapeTable() method instead.
+     *
+     * @param string $identifierName    The identifier name. If it has a dot in
+     *                                  it, it'll automatically split the
+     *                                  identifier name into the
+     *                                  `tableName`.`columnName` syntax.
+     *
+     * @param string $as                (Optional) adds an AS syntax, but only
+     *                                  if it's a string. The value is the alias
+     *                                  the identifier should have for the query.
+     *
+     * @param $qc                       The quote character. Default: `
      *
      * @todo Possibly change the functionality to remove the automatic dot 
      * detection,
      * 	and ask for an array instead?
-     *
-     * @deprecated Do not rely on this static method. Its public visibility or name may be changed
-     *  in the future. Use the non-static escapeTable() method instead.
      *
      * e.g.
      *  echo $amysql->escapeIdentifier('table.order', 'ot');
@@ -623,7 +663,16 @@ abstract class AMysql_Abstract
     /**
      * Escapes a table name.
      *
-     * @see self::escapeIdentifier
+     * @param string $identifierName    The identifier name. If it has a dot in
+     *                                  it, it'll automatically split the
+     *                                  identifier name into the
+     *                                  `tableName`.`columnName` syntax.
+     *
+     * @param string $as                (Optional) adds an AS syntax, but only
+     *                                  if it's a string. The value is the alias
+     *                                  the identifier should have for the query.
+     *
+     * @return string
      */
     public function escapeTable($tableName, $as = null)
     {
@@ -633,7 +682,16 @@ abstract class AMysql_Abstract
     /**
      * Escapes a column name.
      *
-     * @see self::escapeIdentifier
+     * @param string $identifierName    The identifier name. If it has a dot in
+     *                                  it, it'll automatically split the
+     *                                  identifier name into the
+     *                                  `tableName`.`columnName` syntax.
+     *
+     * @param string $as                (Optional) adds an AS syntax, but only
+     *                                  if it's a string. The value is the alias
+     *                                  the identifier should have for the query.
+     *
+     * @return string
      */
     public function escapeColumn($columnName, $as = null)
     {
@@ -656,6 +714,8 @@ abstract class AMysql_Abstract
      * Performs a mysql ROLLBACK.
      *
      * @todo checks
+     * @return mixed        Do not rely on this return value; it may change in
+     *                      the future.
      **/
     public function startTransaction()
     {
@@ -674,6 +734,8 @@ abstract class AMysql_Abstract
      * Performs a mysql COMMIT.
      *
      * @todo checks
+     * @return mixed        Do not rely on this return value; it may change in
+     *                      the future.
      **/
     public function commit()
     {
@@ -691,6 +753,8 @@ abstract class AMysql_Abstract
      * Performs a mysql ROLLBACK.
      *
      * @todo checks
+     * @return mixed        Do not rely on this return value; it may change in
+     *                      the future.
      **/
     public function rollback()
     {
@@ -723,10 +787,10 @@ abstract class AMysql_Abstract
      * Executes a query, and returns the first found row's first column's value.
      * Throws a warning if no rows were found.
      *
-     * @param string $sql The SQL string.
-     * @param mixed $binds The binds or a single bind.
+     * @param string $sql   The SQL string.
+     * @param mixed $binds  The binds or a single bind.
      *
-     * @return string
+     * @return string|int
      **/
     public function getOne($sql, $binds = array ())
     {
@@ -739,12 +803,12 @@ abstract class AMysql_Abstract
      * Like $this->getOne(), except returns a null when no result is found,
      * without throwing an error.
      *
-     * @param string $sql The SQL string.
-     * @param mixed $binds The binds or a single bind.
+     * @param string $sql   The SQL string.
+     * @param mixed $binds  The binds or a single bind.
      *
-     * @see $this->getOne()
+     * @see AMysql_Abstract::getOne()
      *
-     * @return string
+     * @return string|int|NULL
      **/
     public function getOneNull($sql, $binds = array ())
     {
@@ -760,9 +824,9 @@ abstract class AMysql_Abstract
      * @param string $sql The SQL string.
      * @param mixed $binds The binds or a single bind.
      *
-     * @see $this->getOne()
+     * @see AMysql_Abstract::getOne()
      *
-     * @return string
+     * @return int
      **/
     public function getOneInt($sql, $binds = array ())
     {
@@ -774,9 +838,9 @@ abstract class AMysql_Abstract
     /**
      * Prepares a mysql statement. It is to be executed.
      *
-     * @param string $sql The SQL string.
+     * @param string $sql               The unbound SQL string.
      *
-     * @return AMysql_Statement
+     * @return AMysql_Statement         A new statement instance.
      **/
     public function prepare($sql)
     {
@@ -790,9 +854,11 @@ abstract class AMysql_Abstract
      * By passing parameters, you can now have $select->column() invoked
      * straight away (e.g. $amysql->select('*')->...)
      *
-     * @param mixed $columns    (Optional) @see AMysql_Select::column()
+     * @param mixed $columns            (Optional)
      *
-     * @return AMysql_Select
+     * @see AMysql_Select::column()
+     *
+     * @return AMysql_Select            A new instance of this class
      **/
     public function select($columns = null)
     {
@@ -817,12 +883,12 @@ abstract class AMysql_Abstract
      * Performs an instant UPDATE returning the statement.
      *
      * @param string $tableName 	The table name.
-     * @param array $data 		The array of data changes. A
-     *					    one-dimensional array
-     * 					with keys as column names and values
-     *					    as their values.
-     * @param string $where		An SQL substring of the WHERE clause.
-     * @param mixed $binds		(Optional) The binds or a single bind for the WHERE clause.
+     * @param array $data 		    The array of data changes. A
+     *					            one-dimensional array
+     * 					            with keys as column names and values
+     *					            as their values.
+     * @param string $where		    An SQL substring of the WHERE clause.
+     * @param mixed $binds		    (Optional) The binds or a single bind for the WHERE clause.
      *
      * @return AMysql_Statement
      **/
@@ -838,14 +904,14 @@ abstract class AMysql_Abstract
      * Performs an instant UPDATE returning its success.
      *
      * @param string $tableName 	The table name.
-     * @param array $data 		The array of data changes. A
-     *					    one-dimensional array
-     * 					with keys as column names and values
-     *					    as their values.
-     * @param string $where		An SQL substring of the WHERE clause.
-     * @param mixed $binds		(Optional) The binds or a single bind for the WHERE clause.
+     * @param array $data 		    The array of data changes. A
+     *					            one-dimensional array
+     * 					            with keys as column names and values
+     *					            as their values.
+     * @param string $where		    An SQL substring of the WHERE clause.
+     * @param mixed $binds		    (Optional) The binds or a single bind for the WHERE clause.
      *
-     * @return boolean Whether the update was successful.
+     * @return boolean              Whether the update was successful.
      **/
     public function update($tableName, array $data, $where, $binds = array())
     {
@@ -858,17 +924,33 @@ abstract class AMysql_Abstract
      * $this->multipleAffectedRows.
      *
      * @param string $tableName 	The table name.
-     * @param array $data 		The array of data changes. A
-     *					    one-dimensional array
-     * 					with keys as column names and values
-     *					    as their values.
-     *					One of the keys should be the one
-     *					    with the value to search for for
-     *					    replacement.
-     * @param string $column		(Options) the name of the column and
-     *					    key to search for. The default is
-     *					    'id'.
-     * @return boolean
+     * @param array[] $data 	    The array of data changes. An array of
+     *                              an array of column-value pairs to update
+     *                              for that row.
+     *					            One of the column keys should be the one
+     *					            with the value to search for for updating
+     *					            (typically the primary key)
+     *					            e.g.
+     *					            [
+     *					                [
+     *					                    'id' => 1,
+     *					                    'col1' => 'newStringValue',
+     *					                    'col2' => 'newStringValue2'
+     *					                ],
+     *					                [
+     *					                    'id' => 2,
+     *					                    'col1' => 'anotherNewStringValue',
+     *					                    'col2' => 'anotherNewStringValue2'
+     *					                ],
+     *					                ...
+     *					            ]
+     * @param string $column		(Options) the name of the column to search
+     *                              for, and key to use among the data.
+     *					            The default is 'id'.
+     * @return boolean              Whether there was an equal amount of
+     *                              successful updates (whether a row was
+     *                              affected or not) as the size of the
+     *                              inputted data array.
      **/
     public function updateMultipleByData(
         $tableName,
@@ -899,21 +981,33 @@ abstract class AMysql_Abstract
      * $this->multipleAffectedRows.
      *
      * @param string $tableName 	The table name.
-     * @param array $data 		The array of data changes. A
-     *					    one-dimensional array
-     * 					with keys as column names and values
-     *					    as their values.
-     *					Each data row must be under the key
-     *					    that is the same as the value of
-     *					    the column being searched for.
+     * @param array[] $data 	    The array of data changes. An array
+     *                              indexed by the value of the column to
+     *                              apply the update to (typically the primary)
+     *                              key containing
+     *                              an array of column-value pairs to update
+     *                              for that row.
+     *					            e.g.
+     *					            [
+     *					                1 => [
+     *					                    'col1' => 'newStringValue',
+     *					                    'col2' => 'newStringValue2'
+     *					                ],
+     *					                2 => [
+     *					                    'id' => 2,
+     *					                    'col1' => 'anotherNewStringValue',
+     *					                    'col2' => 'anotherNewStringValue2'
+     *					                ],
+     *					                ...
+     *					            ]
      * @param string $column		(Options) the name of the column and
-     *					    key to search for. The default is
-     *					    'id'.
-     * @param string $updateSameColumn	(Options) If the column being searched
-     *					    for is within the a data row,
-     *					    if this is false, that key should
-     *					    be removed before updating the data.
-     *					    This is the default.
+     *					            key to search for. The default is
+     *					            'id'.
+     * @param boolean $updateSameColumn	(Optional) If the column being searched
+     *					                for is within the a data row,
+     *					                if this is false, that key should
+     *					                be removed before updating the data.
+     *					                This is the default.
      *
      * @return boolean
      **/
@@ -942,21 +1036,21 @@ abstract class AMysql_Abstract
     }
 
     /**
-     * Performs an instant INSERT.
+     * Performs an instant INSERT, returning the statement.
      *
      * @param string $tableName 	The table name.
-     * @param array $data		A one or two-dimensional array.
-     * 					1D:
-     * 					an associative array of keys as column names and values
-     * 					as their values. This inserts one row.
-     * 					2D numeric:
-     * 					A numeric array where each value is an associative array
-     * 					with column-value pairs. Each outer, numeric value represents
-     * 					a row of data.
-     * 					2D associative:
-     * 					An associative array where the keys are the columns, the
-     * 					values are numerical arrays, where each value represents the
-     * 					value for the new row of that key.
+     * @param array $data		    A one or two-dimensional array.
+     * 					            1D:
+     * 					            an associative array of keys as column names and values
+     * 					            as their values. This inserts one row.
+     * 					            2D numeric:
+     * 					            A numeric array where each value is an associative array
+     * 					            with column-value pairs. Each outer, numeric value represents
+     * 					            a row of data.
+     * 					            2D associative:
+     * 					            An associative array where the keys are the columns, the
+     * 					            values are numerical arrays, where each value represents the
+     * 					            value for the new row of that key.
      *
      * @return AMysql_Statement
      **/
@@ -969,14 +1063,28 @@ abstract class AMysql_Abstract
     }
 
     /**
-     * Performs an instant INSERT, but tries to return the last insert id straight away.
+     * Performs an instant INSERT, but tries to return the last insert
+     * id straight away.
      * 
      * @param string $tableName 	The table name.
-     * @param array $data           @see $this->ins()
+     * @param array $data		    A one or two-dimensional array.
+     * 					            1D:
+     * 					            an associative array of keys as column names and values
+     * 					            as their values. This inserts one row.
+     * 					            2D numeric:
+     * 					            A numeric array where each value is an associative array
+     * 					            with column-value pairs. Each outer, numeric value represents
+     * 					            a row of data.
+     * 					            2D associative:
+     * 					            An associative array where the keys are the columns, the
+     * 					            values are numerical arrays, where each value represents the
+     * 					            value for the new row of that key.
      * @access public
      *
-     * @return mixed The mysql_insert_id(), if the query succeeded and there exists a primary
-     * key. Otherwise the boolean of whether the insert was successful.
+     * @return int|boolean          The mysql_insert_id(), if the query
+     *                              succeeded and there exists a primary key.
+     *                              Otherwise the boolean of whether the insert
+     *                              was successful.
      */
     public function insert($tableName, array $data)
     {
@@ -992,7 +1100,19 @@ abstract class AMysql_Abstract
     /**
      * Performs an instant REPLACE, returning the statement.
      *
-     * @see $this->insert()
+     * @param string $tableName 	The table name.
+     * @param array $data		    A one or two-dimensional array.
+     * 					            1D:
+     * 					            an associative array of keys as column names and values
+     * 					            as their values. This inserts one row.
+     * 					            2D numeric:
+     * 					            A numeric array where each value is an associative array
+     * 					            with column-value pairs. Each outer, numeric value represents
+     * 					            a row of data.
+     * 					            2D associative:
+     * 					            An associative array where the keys are the columns, the
+     * 					            values are numerical arrays, where each value represents the
+     * 					            value for the new row of that key.
      *
      * @return AMysql_Statement
      **/
@@ -1005,11 +1125,28 @@ abstract class AMysql_Abstract
     }
 
     /**
-     * Performs an instant REPLACE, returning the success.
+     * Performs an instant REPLACE, returning its success.
      *
-     * @see $this->insert()
+     * @param string $tableName 	The table name.
+     * @param array $data		    A one or two-dimensional array.
+     * 					            1D:
+     * 					            an associative array of keys as column 
+     * 					            names and values
+     * 					            as their values. This inserts one row.
+     * 					            2D numeric:
+     * 					            A numeric array where each value is an 
+     * 					            associative array
+     * 					            with column-value pairs. Each outer, 
+     * 					            numeric value represents
+     * 					            a row of data.
+     * 					            2D associative:
+     * 					            An associative array where the keys are the 
+     * 					            columns, the
+     * 					            values are numerical arrays, where each 
+     * 					            value represents the
+     * 					            value for the new row of that key.
      *
-     * @return boolean Success.
+     * @return boolean              Success.
      **/
     public function replace($tableName, array $data)
     {
@@ -1018,25 +1155,25 @@ abstract class AMysql_Abstract
     }
 
     /**
-     * Performs an INSERT or an UPDATE; if the $value
-     * parameter is not falsy, an UPDATE is performed with the given column name
-     * and value, otherwise an insert. It is recommended that this is used for
-     * tables with a primary key, and use the primary key as the column to
-     * look at. Also, this would keep the return value consistent.
+     * Performs an INSERT or an UPDATE; if the $value parameter is not falsy, 
+     * an UPDATE is performed with the given column name and value, otherwise 
+     * an insert. It is recommended that this is used for tables with a primary 
+     * key, and use the primary key as the column to look at. Also, this would 
+     * keep the return value consistent.
      * 
      * @param mixed $tableName		The table name to INSERT or UPDATE to
-     * @param mixed $data		The data to change
+     * @param mixed $data		    The data to change
      * @param mixed $columnName		The column to search by. It should be
-     *					a primary key.
-     * @param mixed $value		(Optional) The value to look for in
-     *					case you want
-     *					to UPDATE. Keep this at null, 0,
-     *					or anything else falsy for INSERT.
+     *					            a primary key.
+     * @param mixed $value		    (Optional) The value to look for in
+     *					            case you want
+     *					            to UPDATE. Keep this at null, 0,
+     *					            or anything else falsy for INSERT.
      *
-     * @return integer			If the $value is not falsy, it returns
-     *					$value after UPDATING. Otherwise the
-     *					mysql_insert_id() of the newly
-     *					INSERTED row.
+     * @return int			        If the $value is not falsy, it returns
+     *					            $value after UPDATING. Otherwise the
+     *					            mysql_insert_id() of the newly
+     *					            INSERTED row.
      */
     public function save($tableName, $data, $columnName, $value = null)
     {
@@ -1054,8 +1191,9 @@ abstract class AMysql_Abstract
      * Performs an instant DELETE, returning the statement.
      *
      * @param string $tableName 	The table name.
-     * @param string $where		An SQL substring of the WHERE clause.
-     * @param mixed $binds		(Optional) The binds or a single bind for the WHERE clause.
+     * @param string $where		    An SQL substring of the WHERE clause.
+     * @param mixed $binds		    (Optional) The binds or a single bind for 
+     *                              the WHERE clause.
      *
      * @return AMysql_Statement
      **/
@@ -1071,10 +1209,12 @@ abstract class AMysql_Abstract
      * Performs an instant DELETE, returning whether it succeeded.
      *
      * @param string $tableName 	The table name.
-     * @param string $where		An SQL substring of the WHERE clause.
-     * @param mixed $binds		(Optional) The binds or a single bind for the WHERE clause.
+     * @param string $where		    An SQL substring of the WHERE clause.
+     * @param mixed $binds		    (Optional) The binds or a single bind for 
+     *                              the WHERE clause.
      *
-     * @return resource|false The mysql resource if the delete was successful, otherwise false.
+     * @return resource|FALSE       The mysql resource if the delete was 
+     *                              successful, otherwise false.
      **/
     public function delete($tableName, $where, $binds = array ())
     {
@@ -1087,7 +1227,7 @@ abstract class AMysql_Abstract
      * query with LIMIT and OFFSET ignored.
      * 
      * @access public
-     * @return void
+     * @return int              Number of found rows.
      */
     public function foundRows()
     {
@@ -1107,6 +1247,7 @@ abstract class AMysql_Abstract
      *	))
      *
      * @see AMysql_Expr
+     * @param ...$variadic      see AMysql_Expr
      *
      * @return AMysql_Expr
      **/
@@ -1122,9 +1263,11 @@ abstract class AMysql_Abstract
      * Escapes LIKE. The after the LIKE <string> syntax, you must place
      * an ESCAPE statement with '=' or whatever you pass here as
      * $escapeStr
+     * It is not recommended to call this static method externally;
+     * please use {@link AMysql_Expr} instead.
      *
-     * @param string $s The string to LIKE escape
-     * @param string $escapeChar (Opcionális) The escape character
+     * @param string $s                 The string to LIKE escape
+     * @param string $escapeChar        (Optional) The escape character
      **/
     public static function escapeLike($s, $escapeStr = '=')
     {
@@ -1136,17 +1279,28 @@ abstract class AMysql_Abstract
     }
 
     /**
-     * Escapes a value. The method depends on the passed value's type, but unless the passed type
-     * is an AMysql_Expr, the safety is almost guaranteed. Do not put apostrophes around bind marks!
-     * Those are handled by this escaping method.
+     * Escapes a value. The method depends on the passed value's type, but 
+     * unless the passed type is an AMysql_Expr, the safety is almost 
+     * guaranteed. Do not put apostrophes around bind marks!  Those are handled 
+     * by this escaping method.
      *
-     * @param mixed The value to escape
+     * @param mixed         The value to escape
+     *
+     * @return string|int               The value safe to put into a query,
+     *                                  including surrounding apostrophes if
+     *                                  the value is string-like, not including
+     *                                  apostrophes if it's an int or an
+     *                                  {@link AMysql_Expr} or
+     *                                  {@link AMysql_Select}
+     *                                  (for selectception)
      *
      **/
     public function escape($value)
     {
         $res = $this->autoConnect();
-        $isValidLink = $res instanceof Mysqli || 0 === strpos(get_resource_type($res), 'mysql link');
+        $isValidLink =
+            $res instanceof Mysqli ||
+            0 === strpos(get_resource_type($res), 'mysql link');
         if (!$isValidLink) {
             throw new RuntimeException('Resource is not a mysql resource.', 0);
         }
@@ -1173,10 +1327,14 @@ abstract class AMysql_Abstract
         }
         // In the case of a string or anything else, let's escape it and
         // put it between apostrophes.
-        return "'" .
-            ($isMysqli ? $this->link->real_escape_string($value) : mysql_real_escape_string($value, $res)) .
+        return
+            "'" .
+                ($isMysqli ?
+                    $this->link->real_escape_string($value) :
+                    mysql_real_escape_string($value, $res))
+                .
             "'"
-            ;
+        ;
     }
 
     /**
@@ -1208,7 +1366,7 @@ abstract class AMysql_Abstract
      *       )
      *   );
      *
-     * @param array $array The 2 dimensional array to transpose
+     * @param array $array      The 2 dimensional array to transpose
      * @return array
      */
     public static function transpose(array $array)
@@ -1238,7 +1396,7 @@ abstract class AMysql_Abstract
      * @param string $query         The SQL query.
      * @param float $queryTime      The time the query took.
      * @access public
-     * @return $this
+     * @return AMysql_Abstract (chainable)
      */
     public function addQuery($query, $queryTime)
     {
@@ -1250,13 +1408,14 @@ abstract class AMysql_Abstract
      * Pings the mysql server to see if it's still alive;
      * attempts to reconnect otherwise.
      * 
-     * @param boolean $handleError    (Optional) If TRUE, on failure, this will be handled as
-     *                              any other AMysql error. Defaults to FALSE (no errors or
-     *                              exceptions).
+     * @param boolean $handleError      (Optional) If TRUE, on failure, this will 
+     *                                  be handled as any other AMysql error. 
+     *                                  Defaults to FALSE (no errors or 
+     *                                  exceptions).
      * @access public
-     * @return boolean          TRUE if the connection is still there or reconnection
-     *                          was successful.
-     *                          FALSE if reconnection wasn't successful.
+     * @return boolean                  TRUE if the connection is still there 
+     *                                  or reconnection was successful.
+     *                                  FALSE if reconnection wasn't successful.
      */
     public function pingReconnect()
     {
@@ -1283,7 +1442,7 @@ abstract class AMysql_Abstract
      * Pings if the set amount of auto ping time has passed.
      * 
      * @access public
-     * @return void
+     * @return AMysql_Abstract (chainable)
      */
     public function autoPing()
     {
@@ -1327,8 +1486,8 @@ abstract class AMysql_Abstract
     }
 
     /**
-     * Returns an arrays of profiled query data. Each value is an array that consists
-     * of:
+     * Returns an arrays of profiled query data. Each value is an array that 
+     * consists of:
      *  - query - The SQL query performed
      *  - time - The amount of seconds the query took (float)
      *
@@ -1360,7 +1519,7 @@ abstract class AMysql_Abstract
      * Force using a new profiler.
      * 
      * @access public
-     * @return $this
+     * @return AMysql_Abstract (chainable)
      */
     public function useNewProfiler()
     {
@@ -1369,7 +1528,7 @@ abstract class AMysql_Abstract
     }
 
     /**
-     * handleError 
+     * For internal use.
      * 
      * @param mixed $msg 
      * @param mixed $code 
@@ -1393,7 +1552,7 @@ abstract class AMysql_Abstract
     }
 
     /**
-     * handleException 
+     * For internal use. 
      * 
      * @param mixed $msg 
      * @param mixed $code 

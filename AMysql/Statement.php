@@ -68,6 +68,12 @@ class AMysql_Statement implements IteratorAggregate, Countable
 
     const CODE_QUERY_NOT_SUCCESSFUL = 120000;
 
+    /**
+     * __construct
+     * 
+     * @param AMysql_Abstract $amysql
+     * @access public
+     */
     public function __construct(AMysql_Abstract $amysql)
     {
         $amysql->lastStatement = $this;
@@ -99,6 +105,12 @@ class AMysql_Statement implements IteratorAggregate, Countable
         return $this->link;
     }
 
+    /**
+     * Checks whether mysqli is being used (as opposed to mysql)
+     * 
+     * @access public
+     * @return boolean
+     */
     public function isMysqli()
     {
         if (!isset($this->isMysqli)) {
@@ -108,6 +120,16 @@ class AMysql_Statement implements IteratorAggregate, Countable
         return $this->isMysqli;
     }
 
+    /**
+     * Fetches the iterator for iterating through the results of the statement
+     * with the set fetch mode (default is assoc).
+     * This method is automatically called due to this class being an
+     * IteratorAggregate, so all you need to do is foreach your $statement
+     * object.
+     * 
+     * @access public
+     * @return AMysql_Iterator
+     */
     public function getIterator()
     {
         return new AMysql_Iterator($this);
@@ -122,7 +144,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * @param mixed $fetchMode      The fetch mode. Use the AMysql_Abstract
      *                              constants.
      * @access public
-     * @return $this
+     * @return AMysql_Statement (chainable)
      */
     public function setFetchMode($fetchMode/* [, extras [, extras...]]*/)
     {
@@ -171,9 +193,9 @@ class AMysql_Statement implements IteratorAggregate, Countable
      *				surrounded by apostrophes if needed. Do NOT
      *				add apostrophes around the string values as
      *				encapsulating for a mysql string.
-     *				@see AMysql_Abstract::escape()
+     * @see AMysql_Abstract::escape()
      *
-     * @return $this
+     * @return AMysql_Statement (chainable)
      */
     public function execute($binds = array ())
     {
@@ -217,9 +239,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * string would be by calling this method.
      *
      * @param string $prepared	(Optional) Use this prepared string
-     *					instead of the one set.
-     *
-     * @author Szerémi Attila               
+     *					        instead of the one set.
      **/
     public function getSql($prepared = null)
     {
@@ -230,14 +250,14 @@ class AMysql_Statement implements IteratorAggregate, Countable
     }
 
     /**
-     * Like $this->getSql(), but you must give the prepared statement, the
-     * binds, and $this->beforeSql is ignored.
+     * Like {@link AMysql_Statement::getSql()}, but you must give the prepared 
+     * statement, the binds, and {@link AMysql_Statement::beforeSql} is ignored.
      *
-     * @see $this->getSql()
+     * @see AMysql_Statement::getSql()
      * 
      * @param string $prepared 
      * @param mixed $binds		$binds are automatically type casted
-     *					to an array.
+     *					        to an array.
      * @return string
      */
     public function quoteInto($prepared, $binds)
@@ -281,6 +301,9 @@ class AMysql_Statement implements IteratorAggregate, Countable
                 $replacements[$key] = $this->amysql->escape($bind);
             }
             $keysOr = join('|', $keysQuoted);
+            # Anything that is one of the keys followed by a non-word ascii
+            # character. This prevents :someKeyWithLongerName from being
+            # treated as :someKey, if both those keys actually existed.
             $pattern =
                 "/($keysOr)(?![\w\x80-\xff])/m";
             $this->_replacements = $replacements;
@@ -294,6 +317,14 @@ class AMysql_Statement implements IteratorAggregate, Countable
         return $sql;
     }
 
+    /**
+     * Replaced a named placeholder with its replacement escaped via
+     * {@link AMysql_Abstract::escape()} 
+     * 
+     * @param array $match
+     * @access protected
+     * @return string           The replacement
+     */
     protected function _replaceCallback($match)
     {
         $key = $match[0];
@@ -308,8 +339,8 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * method is not recommended externally. Use the AMysql class's
      * prepare method instead which returns a new AMysql_Statement instance.
      * 
-     * @param string $sql The SQL string to prepare.
-     * @return $this
+     * @param string $sql           The SQL string to prepare.
+     * @return AMysql_Statement (chainable)
      */
     public function prepare($sql)
     {
@@ -322,13 +353,13 @@ class AMysql_Statement implements IteratorAggregate, Countable
     /**
      * Prepares a statement and executes it with the given binds.
      *
-     * @see $this->prepare()
-     * @see $this->execute()
+     * @see AMysql_Statement::prepare()
+     * @see AMysql_Statement::execute()
      * 
      * @param string $sql       The SQL string to prepare.
      * @param array $binds      @see $this->execute()
      * @access public
-     * @return $this
+     * @return AMysql_Statement (chainable)
      */
     public function query($sql, $binds = array ())
     {
@@ -344,7 +375,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * @param string $sql       The SQL string.
      * @access protected
      * @throws AMysql_Exception on error
-     * @return $this
+     * @return AMysql_Statement (chainable)
      */
     protected function _query($sql)
     {
@@ -436,7 +467,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
     /**
      * Frees the mysql result resource.
      *
-     * @return $this
+     * @return AMysql_Statement (chainable)
      **/
     public function freeResults()
     {
@@ -452,7 +483,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * Returns all the results with each row in the format of that specified
      * by the fetch mode.
      * 
-     * @see $this->setFetchMode()
+     * @see AMysql_Statement::setFetchMode()
      *
      * @return array
      **/
@@ -490,9 +521,12 @@ class AMysql_Statement implements IteratorAggregate, Countable
     /**
      * Returns one row in the format specified by the fetch mode.
      *
-     * @see $this->setFetchMode()
+     * @see AMysql_Statement::setFetchMode()
      * 
-     * @return array
+     * @return mixed            Usually array. Can also be FALSE if there are
+     *                          no more rows. If AMysql_Abstract::FETCH_OBJECT
+     *                          is the fetch mode, then an object would be
+     *                          returned.
      */
     public function fetch()
     {
@@ -507,14 +541,14 @@ class AMysql_Statement implements IteratorAggregate, Countable
         } elseif (AMysql_Abstract::FETCH_ARRAY == $this->_fetchMode) {
             return $this->fetchArray();
         } else {
-            throw new Exception("Unknown fetch mode: `$this->_fetchMode`");
+            throw new RuntimeException("Unknown fetch mode: `$this->_fetchMode`");
         }
     }
 
     /**
      * Fetches one row with column names as the keys.
      * 
-     * @return array|false
+     * @return array|FALSE
      */
     public function fetchAssoc()
     {
@@ -577,19 +611,24 @@ class AMysql_Statement implements IteratorAggregate, Countable
 
     /**
      * Fetches the next row with column names as numeric indices.
+     * Returns FALSE if there are no more rows.
      * 
-     * @return array
+     * @return array|FALSE
      */
     public function fetchRow()
     {
         $result = $this->result;
-        return $this->isMysqli() ? $result->fetch_row() : mysql_fetch_row($result);
+        return $this->isMysqli() ?
+            $result->fetch_row() :
+            mysql_fetch_row($result);
     }
 
     /**
-     * Alias of $this->fetchRow()
+     * Alias of {@link AMysql_Statement::fetchRow()}
+     *
+     * @see AMysql_Statement::fetchRow()
      * 
-     * @return array
+     * @return array|FALSE
      */
     public function fetchNum()
     {
@@ -605,16 +644,18 @@ class AMysql_Statement implements IteratorAggregate, Countable
     {
         $result = $this->result;
         $isMysqli = $this->isMysqli();
-        return $isMysqli ? $result->fetch_array(MYSQLI_BOTH) : mysql_fetch_array($result, MYSQL_BOTH);
+        return $isMysqli ?
+            $result->fetch_array(MYSQLI_BOTH) :
+            mysql_fetch_array($result, MYSQL_BOTH);
     }
 
     /**
      * Returns the result of the given row and field. A warning is issued
      * if the result on the given row and column does not exist.
      * 
-     * @param int $row		(Optional) The row number.
-     * @param mixed $field	(Optional) The field number or name.
-     * @return mixed
+     * @param int $row		        (Optional) The row number.
+     * @param int|string $field	    (Optional) The field number or name.
+     * @return string|int|FALSE
      */
     public function result($row = 0, $field = 0)
     {
@@ -824,7 +865,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * Returns the number of rows selected, or FALSE on failure.
      * 
      * @access public
-     * @return int|false
+     * @return int|FALSE
      */
     public function numRows()
     {
@@ -861,7 +902,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * Appends a string to the prepared string.
      *
      * @param string $sql The string to append.
-     * @return $this
+     * @return AMysql_Statement (chainable)
      **/
     public function appendPrepare($sql)
     {
@@ -899,7 +940,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      *				    so do not add apostrophes in your
      *				    prepared sqls.
      *
-     * @return $this
+     * @return AMysql_Statement (chainable)
      **/
     public function bindValue($key, $val)
     {
@@ -916,7 +957,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      *
      * @see $this->bindValue()
      *
-     * @return $this
+     * @return AMysql_Statement (chainable)
      */
     public function bindParam($key, &$val)
     {
@@ -932,7 +973,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * 
      * @param array $binds      The binds.
      * @access public
-     * @return $this
+     * @return AMysql_Statement (chainable)
      */
     public function setBinds(array $binds)
     {
@@ -946,7 +987,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * 
      * @param array $binds      The binds.
      * @access public
-     * @return $this
+     * @return AMysql_Statement (chainable)
      */
     public function addBinds(array $binds)
     {
@@ -1044,7 +1085,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      *					    as their values.
      * @param string $where		An SQL substring of the WHERE clause.
      *
-     * @return $this
+     * @return AMysql_Statement (chainable)
      * @throws AMysql_Exception                
      **/
     public function update($tableName, array $data, $where)
@@ -1088,7 +1129,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * 					values are numerical arrays, where each value represents the
      * 					value for the new row of that key.
      *
-     * @return $this
+     * @return AMysql_Statement (chainable)
      * @throws AMysql_Exception                              
      **/
     public function insertReplace($type, $tableName, array $data)
@@ -1113,7 +1154,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * @param string $tableName 
      * @param array $data 
      * @access public
-     * @return $this
+     * @return AMysql_Statement (chainable)
      */
     public function insert($tableName, array $data)
     {
@@ -1128,7 +1169,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * @param string $tableName 
      * @param array $data 
      * @access public
-     * @return $this
+     * @return AMysql_Statement (chainable)
      */
     public function replace($tableName, array $data)
     {
@@ -1147,7 +1188,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      *
      * @see AMysql_Abstract::delete()
      *
-     * @return $this
+     * @return AMysql_Statement (chainable)
      **/
     public function delete($tableName, $where)
     {
@@ -1163,7 +1204,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
     /**
      * Returns the last insert id
      *
-     * @return integer|false
+     * @return integer|FALSE
      **/
     public function insertId()
     {
