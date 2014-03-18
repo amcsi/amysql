@@ -1,0 +1,2930 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="generator" content="ApiGen 2.8.0" />
+
+	<title>Class AMysql_Statement</title>
+
+	<script type="text/javascript" src="resources/combined.js?1487491625"></script>
+	<script type="text/javascript" src="elementlist.js?774651034"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Namespaces</h3>
+			<ul>
+				<li class="active"><a href="namespace-None.html">None</a>
+						</li>
+				<li><a href="namespace-PHP.html">PHP</a>
+						</li>
+			</ul>
+		</div>
+
+		<hr />
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-AbstractTest.html">AbstractTest</a></li>
+				<li><a href="class-AMysql.html">AMysql</a></li>
+				<li><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></li>
+				<li><a href="class-AMysql_Expr.html">AMysql_Expr</a></li>
+				<li><a href="class-AMysql_Iterator.html">AMysql_Iterator</a></li>
+				<li><a href="class-AMysql_Profiler.html">AMysql_Profiler</a></li>
+				<li><a href="class-AMysql_Select.html">AMysql_Select</a></li>
+				<li class="active"><a href="class-AMysql_Statement.html">AMysql_Statement</a></li>
+				<li><a href="class-AMysql_TestCase.html">AMysql_TestCase</a></li>
+				<li><a href="class-ExceptionTest.html">ExceptionTest</a></li>
+				<li><a href="class-ExprTest.html">ExprTest</a></li>
+				<li><a href="class-IteratorTest.html">IteratorTest</a></li>
+				<li><a href="class-SelectTest.html">SelectTest</a></li>
+				<li><a href="class-StatementTest.html">StatementTest</a></li>
+			</ul>
+
+
+
+			<h3>Exceptions</h3>
+			<ul>
+				<li><a href="class-AMysql_Exception.html">AMysql_Exception</a></li>
+			</ul>
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="" />
+		<input type="hidden" name="ie" value="UTF-8" />
+		<input type="text" name="q" class="text" />
+		<input type="submit" value="Search" />
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="namespace-None.html" title="Summary of None"><span>Namespace</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class AMysql_Statement</h1>
+
+
+	<div class="description">
+	
+<p>The statement class belonging to the AMysql_Abstract class, where mysql
+queries are built and handled. Most methods here are chainable, and many common
+AMysql_Abstract methods return a new instance of this class. A simple use
+example:</p>
+
+<p>$amysql = new AMysql($conn); try { $stmt = $amysql-&gt;query('SELECT * FROM
+cms_content'); while ($row = $stmt-&gt;fetchAssoc()) { ... } } catch
+(AMysql_Exception $e) { echo $e-&gt;getDetails(); }</p>
+
+<p>Visit <a
+href="https://github.com/amcsi/amysql">https://github.com/amcsi/amysql</a></p>
+
+	</div>
+
+	<dl class="tree">
+		<dd style="padding-left:0px">
+<b><span>AMysql_Statement</span></b>			
+			 implements 
+				<a href="class-IteratorAggregate.html"><span>IteratorAggregate</span></a>, 
+			
+				<a href="class-Countable.html"><span>Countable</span></a>
+			
+			
+		</dd>
+	</dl>
+
+
+	<div>
+		<h4>Direct known subclasses</h4>
+			<a href="class-AMysql_Select.html">AMysql_Select</a>
+	</div>
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		
+		
+
+				<b>License:</b>
+				<a href="MIT">License; http://www.opensource.org/licenses/mit-license.php</a><br />
+				<b>Author:</b>
+				Szerémi Attila<br />
+		<b>Located at</b> <a href="source-class-AMysql_Statement.html#2-1263" title="Go to source code">AMysql/Statement.php</a><br />
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-AMysql_Statement.html#71-78" title="Go to source code">__construct</a>( <span><code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code> <var>$amysql</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getLink" id="_getLink">
+
+		<td class="attributes"><code>
+			 public 
+			resource|Mysqli
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getLink">#</a>
+		<code><a href="source-class-AMysql_Statement.html#80-100" title="Go to source code">getLink</a>( )</code>
+
+		<div class="description short">
+			
+<p>Fetches the mysql link. If it is not set, try to take it from the amysql
+object. Of still not set, try to connect and take it.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Fetches the mysql link. If it is not set, try to take it from the amysql
+object. Of still not set, try to connect and take it.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>resource|Mysqli</code><br>$link The mysql resource or Mysqli object<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="isMysqli" id="_isMysqli">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_isMysqli">#</a>
+		<code><a href="source-class-AMysql_Statement.html#102-109" title="Go to source code">isMysqli</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getIterator" id="_getIterator">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getIterator">#</a>
+		<code><a href="source-class-AMysql_Statement.html#111-114" title="Go to source code">getIterator</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+				<h4>Implementation of</h4>
+				<div class="list"><code><a href="class-IteratorAggregate.html#_getIterator">IteratorAggregate::getIterator()</a></code></div>
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setFetchMode" id="_setFetchMode">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setFetchMode">#</a>
+		<code><a href="source-class-AMysql_Statement.html#116-142" title="Go to source code">setFetchMode</a>( <span>mixed <var>$fetchMode</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Sets the fetch mode for fetch() and fetchAll() Any extra parameters are
+passed on to the handler for that fetch type. For example you can pass the class
+name and parameters for fetchObject here.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Sets the fetch mode for fetch() and fetchAll() Any extra parameters are
+passed on to the handler for that fetch type. For example you can pass the class
+name and parameters for fetchObject here.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$fetchMode</var></dt>
+					<dd><code>mixed</code><br>$fetchMode The fetch mode. Use the AMysql_Abstract constants.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="execute" id="_execute">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_execute">#</a>
+		<code><a href="source-class-AMysql_Statement.html#144-211" title="Go to source code">execute</a>( <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span> ()</span> )</code>
+
+		<div class="description short">
+			
+<p>Executes a prepared statement, optionally accepting binds for replacing
+placeholders.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Executes a prepared statement, optionally accepting binds for replacing
+placeholders.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$binds</var></dt>
+					<dd><code>mixed</code><br>$binds (Optional) The binds for the placeholders. This library supports names
+and unnames placeholders. To use unnamed placeholders, use question marks (?) as
+placeholders. A bind's key should be the index of the question mark. If $binds
+is not an array, it is casted to one. To use named placeholders, the
+placeholders must start with a non-alphanumeric, non-128+ character. If the key
+starts with an alphanumeric or 128+ character, the placeholder that is searched
+to be replaced will be the key prepended by a colon (:). Here are examples for
+what keys will replace what placeholders for the value: :key: =&gt; :key: :key
+=&gt; :key key =&gt; :key key: =&gt; :key: !key =&gt; !key élet =&gt; :élet
+All values are escaped and are automatically surrounded by apostrophes if
+needed. Do NOT add apostrophes around the string values as encapsulating for a
+mysql string.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						<code><code><a href="class-AMysql_Abstract.html#_escape">AMysql_Abstract::escape()</a></code></code><br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getSql" id="_getSql">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getSql">#</a>
+		<code><a href="source-class-AMysql_Statement.html#213-230" title="Go to source code">getSql</a>( <span>string <var>$prepared</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>The sql string built up by the different preparing methods (prepare, select,
+insert etc.) is returned, having the placeholders being replaced by their binded
+values. You can debug what the final SQL string would be by calling this
+method.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>The sql string built up by the different preparing methods (prepare, select,
+insert etc.) is returned, having the placeholders being replaced by their binded
+values. You can debug what the final SQL string would be by calling this
+method.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$prepared</var></dt>
+					<dd><code>string</code><br>$prepared (Optional) Use this prepared string instead of the one set.</dd>
+				</dl></div>
+
+
+
+				<h4>Author</h4>
+				<div class="list">
+						Szerémi Attila<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="quoteInto" id="_quoteInto">
+
+		<td class="attributes"><code>
+			 public 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_quoteInto">#</a>
+		<code><a href="source-class-AMysql_Statement.html#232-295" title="Go to source code">quoteInto</a>( <span>string <var>$prepared</var></span>, <span>mixed <var>$binds</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Like $this-&gt;getSql(), but you must give the prepared statement, the binds,
+and $this-&gt;beforeSql is ignored.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Like $this-&gt;getSql(), but you must give the prepared statement, the binds,
+and $this-&gt;beforeSql is ignored.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$prepared</var></dt>
+					<dd><code>string</code><br>$prepared</dd>
+					<dt><var>$binds</var></dt>
+					<dd><code>mixed</code><br>$binds $binds are automatically type casted to an array.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						$this-&gt;getSql()<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="_replaceCallback" id="__replaceCallback">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#__replaceCallback">#</a>
+		<code><a href="source-class-AMysql_Statement.html#297-304" title="Go to source code">_replaceCallback</a>( <span>mixed <var>$match</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="prepare" id="_prepare">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_prepare">#</a>
+		<code><a href="source-class-AMysql_Statement.html#306-320" title="Go to source code">prepare</a>( <span>string <var>$sql</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Prepares an SQL string for binding and execution. Use of this method is not
+recommended externally. Use the AMysql class's prepare method instead which
+returns a new AMysql_Statement instance.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Prepares an SQL string for binding and execution. Use of this method is not
+recommended externally. Use the AMysql class's prepare method instead which
+returns a new AMysql_Statement instance.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sql</var></dt>
+					<dd><code>string</code><br>$sql The SQL string to prepare.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="query" id="_query">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_query">#</a>
+		<code><a href="source-class-AMysql_Statement.html#322-338" title="Go to source code">query</a>( <span>string <var>$sql</var></span>, <span>array <var>$binds</var> = <span class="php-keyword1">array</span> ()</span> )</code>
+
+		<div class="description short">
+			
+<p>Prepares a statement and executes it with the given binds.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Prepares a statement and executes it with the given binds.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sql</var></dt>
+					<dd><code>string</code><br>$sql The SQL string to prepare.</dd>
+					<dt><var>$binds</var></dt>
+					<dd><code>array</code><br>$binds @see $this-&gt;execute()</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						$this-&gt;prepare()<br />
+						$this-&gt;execute()<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="_query" id="__query">
+
+		<td class="attributes"><code>
+			 protected 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#__query">#</a>
+		<code><a href="source-class-AMysql_Statement.html#340-434" title="Go to source code">_query</a>( <span>string <var>$sql</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Performs the actual query on the database with the given SQL string, making
+no further modifications on it.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Performs the actual query on the database with the given SQL string, making
+no further modifications on it.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sql</var></dt>
+					<dd><code>string</code><br>$sql The SQL string.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code><code><a href="class-AMysql_Exception.html">AMysql_Exception</a></code></code><br>on error<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="freeResults" id="_freeResults">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_freeResults">#</a>
+		<code><a href="source-class-AMysql_Statement.html#436-449" title="Go to source code">freeResults</a>( )</code>
+
+		<div class="description short">
+			
+<p>Frees the mysql result resource.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Frees the mysql result resource.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="fetchAll" id="_fetchAll">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_fetchAll">#</a>
+		<code><a href="source-class-AMysql_Statement.html#451-488" title="Go to source code">fetchAll</a>( )</code>
+
+		<div class="description short">
+			
+<p>Returns all the results with each row in the format of that specified by the
+fetch mode.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns all the results with each row in the format of that specified by the
+fetch mode.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						$this-&gt;setFetchMode()<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="fetch" id="_fetch">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_fetch">#</a>
+		<code><a href="source-class-AMysql_Statement.html#490-512" title="Go to source code">fetch</a>( )</code>
+
+		<div class="description short">
+			
+<p>Returns one row in the format specified by the fetch mode.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns one row in the format specified by the fetch mode.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						$this-&gt;setFetchMode()<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="fetchAssoc" id="_fetchAssoc">
+
+		<td class="attributes"><code>
+			 public 
+			array|false
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_fetchAssoc">#</a>
+		<code><a href="source-class-AMysql_Statement.html#514-523" title="Go to source code">fetchAssoc</a>( )</code>
+
+		<div class="description short">
+			
+<p>Fetches one row with column names as the keys.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Fetches one row with column names as the keys.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array|false</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="fetchAllAssoc" id="_fetchAllAssoc">
+
+		<td class="attributes"><code>
+			 public 
+			&lt;Associative
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_fetchAllAssoc">#</a>
+		<code><a href="source-class-AMysql_Statement.html#525-576" title="Go to source code">fetchAllAssoc</a>( <span>integer|string|boolean <var>$keyColumn</var> = <span class="php-keyword1">false</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Fetches all rows and returns them as an array of associative arrays. The
+outer array is numerically indexed by default, but can be indexed by a field
+value.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Fetches all rows and returns them as an array of associative arrays. The
+outer array is numerically indexed by default, but can be indexed by a field
+value.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$keyColumn</var></dt>
+					<dd><code>integer|string|boolean</code><br>$keyColumn (Optional) If a string, the cell of the given field will be the key
+for its row, so the result will not be an array numerically indexed from 0 in
+order. This value can also be an integer, specifying the index of the field with
+the key.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>&lt;Associative</code><br>result array&gt;[]<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="fetchRow" id="_fetchRow">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_fetchRow">#</a>
+		<code><a href="source-class-AMysql_Statement.html#578-587" title="Go to source code">fetchRow</a>( )</code>
+
+		<div class="description short">
+			
+<p>Fetches the next row with column names as numeric indices.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Fetches the next row with column names as numeric indices.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="fetchNum" id="_fetchNum">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_fetchNum">#</a>
+		<code><a href="source-class-AMysql_Statement.html#589-597" title="Go to source code">fetchNum</a>( )</code>
+
+		<div class="description short">
+			
+<p>Alias of $this-&gt;fetchRow()</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Alias of $this-&gt;fetchRow()</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="fetchArray" id="_fetchArray">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_fetchArray">#</a>
+		<code><a href="source-class-AMysql_Statement.html#599-609" title="Go to source code">fetchArray</a>( )</code>
+
+		<div class="description short">
+			
+<p>Fetches the next row with column names and their indexes as keys.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Fetches the next row with column names and their indexes as keys.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="result" id="_result">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_result">#</a>
+		<code><a href="source-class-AMysql_Statement.html#611-643" title="Go to source code">result</a>( <span>integer <var>$row</var> = <span class="php-num">0</span></span>, <span>mixed <var>$field</var> = <span class="php-num">0</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Returns the result of the given row and field. A warning is issued if the
+result on the given row and column does not exist.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns the result of the given row and field. A warning is issued if the
+result on the given row and column does not exist.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$row</var></dt>
+					<dd><code>integer</code><br>$row (Optional) The row number.</dd>
+					<dt><var>$field</var></dt>
+					<dd><code>mixed</code><br>$field (Optional) The field number or name.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="resultDefault" id="_resultDefault">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_resultDefault">#</a>
+		<code><a href="source-class-AMysql_Statement.html#645-660" title="Go to source code">resultDefault</a>( <span>mixed <var>$default</var></span>, <span>integer <var>$row</var> = <span class="php-num">0</span></span>, <span>integer <var>$field</var> = <span class="php-num">0</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Returns the result of the given row and field, or the given value if the row
+doesn't exist</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns the result of the given row and field, or the given value if the row
+doesn't exist</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$default</var></dt>
+					<dd><code>mixed</code><br>$default The value to return if the field is not found.</dd>
+					<dt><var>$row</var></dt>
+					<dd><code>integer</code><br>$row (Optional) The row number.</dd>
+					<dt><var>$field</var></dt>
+					<dd><code>integer</code><br>$field (Optional) The field.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="resultNull" id="_resultNull">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_resultNull">#</a>
+		<code><a href="source-class-AMysql_Statement.html#663-675" title="Go to source code">resultNull</a>( <span>integer <var>$row</var> = <span class="php-num">0</span></span>, <span>integer <var>$field</var> = <span class="php-num">0</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Returns the result of the given row and field, or null if the row doesn't
+exist</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns the result of the given row and field, or null if the row doesn't
+exist</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$row</var></dt>
+					<dd><code>integer</code><br>$row (Optional) The row number.</dd>
+					<dt><var>$field</var></dt>
+					<dd><code>integer</code><br>$field (Optional) The field.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="resultInt" id="_resultInt">
+
+		<td class="attributes"><code>
+			 public 
+			integer
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_resultInt">#</a>
+		<code><a href="source-class-AMysql_Statement.html#677-688" title="Go to source code">resultInt</a>( <span>integer <var>$row</var> = <span class="php-num">0</span></span>, <span>integer <var>$field</var> = <span class="php-num">0</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Returns the result of the given row and field as an integer. 0, if that
+result doesn't exist.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns the result of the given row and field as an integer. 0, if that
+result doesn't exist.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$row</var></dt>
+					<dd><code>integer</code><br>$row (Optional) The row number.</dd>
+					<dt><var>$field</var></dt>
+					<dd><code>integer</code><br>$field (Optional) The field.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="fetchPairs" id="_fetchPairs">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_fetchPairs">#</a>
+		<code><a href="source-class-AMysql_Statement.html#690-712" title="Go to source code">fetchPairs</a>( <span>mixed <var>$keyColumn</var> = <span class="php-num">0</span></span>, <span>mixed <var>$valueColumn</var> = <span class="php-num">1</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Returns an array of scalar values, where the keys are the values of the key
+column specified, and the values are the values of the value column
+specified.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns an array of scalar values, where the keys are the values of the key
+column specified, and the values are the values of the value column
+specified.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$keyColumn</var></dt>
+					<dd><code>mixed</code><br>$keyColumn (Optional) column number or string for the keys. Default: 0.</dd>
+					<dt><var>$valueColumn</var></dt>
+					<dd><code>mixed</code><br>$valueColumn (Optional) column number or string for the values. Default: 1.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="pairUp" id="_pairUp">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_pairUp">#</a>
+		<code><a href="source-class-AMysql_Statement.html#714-717" title="Go to source code">pairUp</a>( <span>mixed <var>$keyColumn</var> = <span class="php-num">0</span></span>, <span>mixed <var>$valueColumn</var> = <span class="php-num">1</span></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="fetchAllColumn" id="_fetchAllColumn">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_fetchAllColumn">#</a>
+		<code><a href="source-class-AMysql_Statement.html#719-740" title="Go to source code">fetchAllColumn</a>( <span>mixed <var>$column</var> = <span class="php-num">0</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Returns all values of a specified column as an array.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns all values of a specified column as an array.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$column</var></dt>
+					<dd><code>mixed</code><br>$column (Optional) column number or string for the values. Default: 0.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="fetchAllColumns" id="_fetchAllColumns">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_fetchAllColumns">#</a>
+		<code><a href="source-class-AMysql_Statement.html#742-784" title="Go to source code">fetchAllColumns</a>( <span>mixed <var>$keyColumn</var> = <span class="php-keyword1">false</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Fetches all rows and returns them as an array of columns containing an array
+of values. Works simalarly to fetchAllAssoc(), but with the resulting array
+transposed.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Fetches all rows and returns them as an array of columns containing an array
+of values. Works simalarly to fetchAllAssoc(), but with the resulting array
+transposed.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="fetchObject" id="_fetchObject">
+
+		<td class="attributes"><code>
+			 public 
+			object
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_fetchObject">#</a>
+		<code><a href="source-class-AMysql_Statement.html#786-811" title="Go to source code">fetchObject</a>( <span>string <var>$className</var> = <span class="php-quote">'stdClass'</span></span>, <span>array <var>$params</var> = <span class="php-keyword1">array</span>() </span> )</code>
+
+		<div class="description short">
+			
+<p>Fetches the next row as an object.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Fetches the next row as an object.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$className</var></dt>
+					<dd><code>string</code><br>$className (Optional) The class to use. Default is stdClass.</dd>
+					<dt><var>$params</var></dt>
+					<dd><code>array</code><br>$params (Optional) The params to pass to the object.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>object</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="affectedRows" id="_affectedRows">
+
+		<td class="attributes"><code>
+			 public 
+			integer
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_affectedRows">#</a>
+		<code><a href="source-class-AMysql_Statement.html#813-821" title="Go to source code">affectedRows</a>( )</code>
+
+		<div class="description short">
+			
+<p>Returns the number of affected rows.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns the number of affected rows.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="numRows" id="_numRows">
+
+		<td class="attributes"><code>
+			 public 
+			integer|false
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_numRows">#</a>
+		<code><a href="source-class-AMysql_Statement.html#823-835" title="Go to source code">numRows</a>( )</code>
+
+		<div class="description short">
+			
+<p>Returns the number of rows selected, or FALSE on failure.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns the number of rows selected, or FALSE on failure.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer|false</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="throwException" id="_throwException">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_throwException">#</a>
+		<code><a href="source-class-AMysql_Statement.html#837-845" title="Go to source code">throwException</a>( )</code>
+
+		<div class="description short">
+			
+<p>Throws an AMysqlException for the last mysql error.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Throws an AMysqlException for the last mysql error.</p>
+
+
+
+
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code><code><a href="class-AMysql_Exception.html">AMysql_Exception</a></code></code><br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="escapeIdentifierSimple" id="_escapeIdentifierSimple">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_escapeIdentifierSimple">#</a>
+		<code><a href="source-class-AMysql_Statement.html#847-850" title="Go to source code">escapeIdentifierSimple</a>( <span>mixed <var>$columnName</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="escapeIdentifier" id="_escapeIdentifier">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_escapeIdentifier">#</a>
+		<code><a href="source-class-AMysql_Statement.html#852-858" title="Go to source code">escapeIdentifier</a>( <span>mixed <var>$columnName</var></span>, <span>mixed <var>$as</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+				<h4>See</h4>
+				<div class="list">
+						AMysql_Abstract::escapeIdentifier<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="appendPrepare" id="_appendPrepare">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_appendPrepare">#</a>
+		<code><a href="source-class-AMysql_Statement.html#860-870" title="Go to source code">appendPrepare</a>( <span>string <var>$sql</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Appends a string to the prepared string.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Appends a string to the prepared string.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sql</var></dt>
+					<dd><code>string</code><br>$sql The string to append.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="bindValue" id="_bindValue">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_bindValue">#</a>
+		<code><a href="source-class-AMysql_Statement.html#872-911" title="Go to source code">bindValue</a>( <span>mixed <var>$key</var></span>, <span>mixed <var>$val</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Binds a value to the sql string.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Binds a value to the sql string.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$key</var></dt>
+					<dd><code>mixed</code><br>$key If an integer, then the given index question mark will be replaced. If a
+string, then then, if it starts with an alphanumberic or 128+ ascii character,
+then a colon plus the string given will be replaced, otherwise the given string
+literally will be replaced. Example: if the string is foo then :foo will be
+replaced. if the string is !foo then !foo will be replaced if the string is
+:foo: then :foo: will be replaced. Note: don't worry about keys that have a
+common beginning. If foo and fool are set, :fool will not be replaced with the
+value given for foo.</dd>
+					<dt><var>$val</var></dt>
+					<dd><code>mixed</code><br>$val Bind this value for replacing the mark defined by $key. The value is
+escaped depeding on its type, apostrophes included, so do not add apostrophes in
+your prepared sqls.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="bindParam" id="_bindParam">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_bindParam">#</a>
+		<code><a href="source-class-AMysql_Statement.html#913-928" title="Go to source code">bindParam</a>( <span>mixed <var>$key</var></span>, <span>mixed <var>&amp; $val</var></span> )</code>
+
+		<div class="description short">
+			
+<p>The same as $this-&gt;bindValue(), except that $val is binded by reference,
+meaning its value is extracted on execute.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>The same as $this-&gt;bindValue(), except that $val is binded by reference,
+meaning its value is extracted on execute.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						$this-&gt;bindValue()<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setBinds" id="_setBinds">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setBinds">#</a>
+		<code><a href="source-class-AMysql_Statement.html#930-941" title="Go to source code">setBinds</a>( <span>array <var>$binds</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Sets the binds binding question marks or named binds to values.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Sets the binds binding question marks or named binds to values.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$binds</var></dt>
+					<dd><code>array</code><br>$binds The binds.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="addBinds" id="_addBinds">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_addBinds">#</a>
+		<code><a href="source-class-AMysql_Statement.html#943-955" title="Go to source code">addBinds</a>( <span>array <var>$binds</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Merges an array of binds with the ones already set. Only use for named
+parameters!</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Merges an array of binds with the ones already set. Only use for named
+parameters!</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$binds</var></dt>
+					<dd><code>array</code><br>$binds The binds.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="buildColumnsValues" id="_buildColumnsValues">
+
+		<td class="attributes"><code>
+			 public 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_buildColumnsValues">#</a>
+		<code><a href="source-class-AMysql_Statement.html#957-1013" title="Go to source code">buildColumnsValues</a>( <span>array <var>$data</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Builds a columns list with values as a string</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Builds a columns list with values as a string</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$data</var></dt>
+					<dd><code>array</code><br>$data @see $this-&gt;insertReplace()</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="buildSet" id="_buildSet">
+
+		<td class="attributes"><code>
+			 public 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_buildSet">#</a>
+		<code><a href="source-class-AMysql_Statement.html#1015-1031" title="Go to source code">buildSet</a>( <span>array <var>$data</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Puts together a string that is to be placed after a SET statement. i.e.
+column1 = 'value', int_col = 3</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Puts together a string that is to be placed after a SET statement. i.e.
+column1 = 'value', int_col = 3</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$data</var></dt>
+					<dd><code>array</code><br>$data Keys are column names, values are the values unescaped</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="update" id="_update">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_update">#</a>
+		<code><a href="source-class-AMysql_Statement.html#1033-1067" title="Go to source code">update</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span>, <span>string <var>$where</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Prepares a mysql UPDATE unexecuted. By execution, have the placeholders of
+the WHERE statement binded. It is rather recommended to use
+AMysql_Abstract::update() instead, which lets you also bind the values in one
+call and it returns the success of the query.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Prepares a mysql UPDATE unexecuted. By execution, have the placeholders of
+the WHERE statement binded. It is rather recommended to use
+AMysql_Abstract::update() instead, which lets you also bind the values in one
+call and it returns the success of the query.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$tableName</var></dt>
+					<dd><code>string</code><br>$tableName The table name.</dd>
+					<dt><var>$data</var></dt>
+					<dd><code>array</code><br>$data The array of data changes. A one-dimensional array with keys as column
+names and values as their values.</dd>
+					<dt><var>$where</var></dt>
+					<dd><code>string</code><br>$where An SQL substring of the WHERE clause.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code><code><a href="class-AMysql_Exception.html">AMysql_Exception</a></code></code><br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="insertReplace" id="_insertReplace">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_insertReplace">#</a>
+		<code><a href="source-class-AMysql_Statement.html#1069-1106" title="Go to source code">insertReplace</a>( <span>string <var>$type</var></span>, <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Prepares a mysql INSERT or REPLACE unexecuted. After this, you should just
+call $this-&gt;execute(). It is rather recommended to use
+AMysql_Abstract::insert() instead, which returns the last inserted id
+already.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Prepares a mysql INSERT or REPLACE unexecuted. After this, you should just
+call $this-&gt;execute(). It is rather recommended to use
+AMysql_Abstract::insert() instead, which returns the last inserted id
+already.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$type</var></dt>
+					<dd><code>string</code><br>$type "$type INTO..." (INSERT, INSERT IGNORE, REPLACE) etc.</dd>
+					<dt><var>$tableName</var></dt>
+					<dd><code>string</code><br>$tableName The table name.</dd>
+					<dt><var>$data</var></dt>
+					<dd><code>array</code><br>$data A one or two-dimensional array. 1D: an associative array of keys as column
+names and values as their values. This inserts one row. 2D numeric: A numeric
+array where each value is an associative array with column-value pairs. Each
+outer, numeric value represents a row of data. 2D associative: An associative
+array where the keys are the columns, the values are numerical arrays, where
+each value represents the value for the new row of that key.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code><code><a href="class-AMysql_Exception.html">AMysql_Exception</a></code></code><br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="insert" id="_insert">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_insert">#</a>
+		<code><a href="source-class-AMysql_Statement.html#1108-1121" title="Go to source code">insert</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Performs an INSERT.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Performs an INSERT.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$tableName</var></dt>
+					<dd><code>string</code><br>$tableName</dd>
+					<dt><var>$data</var></dt>
+					<dd><code>array</code><br>$data</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						$this-&gt;insertReplace<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="replace" id="_replace">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_replace">#</a>
+		<code><a href="source-class-AMysql_Statement.html#1123-1136" title="Go to source code">replace</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Performs a REPLACE.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Performs a REPLACE.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$tableName</var></dt>
+					<dd><code>string</code><br>$tableName</dd>
+					<dt><var>$data</var></dt>
+					<dd><code>array</code><br>$data</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						$this-&gt;insertReplace<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="delete" id="_delete">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_delete">#</a>
+		<code><a href="source-class-AMysql_Statement.html#1138-1161" title="Go to source code">delete</a>( <span>string <var>$tableName</var></span>, <span>string <var>$where</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Prepares a mysql DELETE unexecuted. By execution, have the placeholders of
+the WHERE statement binded. It is rather recommended to use
+AMysql_Abstract::delete() instead, which lets you also bind the values in one
+call and it returns the success of the query.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Prepares a mysql DELETE unexecuted. By execution, have the placeholders of
+the WHERE statement binded. It is rather recommended to use
+AMysql_Abstract::delete() instead, which lets you also bind the values in one
+call and it returns the success of the query.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$tableName</var></dt>
+					<dd><code>string</code><br>$tableName The table name.</dd>
+					<dt><var>$where</var></dt>
+					<dd><code>string</code><br>$where An SQL substring of the WHERE clause.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						<code><code><a href="class-AMysql_Abstract.html#_delete">AMysql_Abstract::delete()</a></code></code><br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="insertId" id="_insertId">
+
+		<td class="attributes"><code>
+			 public 
+			integer|false
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_insertId">#</a>
+		<code><a href="source-class-AMysql_Statement.html#1163-1172" title="Go to source code">insertId</a>( )</code>
+
+		<div class="description short">
+			
+<p>Returns the last insert id</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns the last insert id</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer|false</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="__destruct" id="___destruct">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___destruct">#</a>
+		<code><a href="source-class-AMysql_Statement.html#1174-1180" title="Go to source code">__destruct</a>( )</code>
+
+		<div class="description short">
+			
+<p>Free the results.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Free the results.</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="__set" id="___set">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___set">#</a>
+		<code><a href="source-class-AMysql_Statement.html#1182-1193" title="Go to source code">__set</a>( <span>mixed <var>$name</var></span>, <span>mixed <var>$value</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="count" id="_count">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_count">#</a>
+		<code><a href="source-class-AMysql_Statement.html#1195-1204" title="Go to source code">count</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+				<h4>Implementation of</h4>
+				<div class="list"><code><a href="class-Countable.html#_count">Countable::count()</a></code></div>
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="reportErrorException" id="_reportErrorException">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_reportErrorException">#</a>
+		<code><a href="source-class-AMysql_Statement.html#1206-1217" title="Go to source code">reportErrorException</a>( <span><code><a href="class-ErrorException.html">ErrorException</a></code> <var>$ex</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Handle an ErrorException thrown with the help of
+$this-&gt;errorHandlerCallback. For now, just suppress the error.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Handle an ErrorException thrown with the help of
+$this-&gt;errorHandlerCallback. For now, just suppress the error.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$ex</var></dt>
+					<dd><code><code><a href="class-ErrorException.html">ErrorException</a></code></code><br>$ex</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="errorHandlerCallback" id="_errorHandlerCallback">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_errorHandlerCallback">#</a>
+		<code><a href="source-class-AMysql_Statement.html#1219-1232" title="Go to source code">errorHandlerCallback</a>( <span>mixed <var>$errno</var></span>, <span>mixed <var>$errstr</var></span>, <span>mixed <var>$errfile</var> = <span class="php-keyword1">null</span></span>, <span>mixed <var>$errline</var> = <span class="php-keyword1">null</span></span>, <span>mixed <var>$errcontext</var> = <span class="php-keyword1">null</span> </span> )</code>
+
+		<div class="description short">
+			
+<p>Changes warnings into exceptions.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Changes warnings into exceptions.</p>
+
+<p>Mainly for handling warnings generated by mysql functions/methods.</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="handleError" id="_handleError">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_handleError">#</a>
+		<code><a href="source-class-AMysql_Statement.html#1234-1249" title="Go to source code">handleError</a>( <span>mixed <var>$msg</var></span>, <span>mixed <var>$code</var></span>, <span>mixed <var>$query</var></span> )</code>
+
+		<div class="description short">
+			
+<p>handleError</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>handleError</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$msg</var></dt>
+					<dd><code>mixed</code><br>$msg</dd>
+					<dt><var>$code</var></dt>
+					<dd><code>mixed</code><br>$code</dd>
+					<dt><var>$query</var></dt>
+					<dd><code>mixed</code><br>$query</dd>
+				</dl></div>
+
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code><code><a href="class-AMysql_Exception.html">AMysql_Exception</a></code></code><br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="handleException" id="_handleException">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_handleException">#</a>
+		<code><a href="source-class-AMysql_Statement.html#1251-1262" title="Go to source code">handleException</a>( <span><code><a href="class-AMysql_Exception.html">AMysql_Exception</a></code> <var>$ex</var></span> )</code>
+
+		<div class="description short">
+			
+<p>handleException</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>handleException</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$ex</var></dt>
+					<dd><code><code><a href="class-AMysql_Exception.html">AMysql_Exception</a></code></code></dd>
+				</dl></div>
+
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code><code><a href="class-AMysql_Exception.html">AMysql_Exception</a></code></code><br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+	<table class="summary" id="constants">
+	<caption>Constants summary</caption>
+	<tr data-order="CODE_QUERY_NOT_SUCCESSFUL" id="CODE_QUERY_NOT_SUCCESSFUL">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-AMysql_Statement.html#69" title="Go to source code"><b>CODE_QUERY_NOT_SUCCESSFUL</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">120000</span></code></td>
+		<td class="description"><div>
+			<a href="#CODE_QUERY_NOT_SUCCESSFUL" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="amysql" id="$amysql">
+		<td class="attributes"><code>
+			public  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#26" title="Go to source code"><var>$amysql</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$amysql" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="error" id="$error">
+		<td class="attributes"><code>
+			public  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#27" title="Go to source code"><var>$error</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$error" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="errno" id="$errno">
+		<td class="attributes"><code>
+			public  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#28" title="Go to source code"><var>$errno</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$errno" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="result" id="$result">
+		<td class="attributes"><code>
+			public  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#29" title="Go to source code"><var>$result</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$result" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="results" id="$results">
+		<td class="attributes"><code>
+			public  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#30" title="Go to source code"><var>$results</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span> ()</code></td>
+		<td class="description"><div>
+			<a href="#$results" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="query" id="$query">
+		<td class="attributes"><code>
+			public  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#31" title="Go to source code"><var>$query</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$query" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="affectedRows" id="$affectedRows">
+		<td class="attributes"><code>
+			public  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#32" title="Go to source code"><var>$affectedRows</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$affectedRows" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="throwExceptions" id="$throwExceptions">
+		<td class="attributes"><code>
+			public  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#33" title="Go to source code"><var>$throwExceptions</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$throwExceptions" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="lastException" id="$lastException">
+		<td class="attributes"><code>
+			public  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#34" title="Go to source code"><var>$lastException</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">null</span></code></td>
+		<td class="description"><div>
+			<a href="#$lastException" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="insertId" id="$insertId">
+		<td class="attributes"><code>
+			public  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#35" title="Go to source code"><var>$insertId</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$insertId" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="link" id="$link">
+		<td class="attributes"><code>
+			public  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#46" title="Go to source code"><var>$link</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$link" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="isMysqli" id="$isMysqli">
+		<td class="attributes"><code>
+			public  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#47" title="Go to source code"><var>$isMysqli</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$isMysqli" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="_fetchMode" id="$_fetchMode">
+		<td class="attributes"><code>
+			protected  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#49" title="Go to source code"><var>$_fetchMode</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$_fetchMode" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="_fetchModeExtraArgs" id="$_fetchModeExtraArgs">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#50" title="Go to source code"><var>$_fetchModeExtraArgs</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span> ()</code></td>
+		<td class="description"><div>
+			<a href="#$_fetchModeExtraArgs" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="beforeSql" id="$beforeSql">
+		<td class="attributes"><code>
+			public  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#52" title="Go to source code"><var>$beforeSql</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">''</span></code></td>
+		<td class="description"><div>
+			<a href="#$beforeSql" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="prepared" id="$prepared">
+		<td class="attributes"><code>
+			public  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#53" title="Go to source code"><var>$prepared</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">''</span></code></td>
+		<td class="description"><div>
+			<a href="#$prepared" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="binds" id="$binds">
+		<td class="attributes"><code>
+			public  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#54" title="Go to source code"><var>$binds</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
+		<td class="description"><div>
+			<a href="#$binds" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="_executed" id="$_executed">
+		<td class="attributes"><code>
+			protected  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#57" title="Go to source code"><var>$_executed</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$_executed" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="_replacements" id="$_replacements">
+		<td class="attributes"><code>
+			protected  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#59" title="Go to source code"><var>$_replacements</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$_replacements" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="queryTime" id="$queryTime">
+		<td class="attributes"><code>
+			public  
+			float
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Statement.html#61-67" title="Go to source code"><var>$queryTime</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$queryTime" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>The time in took in seconds with microseconds to perform the query. It is
+automatically filled only when $profileQueries is set to true.</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>The time in took in seconds with microseconds to perform the query. It is
+automatically filled only when $profileQueries is set to true.</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		 API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

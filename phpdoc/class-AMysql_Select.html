@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="generator" content="ApiGen 2.8.0" />
+
+	<title>Class AMysql_Select</title>
+
+	<script type="text/javascript" src="resources/combined.js?1487491625"></script>
+	<script type="text/javascript" src="elementlist.js?774651034"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Namespaces</h3>
+			<ul>
+				<li class="active"><a href="namespace-None.html">None</a>
+						</li>
+				<li><a href="namespace-PHP.html">PHP</a>
+						</li>
+			</ul>
+		</div>
+
+		<hr />
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-AbstractTest.html">AbstractTest</a></li>
+				<li><a href="class-AMysql.html">AMysql</a></li>
+				<li><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></li>
+				<li><a href="class-AMysql_Expr.html">AMysql_Expr</a></li>
+				<li><a href="class-AMysql_Iterator.html">AMysql_Iterator</a></li>
+				<li><a href="class-AMysql_Profiler.html">AMysql_Profiler</a></li>
+				<li class="active"><a href="class-AMysql_Select.html">AMysql_Select</a></li>
+				<li><a href="class-AMysql_Statement.html">AMysql_Statement</a></li>
+				<li><a href="class-AMysql_TestCase.html">AMysql_TestCase</a></li>
+				<li><a href="class-ExceptionTest.html">ExceptionTest</a></li>
+				<li><a href="class-ExprTest.html">ExprTest</a></li>
+				<li><a href="class-IteratorTest.html">IteratorTest</a></li>
+				<li><a href="class-SelectTest.html">SelectTest</a></li>
+				<li><a href="class-StatementTest.html">StatementTest</a></li>
+			</ul>
+
+
+
+			<h3>Exceptions</h3>
+			<ul>
+				<li><a href="class-AMysql_Exception.html">AMysql_Exception</a></li>
+			</ul>
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="" />
+		<input type="hidden" name="ie" value="UTF-8" />
+		<input type="text" name="q" class="text" />
+		<input type="submit" value="Search" />
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="namespace-None.html" title="Summary of None"><span>Namespace</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class AMysql_Select</h1>
+
+
+	<div class="description">
+	
+<p>The class is for helping with the assembly of a mysqli SELECT string. Rather
+than having to manually the string - especially of not only the values of
+certain parameters would be dynamic, but the tables, columns, joins, wheres and
+everything else is - you can get a new instance of this class by calling
+$amyql-&gt;select(), and you can freely add fragments to the SELECT query with
+the different methods of this class. When you call -&gt;execute(), the final,
+but unbound SQL string is automatically prepared for binding with the passed (or
+pre-set) binds and execution.</p>
+
+<p>Since the bindings are applied after the SELECT sql string is assembled, you
+are encouraged to use :named placeholders for WHEREs and anything similar,
+binding the values with -&gt;bindValue() each time, or collecting all the binds
+to use in the end and passing it to -&gt;execute().</p>
+
+<p>Please check @link tests/AMysql/SelectTest.php for examples.</p>
+
+<p>Anatomy of a select: SELECT &lt;SELECT OPTIONS&gt; &lt;COLUMNS&gt; FROM
+&lt;FROMS&gt; &lt;JOINS&gt; &lt;WHERES&gt; &lt;GROUP BYS&gt; &lt;HAVINGS&gt;
+&lt;ORDER BYS&gt; &lt;LIMIT&gt; &lt;OFFSET&gt;</p>
+
+<p>Visit <a
+href="https://github.com/amcsi/amysql">https://github.com/amcsi/amysql</a></p>
+
+	</div>
+
+	<dl class="tree">
+		<dd style="padding-left:0px">
+			<a href="class-AMysql_Statement.html"><span>AMysql_Statement</span></a>
+			
+			 implements 
+				<a href="class-IteratorAggregate.html"><span>IteratorAggregate</span></a>, 
+			
+				<a href="class-Countable.html"><span>Countable</span></a>
+			
+			
+		</dd>
+		<dd style="padding-left:30px">
+			<img src="resources/inherit.png" alt="Extended by" />
+<b><span>AMysql_Select</span></b>			
+			
+			
+		</dd>
+	</dl>
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		
+		
+
+				<b>License:</b>
+				<a href="MIT">License; http://www.opensource.org/licenses/mit-license.php</a><br />
+				<b>Author:</b>
+				Szerémi Attila<br />
+		<b>Located at</b> <a href="source-class-AMysql_Select.html#2-469" title="Go to source code">AMysql/Select.php</a><br />
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="option" id="_option">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_option">#</a>
+		<code><a href="source-class-AMysql_Select.html#42-57" title="Go to source code">option</a>( <span>string <var>$selectOption</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a select option.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a select option.</p>
+
+<p>e.g. SQL_CALC_FOUND_ROWS DISTINCT</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$selectOption</var></dt>
+					<dd><code>string</code><br>$selectOption The select option.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="formatSelectColumn" id="_formatSelectColumn">
+
+		<td class="attributes"><code>
+			 public 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_formatSelectColumn">#</a>
+		<code><a href="source-class-AMysql_Select.html#59-82" title="Go to source code">formatSelectColumn</a>( <span>string <var>$columnName</var></span>, <span>string <var>$alias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Formats a column name and an optional alias to form <code>columnName</code>
+AS alias. The alias is automatically not taken into account if it's numeric. No
+need to worry about escaping the select all star character '*'.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Formats a column name and an optional alias to form <code>columnName</code>
+AS alias. The alias is automatically not taken into account if it's numeric. No
+need to worry about escaping the select all star character '*'.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$columnName</var></dt>
+					<dd><code>string</code><br>$columnName The column name.</dd>
+					<dt><var>$alias</var></dt>
+					<dd><code>string</code><br>$alias (Optional) the alias to select AS</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="column" id="_column">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_column">#</a>
+		<code><a href="source-class-AMysql_Select.html#84-109" title="Go to source code">column</a>( <span>string|<code><a href="class-AMysql_Expr.html">AMysql_Expr</a></code>|array <var>$columns</var></span>, <span>array <var>$options</var> = <span class="php-keyword1">array</span> ()</span> )</code>
+
+		<div class="description short">
+			
+<p>Adds one or more COLUMN to the list of columns to select.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds one or more COLUMN to the list of columns to select.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$columns</var></dt>
+					<dd><code>string|<code><a href="class-AMysql_Expr.html">AMysql_Expr</a></code>|array</code><br>$columns The column name. Can be an array of column names in which case the key
+can mark the optional alias of the column.</dd>
+					<dt><var>$options</var></dt>
+					<dd><code>array</code><br>$options (Options) an array of config options columnPrefix - prefix each column
+with this table prefix</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="columnLiteral" id="_columnLiteral">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_columnLiteral">#</a>
+		<code><a href="source-class-AMysql_Select.html#111-126" title="Go to source code">columnLiteral</a>( <span>string <var>$columnLiteral</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Add this literal string between select options and columns.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Add this literal string between select options and columns.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$columnLiteral</var></dt>
+					<dd><code>string</code><br>$columnLiteral Literal string</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="formatFrom" id="_formatFrom">
+
+		<td class="attributes"><code>
+			 public 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_formatFrom">#</a>
+		<code><a href="source-class-AMysql_Select.html#128-144" title="Go to source code">formatFrom</a>( <span>string <var>$tableName</var></span>, <span>string <var>$alias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Formats a table name and an optional alias to form <code>tableName</code> AS
+alias. The alias is automatically not taken into account if it's numeric.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Formats a table name and an optional alias to form <code>tableName</code> AS
+alias. The alias is automatically not taken into account if it's numeric.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$tableName</var></dt>
+					<dd><code>string</code><br>$tableName The table name.</dd>
+					<dt><var>$alias</var></dt>
+					<dd><code>string</code><br>$alias (Optional) the alias to select AS</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="from" id="_from">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_from">#</a>
+		<code><a href="source-class-AMysql_Select.html#146-183" title="Go to source code">from</a>( <span>string|<code><a href="class-AMysql_Expr.html">AMysql_Expr</a></code>|array <var>$tables</var></span>, <span>array <var>$columns</var> = <span class="php-keyword1">array</span> ()</span> )</code>
+
+		<div class="description short">
+			
+<ol>
+	<li>Adds one or more table name to the list of tables to select FROM.</li>
+</ol>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<ol>
+	<li>Adds one or more table name to the list of tables to select FROM.</li>
+
+	<li>Alternatively, if you only select from 1 table here, you can supply an
+	array</li>
+</ol>
+
+<p>of columns to select, having them automatically prefixed to the needed prefix
+of the table selected from. Similar to Zend Framework 1.</p>
+
+<p>e.g. -&gt;from(array('p' =&gt; 'products'), array('product_id',
+'product_name'));// Build this query: // results in: SELECT p."product_id",
+p."product_name" FROM "products" AS p</p>
+
+<p>You can use literals as table names with AMysql_Expr.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$tables</var></dt>
+					<dd><code>string|<code><a href="class-AMysql_Expr.html">AMysql_Expr</a></code>|array</code><br>$tables The table name. Can be an array or table names in which case the key can
+mark the optional alias of the table.</dd>
+					<dt><var>$columns</var></dt>
+					<dd><code>array</code><br>$columns (Optional) The columns from this table to select. Do not use if you are
+selecting from more than 1 tables!</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="join" id="_join">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_join">#</a>
+		<code><a href="source-class-AMysql_Select.html#185-220" title="Go to source code">join</a>( <span>string <var>$type</var></span>, <span>string <var>$table</var></span>, <span>string <var>$on</var></span>, <span>array <var>$columns</var> = <span class="php-keyword1">array</span> ()</span>, <span>boolean <var>$prepend</var> = <span class="php-keyword1">false</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a JOIN</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a JOIN</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$type</var></dt>
+					<dd><code>string</code><br>$type Type of join. 'left' would be LEFT JOIN, 'inner' would be INNER JOIN.
+Leaving this falsy will result in a normal JOIN.</dd>
+					<dt><var>$table</var></dt>
+					<dd><code>string</code><br>$table The table name to join. Can be a 1 element array of ['alias' =&gt;
+'tableName']</dd>
+					<dt><var>$on</var></dt>
+					<dd><code>string</code><br>$on The ON clause unbound.</dd>
+					<dt><var>$columns</var></dt>
+					<dd><code>array</code><br>$columns (Optional) The columns from this table to select. TODO!</dd>
+					<dt><var>$prepend</var></dt>
+					<dd><code>boolean</code><br>$prepend (Optional) whether to prepend this JOIN to the other joins. Default:
+false (append).</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="where" id="_where">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_where">#</a>
+		<code><a href="source-class-AMysql_Select.html#222-243" title="Go to source code">where</a>( <span>string <var>$where</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a WHERE fragment. All fragments are joined by an AND at the end.
+WARNING: When binding a WHERE part that is an AMysql_Expr, you shouldn't pass it
+to this method. You should instead pass a new bind string (e.g. :wherePart) and
+then make a bind to the expression using "wherePart" as the key. If you ignore
+this and the expression contains any bind-related substrings, unexpected results
+will happen when placeholders are bound. Note that this object cannot
+automatically place it in for you as a bind due to not knowing whether named or
+unnamed binds are being used.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a WHERE fragment. All fragments are joined by an AND at the end.
+WARNING: When binding a WHERE part that is an AMysql_Expr, you shouldn't pass it
+to this method. You should instead pass a new bind string (e.g. :wherePart) and
+then make a bind to the expression using "wherePart" as the key. If you ignore
+this and the expression contains any bind-related substrings, unexpected results
+will happen when placeholders are bound. Note that this object cannot
+automatically place it in for you as a bind due to not knowing whether named or
+unnamed binds are being used.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$where</var></dt>
+					<dd><code>string</code><br>$where Unbound WHERE fragment</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="whereBind" id="_whereBind">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_whereBind">#</a>
+		<code><a href="source-class-AMysql_Select.html#245-257" title="Go to source code">whereBind</a>( <span>string <var>$where</var></span>, <span>mixed <var>$key</var></span>, <span>mixed <var>$val</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Syntactic sugar for $this-&gt;where($where)-&gt;bindValue($key, $val);</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Syntactic sugar for $this-&gt;where($where)-&gt;bindValue($key, $val);</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$where</var></dt>
+					<dd><code>string</code><br>$where Unbound WHERE fragment</dd>
+					<dt><var>$key</var></dt>
+					<dd><code>mixed</code><br>$key @see AMysql_Statement</dd>
+					<dt><var>$val</var></dt>
+					<dd><code>mixed</code><br>$val @see AMysql_Statement</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="groupBy" id="_groupBy">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_groupBy">#</a>
+		<code><a href="source-class-AMysql_Select.html#259-281" title="Go to source code">groupBy</a>( <span>name <var>$col</var></span>, <span>boolean <var>$desc</var> = <span class="php-keyword1">false</span></span>, <span>integer <var>$prepend</var> = <span class="php-keyword1">false</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds an GROUP BY parameter</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds an GROUP BY parameter</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$col</var></dt>
+					<dd><code>name</code><br>$col Column name</dd>
+					<dt><var>$desc</var></dt>
+					<dd><code>boolean</code><br>$desc (Optional) Whether to sort DESC. Default: false</dd>
+					<dt><var>$prepend</var></dt>
+					<dd><code>integer</code><br>$prepend (Optional) Whether to prepend this parameter. Default: false</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this;<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="groupByLiteral" id="_groupByLiteral">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_groupByLiteral">#</a>
+		<code><a href="source-class-AMysql_Select.html#283-300" title="Go to source code">groupByLiteral</a>( <span>name <var>$what</var></span>, <span>integer <var>$prepend</var> = <span class="php-keyword1">false</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds an GROUP BY parameter with no escaping.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds an GROUP BY parameter with no escaping.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$what</var></dt>
+					<dd><code>name</code><br>$col What to group by. Can list multiple literals separated by commas.</dd>
+					<dt><var>$prepend</var></dt>
+					<dd><code>integer</code><br>$prepend (Optional) Whether to prepend this parameter. Default: false</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this;<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="having" id="_having">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_having">#</a>
+		<code><a href="source-class-AMysql_Select.html#302-314" title="Go to source code">having</a>( <span>string <var>$having</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a HAVING fragment. All fragments are joined by an AND at the end.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a HAVING fragment. All fragments are joined by an AND at the end.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$having</var></dt>
+					<dd><code>string</code><br>$having Unbound HAVING fragment</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="orderBy" id="_orderBy">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_orderBy">#</a>
+		<code><a href="source-class-AMysql_Select.html#316-338" title="Go to source code">orderBy</a>( <span>name <var>$col</var></span>, <span>boolean <var>$desc</var> = <span class="php-keyword1">false</span></span>, <span>integer <var>$prepend</var> = <span class="php-keyword1">false</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds an ORDER BY parameter</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds an ORDER BY parameter</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$col</var></dt>
+					<dd><code>name</code><br>$col Column name</dd>
+					<dt><var>$desc</var></dt>
+					<dd><code>boolean</code><br>$desc (Optional) Whether to sort DESC. Default: false</dd>
+					<dt><var>$prepend</var></dt>
+					<dd><code>integer</code><br>$prepend (Optional) Whether to prepend this parameter. Default: false</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this;<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="orderByLiteral" id="_orderByLiteral">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_orderByLiteral">#</a>
+		<code><a href="source-class-AMysql_Select.html#340-357" title="Go to source code">orderByLiteral</a>( <span>name <var>$what</var></span>, <span>integer <var>$prepend</var> = <span class="php-keyword1">false</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds an ORDER BY parameter with no escaping.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds an ORDER BY parameter with no escaping.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$what</var></dt>
+					<dd><code>name</code><br>$col What to order by. Can list multiple literals separated by commas.</dd>
+					<dt><var>$prepend</var></dt>
+					<dd><code>integer</code><br>$prepend (Optional) Whether to prepend this parameter. Default: false</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this;<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="limit" id="_limit">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_limit">#</a>
+		<code><a href="source-class-AMysql_Select.html#359-373" title="Go to source code">limit</a>( <span>integer <var>$limit</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a LIMIT You can only limit the number of rows returned here (e.g. LIMIT
+10). To set the offset (e.g. LIMIT 20, 10), you must do:
+$select-&gt;limit(10)-&gt;offset(20);</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a LIMIT You can only limit the number of rows returned here (e.g. LIMIT
+10). To set the offset (e.g. LIMIT 20, 10), you must do:
+$select-&gt;limit(10)-&gt;offset(20);</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$limit</var></dt>
+					<dd><code>integer</code><br>$limit The LIMIT</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="offset" id="_offset">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_offset">#</a>
+		<code><a href="source-class-AMysql_Select.html#375-386" title="Go to source code">offset</a>( <span>integer <var>$offset</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds an OFFSET</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds an OFFSET</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$offset</var></dt>
+					<dd><code>integer</code><br>$offset The OFFSET</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getSql" id="_getSql">
+
+		<td class="attributes"><code>
+			 public 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getSql">#</a>
+		<code><a href="source-class-AMysql_Select.html#388-402" title="Go to source code">getSql</a>( <span>string <var>$prepared</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Gets the full, bound SQL string ready for use with MySQL.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Gets the full, bound SQL string ready for use with MySQL.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$prepared</var></dt>
+					<dd><code>string</code><br>$prepared (Optional) Only for parent compatibility.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br />
+				</div>
+
+
+
+				<h4>Overrides</h4>
+				<div class="list"><code><a href="class-AMysql_Statement.html#_getSql">AMysql_Statement::getSql()</a></code></div>
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getUnboundSql" id="_getUnboundSql">
+
+		<td class="attributes"><code>
+			 public 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getUnboundSql">#</a>
+		<code><a href="source-class-AMysql_Select.html#404-468" title="Go to source code">getUnboundSql</a>( )</code>
+
+		<div class="description short">
+			
+<p>Gets the SQL string without the binds applied yet.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Gets the SQL string without the binds applied yet.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+	<table class="summary inherited">
+	<caption>Methods inherited from <a href="class-AMysql_Statement.html#methods">AMysql_Statement</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-AMysql_Statement.html#___construct">__construct()</a>, 
+			<a href="class-AMysql_Statement.html#___destruct">__destruct()</a>, 
+			<a href="class-AMysql_Statement.html#___set">__set()</a>, 
+			<a href="class-AMysql_Statement.html#__query">_query()</a>, 
+			<a href="class-AMysql_Statement.html#__replaceCallback">_replaceCallback()</a>, 
+			<a href="class-AMysql_Statement.html#_addBinds">addBinds()</a>, 
+			<a href="class-AMysql_Statement.html#_affectedRows">affectedRows()</a>, 
+			<a href="class-AMysql_Statement.html#_appendPrepare">appendPrepare()</a>, 
+			<a href="class-AMysql_Statement.html#_bindParam">bindParam()</a>, 
+			<a href="class-AMysql_Statement.html#_bindValue">bindValue()</a>, 
+			<a href="class-AMysql_Statement.html#_buildColumnsValues">buildColumnsValues()</a>, 
+			<a href="class-AMysql_Statement.html#_buildSet">buildSet()</a>, 
+			<a href="class-AMysql_Statement.html#_count">count()</a>, 
+			<a href="class-AMysql_Statement.html#_delete">delete()</a>, 
+			<a href="class-AMysql_Statement.html#_errorHandlerCallback">errorHandlerCallback()</a>, 
+			<a href="class-AMysql_Statement.html#_escapeIdentifier">escapeIdentifier()</a>, 
+			<a href="class-AMysql_Statement.html#_escapeIdentifierSimple">escapeIdentifierSimple()</a>, 
+			<a href="class-AMysql_Statement.html#_execute">execute()</a>, 
+			<a href="class-AMysql_Statement.html#_fetch">fetch()</a>, 
+			<a href="class-AMysql_Statement.html#_fetchAll">fetchAll()</a>, 
+			<a href="class-AMysql_Statement.html#_fetchAllAssoc">fetchAllAssoc()</a>, 
+			<a href="class-AMysql_Statement.html#_fetchAllColumn">fetchAllColumn()</a>, 
+			<a href="class-AMysql_Statement.html#_fetchAllColumns">fetchAllColumns()</a>, 
+			<a href="class-AMysql_Statement.html#_fetchArray">fetchArray()</a>, 
+			<a href="class-AMysql_Statement.html#_fetchAssoc">fetchAssoc()</a>, 
+			<a href="class-AMysql_Statement.html#_fetchNum">fetchNum()</a>, 
+			<a href="class-AMysql_Statement.html#_fetchObject">fetchObject()</a>, 
+			<a href="class-AMysql_Statement.html#_fetchPairs">fetchPairs()</a>, 
+			<a href="class-AMysql_Statement.html#_fetchRow">fetchRow()</a>, 
+			<a href="class-AMysql_Statement.html#_freeResults">freeResults()</a>, 
+			<a href="class-AMysql_Statement.html#_getIterator">getIterator()</a>, 
+			<a href="class-AMysql_Statement.html#_getLink">getLink()</a>, 
+			<a href="class-AMysql_Statement.html#_handleError">handleError()</a>, 
+			<a href="class-AMysql_Statement.html#_handleException">handleException()</a>, 
+			<a href="class-AMysql_Statement.html#_insert">insert()</a>, 
+			<a href="class-AMysql_Statement.html#_insertId">insertId()</a>, 
+			<a href="class-AMysql_Statement.html#_insertReplace">insertReplace()</a>, 
+			<a href="class-AMysql_Statement.html#_isMysqli">isMysqli()</a>, 
+			<a href="class-AMysql_Statement.html#_numRows">numRows()</a>, 
+			<a href="class-AMysql_Statement.html#_pairUp">pairUp()</a>, 
+			<a href="class-AMysql_Statement.html#_prepare">prepare()</a>, 
+			<a href="class-AMysql_Statement.html#_query">query()</a>, 
+			<a href="class-AMysql_Statement.html#_quoteInto">quoteInto()</a>, 
+			<a href="class-AMysql_Statement.html#_replace">replace()</a>, 
+			<a href="class-AMysql_Statement.html#_reportErrorException">reportErrorException()</a>, 
+			<a href="class-AMysql_Statement.html#_result">result()</a>, 
+			<a href="class-AMysql_Statement.html#_resultDefault">resultDefault()</a>, 
+			<a href="class-AMysql_Statement.html#_resultInt">resultInt()</a>, 
+			<a href="class-AMysql_Statement.html#_resultNull">resultNull()</a>, 
+			<a href="class-AMysql_Statement.html#_setBinds">setBinds()</a>, 
+			<a href="class-AMysql_Statement.html#_setFetchMode">setFetchMode()</a>, 
+			<a href="class-AMysql_Statement.html#_throwException">throwException()</a>, 
+			<a href="class-AMysql_Statement.html#_update">update()</a>
+		</code></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+	<table class="summary inherited">
+	<caption>Constants inherited from <a href="class-AMysql_Statement.html#constants">AMysql_Statement</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-AMysql_Statement.html#CODE_QUERY_NOT_SUCCESSFUL"><b>CODE_QUERY_NOT_SUCCESSFUL</b></a>
+		</code></td>
+	</tr>
+	</table>
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="selectOptions" id="$selectOptions">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Select.html#30" title="Go to source code"><var>$selectOptions</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span> ()</code></td>
+		<td class="description"><div>
+			<a href="#$selectOptions" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="columnLiteral" id="$columnLiteral">
+		<td class="attributes"><code>
+			protected  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Select.html#31" title="Go to source code"><var>$columnLiteral</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$columnLiteral" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="columns" id="$columns">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Select.html#32" title="Go to source code"><var>$columns</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span> ()</code></td>
+		<td class="description"><div>
+			<a href="#$columns" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="froms" id="$froms">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Select.html#33" title="Go to source code"><var>$froms</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span> ()</code></td>
+		<td class="description"><div>
+			<a href="#$froms" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="joins" id="$joins">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Select.html#34" title="Go to source code"><var>$joins</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span> ()</code></td>
+		<td class="description"><div>
+			<a href="#$joins" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="wheres" id="$wheres">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Select.html#35" title="Go to source code"><var>$wheres</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span> ()</code></td>
+		<td class="description"><div>
+			<a href="#$wheres" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="groupBys" id="$groupBys">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Select.html#36" title="Go to source code"><var>$groupBys</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span> ()</code></td>
+		<td class="description"><div>
+			<a href="#$groupBys" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="havings" id="$havings">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Select.html#37" title="Go to source code"><var>$havings</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span> ()</code></td>
+		<td class="description"><div>
+			<a href="#$havings" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="orderBys" id="$orderBys">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Select.html#38" title="Go to source code"><var>$orderBys</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span> ()</code></td>
+		<td class="description"><div>
+			<a href="#$orderBys" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="limit" id="$limit">
+		<td class="attributes"><code>
+			protected  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Select.html#39" title="Go to source code"><var>$limit</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">null</span></code></td>
+		<td class="description"><div>
+			<a href="#$limit" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="offset" id="$offset">
+		<td class="attributes"><code>
+			protected  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Select.html#40" title="Go to source code"><var>$offset</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">null</span></code></td>
+		<td class="description"><div>
+			<a href="#$offset" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+	<table class="summary inherited">
+	<caption>Properties inherited from <a href="class-AMysql_Statement.html#properties">AMysql_Statement</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-AMysql_Statement.html#$_executed"><var>$_executed</var></a>, 
+			<a href="class-AMysql_Statement.html#$_fetchMode"><var>$_fetchMode</var></a>, 
+			<a href="class-AMysql_Statement.html#$_fetchModeExtraArgs"><var>$_fetchModeExtraArgs</var></a>, 
+			<a href="class-AMysql_Statement.html#$_replacements"><var>$_replacements</var></a>, 
+			<a href="class-AMysql_Statement.html#$affectedRows"><var>$affectedRows</var></a>, 
+			<a href="class-AMysql_Statement.html#$amysql"><var>$amysql</var></a>, 
+			<a href="class-AMysql_Statement.html#$beforeSql"><var>$beforeSql</var></a>, 
+			<a href="class-AMysql_Statement.html#$binds"><var>$binds</var></a>, 
+			<a href="class-AMysql_Statement.html#$errno"><var>$errno</var></a>, 
+			<a href="class-AMysql_Statement.html#$error"><var>$error</var></a>, 
+			<a href="class-AMysql_Statement.html#$insertId"><var>$insertId</var></a>, 
+			<a href="class-AMysql_Statement.html#$isMysqli"><var>$isMysqli</var></a>, 
+			<a href="class-AMysql_Statement.html#$lastException"><var>$lastException</var></a>, 
+			<a href="class-AMysql_Statement.html#$link"><var>$link</var></a>, 
+			<a href="class-AMysql_Statement.html#$prepared"><var>$prepared</var></a>, 
+			<a href="class-AMysql_Statement.html#$query"><var>$query</var></a>, 
+			<a href="class-AMysql_Statement.html#$queryTime"><var>$queryTime</var></a>, 
+			<a href="class-AMysql_Statement.html#$result"><var>$result</var></a>, 
+			<a href="class-AMysql_Statement.html#$results"><var>$results</var></a>, 
+			<a href="class-AMysql_Statement.html#$throwExceptions"><var>$throwExceptions</var></a>
+		</code></td>
+	</tr>
+	</table>
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		 API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

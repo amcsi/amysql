@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="generator" content="ApiGen 2.8.0" />
+
+	<title>Class AMysql_Profiler</title>
+
+	<script type="text/javascript" src="resources/combined.js?1487491625"></script>
+	<script type="text/javascript" src="elementlist.js?774651034"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Namespaces</h3>
+			<ul>
+				<li class="active"><a href="namespace-None.html">None</a>
+						</li>
+				<li><a href="namespace-PHP.html">PHP</a>
+						</li>
+			</ul>
+		</div>
+
+		<hr />
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-AbstractTest.html">AbstractTest</a></li>
+				<li><a href="class-AMysql.html">AMysql</a></li>
+				<li><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></li>
+				<li><a href="class-AMysql_Expr.html">AMysql_Expr</a></li>
+				<li><a href="class-AMysql_Iterator.html">AMysql_Iterator</a></li>
+				<li class="active"><a href="class-AMysql_Profiler.html">AMysql_Profiler</a></li>
+				<li><a href="class-AMysql_Select.html">AMysql_Select</a></li>
+				<li><a href="class-AMysql_Statement.html">AMysql_Statement</a></li>
+				<li><a href="class-AMysql_TestCase.html">AMysql_TestCase</a></li>
+				<li><a href="class-ExceptionTest.html">ExceptionTest</a></li>
+				<li><a href="class-ExprTest.html">ExprTest</a></li>
+				<li><a href="class-IteratorTest.html">IteratorTest</a></li>
+				<li><a href="class-SelectTest.html">SelectTest</a></li>
+				<li><a href="class-StatementTest.html">StatementTest</a></li>
+			</ul>
+
+
+
+			<h3>Exceptions</h3>
+			<ul>
+				<li><a href="class-AMysql_Exception.html">AMysql_Exception</a></li>
+			</ul>
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="" />
+		<input type="hidden" name="ie" value="UTF-8" />
+		<input type="text" name="q" class="text" />
+		<input type="submit" value="Search" />
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="namespace-None.html" title="Summary of None"><span>Namespace</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class AMysql_Profiler</h1>
+
+
+	<div class="description">
+	
+<p>This class is so that you could access the query profile data within your
+view containing the information on the latest queries without having to pass the
+entire AMysql object onto the view.</p>
+
+<p>The problem with simply calling $amysql-&gt;getQueriesData() is that you may
+be using a framework that doesn't allow you to set a hook for after resolving
+the controllers, but before rendering a view. With this class, you can just
+fetch it by $amysql-&gt;getProfiler(), assign it to view, and access the latest
+profiler data with $profiler['queriesData'] and $profiler['totalTime'].</p>
+
+<p>Enable the profiler by setting the AMysql object's profileQueries proterty to
+true.</p>
+
+<p>Visit <a
+href="https://github.com/amcsi/amysql">https://github.com/amcsi/amysql</a></p>
+
+	</div>
+
+	<dl class="tree">
+		<dd style="padding-left:0px">
+<b><span>AMysql_Profiler</span></b>			
+			 implements 
+				<a href="class-ArrayAccess.html"><span>ArrayAccess</span></a>
+			
+			
+		</dd>
+	</dl>
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		
+		
+
+				<b>License:</b>
+				<a href="MIT">License; http://www.opensource.org/licenses/mit-license.php</a><br />
+				<b>Author:</b>
+				Szerémi Attila<br />
+		<b>Located at</b> <a href="source-class-AMysql_Profiler.html#2-210" title="Go to source code">AMysql/Profiler.php</a><br />
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-AMysql_Profiler.html#35-38" title="Go to source code">__construct</a>( <span><code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code> <var>$amysql</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getAsHtml" id="_getAsHtml">
+
+		<td class="attributes"><code>
+			 public 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getAsHtml">#</a>
+		<code><a href="source-class-AMysql_Profiler.html#52-72" title="Go to source code">getAsHtml</a>( )</code>
+
+		<div class="description short">
+			
+<p>Gets the profile data as an HTML table with by a template shipped with this
+library. Can also be called with the help of ArrayAccess via $this['asHtml']</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Gets the profile data as an HTML table with by a template shipped with this
+library. Can also be called with the help of ArrayAccess via $this['asHtml']</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getAsArray" id="_getAsArray">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getAsArray">#</a>
+		<code><a href="source-class-AMysql_Profiler.html#74-87" title="Go to source code">getAsArray</a>( )</code>
+
+		<div class="description short">
+			
+<p>Gets the profile data as an array. Can also be called with the help of
+ArrayAccess via $this['asArray']</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Gets the profile data as an array. Can also be called with the help of
+ArrayAccess via $this['asArray']</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="offsetExists" id="_offsetExists">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_offsetExists">#</a>
+		<code><a href="source-class-AMysql_Profiler.html#89-97" title="Go to source code">offsetExists</a>( <span>mixed <var>$key</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+				<h4>Implementation of</h4>
+				<div class="list"><code><a href="class-ArrayAccess.html#_offsetExists">ArrayAccess::offsetExists()</a></code></div>
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="addQuery" id="_addQuery">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_addQuery">#</a>
+		<code><a href="source-class-AMysql_Profiler.html#99-128" title="Go to source code">addQuery</a>( <span>string <var>$query</var></span>, <span>float <var>$queryTime</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a query and a profile for it to the list of queries. Used by
+AMysql_Statement. Do not call externally!</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a query and a profile for it to the list of queries. Used by
+AMysql_Statement. Do not call externally!</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$query</var></dt>
+					<dd><code>string</code><br>$query The SQL query.</dd>
+					<dt><var>$queryTime</var></dt>
+					<dd><code>float</code><br>$queryTime The time the query took.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$this<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getQueries" id="_getQueries">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getQueries">#</a>
+		<code><a href="source-class-AMysql_Profiler.html#130-140" title="Go to source code">getQueries</a>( )</code>
+
+		<div class="description short">
+			
+<p>Gets the list of SQL queries performed so far by AMysql_Statement objects
+connected by this object.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Gets the list of SQL queries performed so far by AMysql_Statement objects
+connected by this object.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getQueriesData" id="_getQueriesData">
+
+		<td class="attributes"><code>
+			 public 
+			array[]
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getQueriesData">#</a>
+		<code><a href="source-class-AMysql_Profiler.html#142-155" title="Go to source code">getQueriesData</a>( )</code>
+
+		<div class="description short">
+			
+<p>Returns an arrays of profiled query data. Each value is an array that
+consists of:<br />
+- query - The SQL query performed<br />
+- time - The amount of seconds the query took (float)</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns an arrays of profiled query data. Each value is an array that
+consists of: - query - The SQL query performed - time - The amount of seconds
+the query took (float)</p>
+
+<p>If profileQueries wss off at any query, its time value will be null.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array[]</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="reset" id="_reset">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_reset">#</a>
+		<code><a href="source-class-AMysql_Profiler.html#157-169" title="Go to source code">reset</a>( )</code>
+
+		<div class="description short">
+			
+<p>Resets the data in the profiler. Not recommended. Use
+AMysql_Abstract::useNewProfiler() instead if possible.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Resets the data in the profiler. Not recommended. Use
+AMysql_Abstract::useNewProfiler() instead if possible.</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="offsetGet" id="_offsetGet">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_offsetGet">#</a>
+		<code><a href="source-class-AMysql_Profiler.html#171-190" title="Go to source code">offsetGet</a>( <span>mixed <var>$key</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+				<h4>Implementation of</h4>
+				<div class="list"><code><a href="class-ArrayAccess.html#_offsetGet">ArrayAccess::offsetGet()</a></code></div>
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="offsetSet" id="_offsetSet">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_offsetSet">#</a>
+		<code><a href="source-class-AMysql_Profiler.html#192-195" title="Go to source code">offsetSet</a>( <span>mixed <var>$key</var></span>, <span>mixed <var>$value</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+				<h4>Implementation of</h4>
+				<div class="list"><code><a href="class-ArrayAccess.html#_offsetSet">ArrayAccess::offsetSet()</a></code></div>
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="offsetUnset" id="_offsetUnset">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_offsetUnset">#</a>
+		<code><a href="source-class-AMysql_Profiler.html#197-204" title="Go to source code">offsetUnset</a>( <span>mixed <var>$key</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+				<h4>Implementation of</h4>
+				<div class="list"><code><a href="class-ArrayAccess.html#_offsetUnset">ArrayAccess::offsetUnset()</a></code></div>
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="__get" id="___get">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___get">#</a>
+		<code><a href="source-class-AMysql_Profiler.html#206-209" title="Go to source code">__get</a>( <span>mixed <var>$key</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="amysql" id="$amysql">
+		<td class="attributes"><code>
+			protected  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Profiler.html#23" title="Go to source code"><var>$amysql</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$amysql" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="totalTime" id="$totalTime">
+		<td class="attributes"><code>
+			protected  
+			float
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Profiler.html#25-31" title="Go to source code"><var>$totalTime</var></a>
+		</td>
+		<td class="value"><code><span class="php-num">0.0</span></code></td>
+		<td class="description"><div>
+			<a href="#$totalTime" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>The total time all the queries have taken so far.</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>The total time all the queries have taken so far.</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="queries" id="$queries">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Profiler.html#32" title="Go to source code"><var>$queries</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
+		<td class="description"><div>
+			<a href="#$queries" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="queriesData" id="$queriesData">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Profiler.html#33" title="Go to source code"><var>$queriesData</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
+		<td class="description"><div>
+			<a href="#$queriesData" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		 API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

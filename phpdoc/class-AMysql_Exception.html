@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="generator" content="ApiGen 2.8.0" />
+
+	<title>Class AMysql_Exception</title>
+
+	<script type="text/javascript" src="resources/combined.js?1487491625"></script>
+	<script type="text/javascript" src="elementlist.js?774651034"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Namespaces</h3>
+			<ul>
+				<li class="active"><a href="namespace-None.html">None</a>
+						</li>
+				<li><a href="namespace-PHP.html">PHP</a>
+						</li>
+			</ul>
+		</div>
+
+		<hr />
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-AbstractTest.html">AbstractTest</a></li>
+				<li><a href="class-AMysql.html">AMysql</a></li>
+				<li><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></li>
+				<li><a href="class-AMysql_Expr.html">AMysql_Expr</a></li>
+				<li><a href="class-AMysql_Iterator.html">AMysql_Iterator</a></li>
+				<li><a href="class-AMysql_Profiler.html">AMysql_Profiler</a></li>
+				<li><a href="class-AMysql_Select.html">AMysql_Select</a></li>
+				<li><a href="class-AMysql_Statement.html">AMysql_Statement</a></li>
+				<li><a href="class-AMysql_TestCase.html">AMysql_TestCase</a></li>
+				<li><a href="class-ExceptionTest.html">ExceptionTest</a></li>
+				<li><a href="class-ExprTest.html">ExprTest</a></li>
+				<li><a href="class-IteratorTest.html">IteratorTest</a></li>
+				<li><a href="class-SelectTest.html">SelectTest</a></li>
+				<li><a href="class-StatementTest.html">StatementTest</a></li>
+			</ul>
+
+
+
+			<h3>Exceptions</h3>
+			<ul>
+				<li class="active"><a href="class-AMysql_Exception.html">AMysql_Exception</a></li>
+			</ul>
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="" />
+		<input type="hidden" name="ie" value="UTF-8" />
+		<input type="text" name="q" class="text" />
+		<input type="submit" value="Search" />
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="namespace-None.html" title="Summary of None"><span>Namespace</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class AMysql_Exception</h1>
+
+
+	<div class="description">
+	
+<p>MySQL exception class</p>
+
+<p>A list of error codes can be found below. Anything in ($#), where # is a
+number which represents the index the substring is captured in in the array
+$this-&gt;getParams() returns.<br />
+CODE_DUPLICATE_ENTRY (1062): Duplicate entry '($0)' for key '($1)'
+CODE_PARENT_FOREIGN_KEY_CONSTRAINT_FAILS (1451): Cannot delete or update a
+parent row: a foreign key constraint fails ($0)
+CODE_CHILD_FOREIGN_KEY_CONSTRAINT_FAILS (1452): Cannot add or update a child
+row: a foreign key constraint fails (%0) CODE_SERVER_GONE_AWAY (2006): Mysql
+server has gone away</p>
+
+<p>List of official MySQL error codes can be found on these links:</p>
+
+	</div>
+
+	<dl class="tree">
+		<dd style="padding-left:0px">
+			<a href="class-Exception.html"><span>Exception</span></a>
+			
+			
+			
+		</dd>
+		<dd style="padding-left:30px">
+			<img src="resources/inherit.png" alt="Extended by" />
+			<a href="class-RuntimeException.html"><span>RuntimeException</span></a>
+			
+			
+			
+		</dd>
+		<dd style="padding-left:60px">
+			<img src="resources/inherit.png" alt="Extended by" />
+<b><span>AMysql_Exception</span></b>			
+			
+			
+		</dd>
+	</dl>
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		
+		
+
+				<b>License:</b>
+				<a href="MIT">License; http://www.opensource.org/licenses/mit-license.php</a><br />
+				<b>Author:</b>
+				Szerémi Attila<br />
+				<b>Link:</b>
+				<a href="http://dev.mysql.com/doc/refman/5.7/en/error-messages-server.html">http://dev.mysql.com/doc/refman/5.7/en/error-messages-server.html</a><br />
+				<b>Link:</b>
+				<a href="http://dev.mysql.com/doc/refman/5.7/en/error-messages-client.html">Visit https://github.com/amcsi/amysql</a><br />
+		<b>Located at</b> <a href="source-class-AMysql_Exception.html#2-147" title="Go to source code">AMysql/Exception.php</a><br />
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-AMysql_Exception.html#41-49" title="Go to source code">__construct</a>( <span>mixed <var>$msg</var></span>, <span>mixed <var>$errno</var></span>, <span>mixed <var>$query</var></span>, <span>mixed <var>$previous</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+				<h4>Overrides</h4>
+				<div class="list"><code><a href="class-Exception.html#___construct">Exception::__construct()</a></code></div>
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getDetails" id="_getDetails">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getDetails">#</a>
+		<code><a href="source-class-AMysql_Exception.html#51-54" title="Go to source code">getDetails</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getLogMessage" id="_getLogMessage">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getLogMessage">#</a>
+		<code><a href="source-class-AMysql_Exception.html#56-59" title="Go to source code">getLogMessage</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getParams" id="_getParams">
+
+		<td class="attributes"><code>
+			 public 
+			array|string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getParams">#</a>
+		<code><a href="source-class-AMysql_Exception.html#61-124" title="Go to source code">getParams</a>( <span>integer <var>$index</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Parses the mysql error message for variables based on the error code. Only a
+subset of error codes/messages are supported. It is recommended that you always
+check the exception's error code before calling this method.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Parses the mysql error message for variables based on the error code. Only a
+subset of error codes/messages are supported. It is recommended that you always
+check the exception's error code before calling this method.</p>
+
+<p>For requests for including support for specific error codes/messages in the
+codebase, please visit @link <a
+href="https://github.com/amcsi/amysql/issues">https://github.com/amcsi/amysql/issues</a></p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$index</var></dt>
+					<dd><code>integer</code><br>$index (Optional) Returns the $index element of the returning array instead</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array|string</code><br>An array of the parsed variables. Empty array if the error code's message
+doesn't have variables, or if the error code/message is not supported. If $index
+was set, a string will be returned if found, otherwise NULL is returned and an
+E_NOTICE is raised.<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="triggerErrorOnce" id="_triggerErrorOnce">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_triggerErrorOnce">#</a>
+		<code><a href="source-class-AMysql_Exception.html#126-139" title="Go to source code">triggerErrorOnce</a>( )</code>
+
+		<div class="description short">
+			
+<p>Performs a trigger_error on this exception. Does nothing if this method has
+already been called on this object.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Performs a trigger_error on this exception. Does nothing if this method has
+already been called on this object.</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="__toString" id="___toString">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___toString">#</a>
+		<code><a href="source-class-AMysql_Exception.html#141-146" title="Go to source code">__toString</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+				<h4>Overrides</h4>
+				<div class="list"><code><a href="class-Exception.html#___toString">Exception::__toString()</a></code></div>
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+	<table class="summary inherited">
+	<caption>Methods inherited from <a href="class-Exception.html#methods">Exception</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Exception.html#_getCode">getCode()</a>, 
+			<a href="class-Exception.html#_getFile">getFile()</a>, 
+			<a href="class-Exception.html#_getLine">getLine()</a>, 
+			<a href="class-Exception.html#_getMessage">getMessage()</a>, 
+			<a href="class-Exception.html#_getPrevious">getPrevious()</a>, 
+			<a href="class-Exception.html#_getTrace">getTrace()</a>, 
+			<a href="class-Exception.html#_getTraceAsString">getTraceAsString()</a>
+		</code></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+	<table class="summary" id="constants">
+	<caption>Constants summary</caption>
+	<tr data-order="CODE_DUPLICATE_ENTRY" id="CODE_DUPLICATE_ENTRY">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-AMysql_Exception.html#36" title="Go to source code"><b>CODE_DUPLICATE_ENTRY</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">1062</span></code></td>
+		<td class="description"><div>
+			<a href="#CODE_DUPLICATE_ENTRY" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="CODE_PARENT_FOREIGN_KEY_CONSTRAINT_FAILS" id="CODE_PARENT_FOREIGN_KEY_CONSTRAINT_FAILS">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-AMysql_Exception.html#37" title="Go to source code"><b>CODE_PARENT_FOREIGN_KEY_CONSTRAINT_FAILS</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">1451</span></code></td>
+		<td class="description"><div>
+			<a href="#CODE_PARENT_FOREIGN_KEY_CONSTRAINT_FAILS" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="CODE_CHILD_FOREIGN_KEY_CONSTRAINT_FAILS" id="CODE_CHILD_FOREIGN_KEY_CONSTRAINT_FAILS">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-AMysql_Exception.html#38" title="Go to source code"><b>CODE_CHILD_FOREIGN_KEY_CONSTRAINT_FAILS</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">1452</span></code></td>
+		<td class="description"><div>
+			<a href="#CODE_CHILD_FOREIGN_KEY_CONSTRAINT_FAILS" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="CODE_SERVER_GONE_AWAY" id="CODE_SERVER_GONE_AWAY">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-AMysql_Exception.html#39" title="Go to source code"><b>CODE_SERVER_GONE_AWAY</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">2006</span></code></td>
+		<td class="description"><div>
+			<a href="#CODE_SERVER_GONE_AWAY" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="query" id="$query">
+		<td class="attributes"><code>
+			public  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Exception.html#29-32" title="Go to source code"><var>$query</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$query" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>The query string mysql had a problem with (if there is one).</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>The query string mysql had a problem with (if there is one).</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="errorTriggered" id="$errorTriggered">
+		<td class="attributes"><code>
+			protected  
+			integer
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Exception.html#33" title="Go to source code"><var>$errorTriggered</var></a>
+		</td>
+		<td class="value"><code><span class="php-num">0</span></code></td>
+		<td class="description"><div>
+			<a href="#$errorTriggered" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="params" id="$params">
+		<td class="attributes"><code>
+			protected  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-AMysql_Exception.html#34" title="Go to source code"><var>$params</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$params" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+	<table class="summary inherited">
+	<caption>Properties inherited from <a href="class-Exception.html#properties">Exception</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Exception.html#$code"><var>$code</var></a>, 
+			<a href="class-Exception.html#$file"><var>$file</var></a>, 
+			<a href="class-Exception.html#$line"><var>$line</var></a>, 
+			<a href="class-Exception.html#$message"><var>$message</var></a>
+		</code></td>
+	</tr>
+	</table>
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		 API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>
