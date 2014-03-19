@@ -7,7 +7,7 @@
 	<title>Class AMysql_Abstract</title>
 
 	<script type="text/javascript" src="resources/combined.js?1487491625"></script>
-	<script type="text/javascript" src="elementlist.js?774651034"></script>
+	<script type="text/javascript" src="elementlist.js?3042082368"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -128,7 +128,7 @@ also.</p>
 				<a href="MIT">License; http://www.opensource.org/licenses/mit-license.php</a><br />
 				<b>Author:</b>
 				Szerémi Attila<br />
-		<b>Located at</b> <a href="source-class-AMysql_Abstract.html#2-1427" title="Go to source code">AMysql/Abstract.php</a><br />
+		<b>Located at</b> <a href="source-class-AMysql_Abstract.html#2-1586" title="Go to source code">AMysql/Abstract.php</a><br />
 	</div>
 
 
@@ -195,7 +195,7 @@ library will still connect to mysqli if it is available)</dd>
 
 		<td class="attributes"><code>
 			 public 
-			
+			<code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code>
 			
 			</code>
 		</td>
@@ -226,6 +226,10 @@ $this-&gt;defaultAutoCommit autoPingSeconds - @see $this-&gt;autoPingSeconds
 autoReconnect - @see $this-&gt;autoReconnect</dd>
 				</dl></div>
 
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code></code><br>(chainable)<br />
+				</div>
 
 
 
@@ -237,14 +241,14 @@ autoReconnect - @see $this-&gt;autoReconnect</dd>
 
 		<td class="attributes"><code>
 			 public 
-			
+			<code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code>
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_oldSetConnDetails">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#252-275" title="Go to source code">oldSetConnDetails</a>( <span>mixed <var>$host</var> = <span class="php-keyword1">null</span></span>, <span>mixed <var>$username</var> = <span class="php-keyword1">null</span></span>, <span>mixed <var>$password</var> = <span class="php-keyword1">null</span></span>, <span>mixed <var>$newLink</var> = <span class="php-keyword1">false</span></span>, <span>mixed <var>$clientFlags</var> = <span class="php-num">0</span> </span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#252-283" title="Go to source code">oldSetConnDetails</a>( <span>string <var>$host</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$username</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$password</var> = <span class="php-keyword1">null</span></span>, <span>boolean <var>$newLink</var> = <span class="php-keyword1">false</span></span>, <span>integer <var>$clientFlags</var> = <span class="php-num">0</span> </span> )</code>
 
 		<div class="description short">
 			
@@ -254,7 +258,24 @@ autoReconnect - @see $this-&gt;autoReconnect</dd>
 			
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$host</var></dt>
+					<dd><code>string</code><br>$host (optional)</dd>
+					<dt><var>$username</var></dt>
+					<dd><code>string</code><br>$username (optional)</dd>
+					<dt><var>$password</var></dt>
+					<dd><code>string</code><br>$password (optional)</dd>
+					<dt><var>$newLink</var></dt>
+					<dd><code>boolean</code><br>$newLink (optional)</dd>
+					<dt><var>$clientFlags</var></dt>
+					<dd><code>integer</code><br>$clientFlags (optional)</dd>
+				</dl></div>
 
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code></code><br>(chainable)<br />
+				</div>
 
 
 				<h4>See</h4>
@@ -270,14 +291,14 @@ autoReconnect - @see $this-&gt;autoReconnect</dd>
 
 		<td class="attributes"><code>
 			 public 
-			mixed
+			<code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code>
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_connect">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#277-356" title="Go to source code">connect</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#285-364" title="Go to source code">connect</a>( )</code>
 
 		<div class="description short">
 			
@@ -296,7 +317,7 @@ and $this-&gt;isMysqli</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>mixed</code><br>$this<br />
+					<code><code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code></code><br>(chainable)<br />
 				</div>
 
 
@@ -309,24 +330,32 @@ and $this-&gt;isMysqli</p>
 
 		<td class="attributes"><code>
 			 public 
-			
+			<code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code>
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_close">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#358-368" title="Go to source code">close</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#366-382" title="Go to source code">close</a>( )</code>
 
 		<div class="description short">
 			
+<p>Closes the connection and unsets its link.</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Closes the connection and unsets its link.</p>
 
 
 
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code></code><br>(chainable)<br />
+				</div>
 
 
 
@@ -338,14 +367,14 @@ and $this-&gt;isMysqli</p>
 
 		<td class="attributes"><code>
 			 public 
-			mixed
+			resource|<code><a href="class-mysqli.html">mysqli</a></code>
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_autoConnect">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#370-383" title="Go to source code">autoConnect</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#384-397" title="Go to source code">autoConnect</a>( )</code>
 
 		<div class="description short">
 			
@@ -364,7 +393,7 @@ check if the connection has since been broken.</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>mixed</code><br>Connection resource or object<br />
+					<code>resource|<code><a href="class-mysqli.html">mysqli</a></code></code><br>Connection resource or object<br />
 				</div>
 
 
@@ -384,14 +413,18 @@ check if the connection has since been broken.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_forceReconnect">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#385-391" title="Go to source code">forceReconnect</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#399-411" title="Go to source code">forceReconnect</a>( )</code>
 
 		<div class="description short">
 			
+<p>Reconnects to the database with the last saved connection details.</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Reconnects to the database with the last saved connection details.</p>
+
 
 
 
@@ -406,24 +439,41 @@ check if the connection has since been broken.</p>
 
 		<td class="attributes"><code>
 			 public 
-			
+			<code><a href="class-AMysql_Statement.html">AMysql_Statement</a></code>
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_setAutoPingSeconds">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#393-398" title="Go to source code">setAutoPingSeconds</a>( <span>mixed <var>$autoPingSeconds</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#413-429" title="Go to source code">setAutoPingSeconds</a>( <span>integer|false <var>$autoPingSeconds</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Sets the amount of seconds needed to pass - since last communicating with the
+database - before communicating again, to ping the database server beforehand
+and also reconnect if the connection has been since lost.</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Sets the amount of seconds needed to pass - since last communicating with the
+database - before communicating again, to ping the database server beforehand
+and also reconnect if the connection has been since lost.</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$autoPingSeconds</var></dt>
+					<dd><code>integer|false</code><br>$autoPingSeconds The amount of seconds, or FALSE if it should be disabled</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-AMysql_Statement.html">AMysql_Statement</a></code></code><br>(chainable)<br />
+				</div>
 
 
 
@@ -435,14 +485,14 @@ check if the connection has since been broken.</p>
 
 		<td class="attributes"><code>
 			 public 
-			mixed
+			<code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code>
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_setAutoReconnect">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#400-411" title="Go to source code">setAutoReconnect</a>( <span>boolean <var>$autoReconnect</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#431-442" title="Go to source code">setAutoReconnect</a>( <span>boolean <var>$autoReconnect</var></span> )</code>
 
 		<div class="description short">
 			
@@ -460,7 +510,7 @@ check if the connection has since been broken.</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>mixed</code><br>$this<br />
+					<code><code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code></code><br>(chainable)<br />
 				</div>
 
 
@@ -484,7 +534,7 @@ check if the connection has since been broken.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getAutoReconnect">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#413-422" title="Go to source code">getAutoReconnect</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#444-453" title="Go to source code">getAutoReconnect</a>( )</code>
 
 		<div class="description short">
 			
@@ -514,14 +564,14 @@ check if the connection has since been broken.</p>
 
 		<td class="attributes"><code>
 			 public 
-			mixed
+			<code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code>
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_setDefaultAutoCommit">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#424-435" title="Go to source code">setDefaultAutoCommit</a>( <span>boolean <var>$defaultAutoCommit</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#455-466" title="Go to source code">setDefaultAutoCommit</a>( <span>boolean <var>$defaultAutoCommit</var></span> )</code>
 
 		<div class="description short">
 			
@@ -539,7 +589,7 @@ check if the connection has since been broken.</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>mixed</code><br>$this<br />
+					<code><code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code></code><br>(chainable)<br />
 				</div>
 
 
@@ -556,24 +606,32 @@ check if the connection has since been broken.</p>
 
 		<td class="attributes"><code>
 			 public 
-			
+			string
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getFetchMode">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#437-440" title="Go to source code">getFetchMode</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#468-477" title="Go to source code">getFetchMode</a>( )</code>
 
 		<div class="description short">
 			
+<p>Returns the default fetch mode. See the FETCH_ class constants.</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Returns the default fetch mode. See the FETCH_ class constants.</p>
 
 
 
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br />
+				</div>
 
 
 
@@ -585,14 +643,14 @@ check if the connection has since been broken.</p>
 
 		<td class="attributes"><code>
 			 public 
-			mixed
+			<code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code>
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_selectDb">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#442-460" title="Go to source code">selectDb</a>( <span>string <var>$db</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#479-497" title="Go to source code">selectDb</a>( <span>string <var>$db</var></span> )</code>
 
 		<div class="description short">
 			
@@ -614,7 +672,7 @@ check if the connection has since been broken.</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>mixed</code><br>$this<br />
+					<code><code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code></code><br>(chainable)<br />
 				</div>
 
 
@@ -627,14 +685,14 @@ check if the connection has since been broken.</p>
 
 		<td class="attributes"><code>
 			 public 
-			mixed
+			<code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code>
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_setUtf8">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#462-471" title="Go to source code">setUtf8</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#499-508" title="Go to source code">setUtf8</a>( )</code>
 
 		<div class="description short">
 			
@@ -651,7 +709,7 @@ check if the connection has since been broken.</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>mixed</code><br>$this<br />
+					<code><code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code></code><br>(chainable)<br />
 				</div>
 
 
@@ -664,14 +722,14 @@ check if the connection has since been broken.</p>
 
 		<td class="attributes"><code>
 			 public 
-			mixed
+			<code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code>
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_setCharset">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#473-500" title="Go to source code">setCharset</a>( <span>string <var>$charset</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#510-537" title="Go to source code">setCharset</a>( <span>string <var>$charset</var></span> )</code>
 
 		<div class="description short">
 			
@@ -693,7 +751,7 @@ check if the connection has since been broken.</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>mixed</code><br>$this<br />
+					<code><code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code></code><br>(chainable)<br />
 				</div>
 
 
@@ -706,14 +764,14 @@ check if the connection has since been broken.</p>
 
 		<td class="attributes"><code>
 			 public 
-			mixed
+			<code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code>
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_setNames">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#502-513" title="Go to source code">setNames</a>( <span>string <var>$names</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#539-550" title="Go to source code">setNames</a>( <span>string <var>$names</var></span> )</code>
 
 		<div class="description short">
 			
@@ -737,7 +795,7 @@ enough to use $this-&gt;setCharset().</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>mixed</code><br>$this<br />
+					<code><code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code></code><br>(chainable)<br />
 				</div>
 
 
@@ -750,14 +808,14 @@ enough to use $this-&gt;setCharset().</p>
 
 		<td class="attributes"><code>
 			 public 
-			mixed
+			<code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code>
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_setAnsi">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#515-531" title="Go to source code">setAnsi</a>( <span>boolean <var>$isAnsi</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#552-568" title="Go to source code">setAnsi</a>( <span>boolean <var>$isAnsi</var></span> )</code>
 
 		<div class="description short">
 			
@@ -785,7 +843,7 @@ off my default on most mysql installations.</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>mixed</code><br>$this<br />
+					<code><code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code></code><br>(chainable)<br />
 				</div>
 
 
@@ -798,14 +856,14 @@ off my default on most mysql installations.</p>
 
 		<td class="attributes"><code>
 			 public 
-			
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_isAnsi">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#533-539" title="Go to source code">isAnsi</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#570-578" title="Go to source code">isAnsi</a>( )</code>
 
 		<div class="description short">
 			
@@ -822,6 +880,10 @@ database)</p>
 
 
 
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br />
+				</div>
 
 
 
@@ -833,14 +895,14 @@ database)</p>
 
 		<td class="attributes"><code>
 			 public static
-			The
+			string
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_escapeIdentifierSimple">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#541-552" title="Go to source code">escapeIdentifierSimple</a>( <span>mixed <var>$identifier</var></span>, <span>mixed <var>$qc</var> = <span class="php-quote">'`'</span></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#580-591" title="Go to source code">escapeIdentifierSimple</a>( <span>string <var>$identifier</var></span>, <span>string <var>$qc</var> = <span class="php-quote">'`'</span></span> )</code>
 
 		<div class="description short">
 			
@@ -859,14 +921,14 @@ identifier.</p>
 				<h4>Parameters</h4>
 				<div class="list"><dl>
 					<dt><var>$identifier</var></dt>
-					<dd><code>mixed</code><br>$identifier The identifier</dd>
+					<dd><code>string</code><br>$identifier The identifier</dd>
 					<dt><var>$qc</var></dt>
-					<dd><code>mixed</code><br>$qc The quote character. Default: `</dd>
+					<dd><code>string</code><br>$qc The quote character. Default: `</dd>
 				</dl></div>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>The</code><br>escaped identifier.<br />
+					<code>string</code><br>The escaped identifier.<br />
 				</div>
 
 
@@ -879,14 +941,14 @@ identifier.</p>
 
 		<td class="attributes"><code>
 			 protected static
-			The
+			string
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#__escapeIdentifier">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#554-575" title="Go to source code">_escapeIdentifier</a>( <span>mixed <var>$identifier</var></span>, <span>mixed <var>$qc</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#593-614" title="Go to source code">_escapeIdentifier</a>( <span>string <var>$identifier</var></span>, <span>string <var>$qc</var></span> )</code>
 
 		<div class="description short">
 			
@@ -905,14 +967,14 @@ identifiers, each escaped, and joined with a dot.</p>
 				<h4>Parameters</h4>
 				<div class="list"><dl>
 					<dt><var>$identifier</var></dt>
-					<dd><code>mixed</code><br>$identifier The identifier</dd>
+					<dd><code>string</code><br>$identifier The identifier</dd>
 					<dt><var>$qc</var></dt>
-					<dd><code>mixed</code><br>$qc The quote character. Default: `</dd>
+					<dd><code>string</code><br>$qc The quote character. Default: `</dd>
 				</dl></div>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>The</code><br>escaped identifier.<br />
+					<code>string</code><br>The escaped identifier.<br />
 				</div>
 
 
@@ -925,14 +987,14 @@ identifiers, each escaped, and joined with a dot.</p>
 
 		<td class="attributes"><code>
 			 public 
-			
+			string
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_escapeTable">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#623-631" title="Go to source code">escapeTable</a>( <span>mixed <var>$tableName</var></span>, <span>mixed <var>$as</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#663-680" title="Go to source code">escapeTable</a>( <span>string <var>$tableName</var></span>, <span>string <var>$as</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -946,13 +1008,23 @@ identifiers, each escaped, and joined with a dot.</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$tableName</var></dt>
+					<dd><code>string</code><br>$identifierName The identifier name. If it has a dot in it, it'll automatically
+split the identifier name into the
+<code>tableName</code>.<code>columnName</code> syntax.</dd>
+					<dt><var>$as</var></dt>
+					<dd><code>string</code><br>$as (Optional) adds an AS syntax, but only if it's a string. The value is the
+alias the identifier should have for the query.</dd>
+				</dl></div>
 
-
-
-				<h4>See</h4>
+				<h4>Returns</h4>
 				<div class="list">
-						self::escapeIdentifier<br />
+					<code>string</code><br />
 				</div>
+
+
 
 
 		</div>
@@ -962,14 +1034,14 @@ identifiers, each escaped, and joined with a dot.</p>
 
 		<td class="attributes"><code>
 			 public 
-			
+			string
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_escapeColumn">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#633-641" title="Go to source code">escapeColumn</a>( <span>mixed <var>$columnName</var></span>, <span>mixed <var>$as</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#682-699" title="Go to source code">escapeColumn</a>( <span>string <var>$columnName</var></span>, <span>string <var>$as</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -983,13 +1055,23 @@ identifiers, each escaped, and joined with a dot.</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$columnName</var></dt>
+					<dd><code>string</code><br>$identifierName The identifier name. If it has a dot in it, it'll automatically
+split the identifier name into the
+<code>tableName</code>.<code>columnName</code> syntax.</dd>
+					<dt><var>$as</var></dt>
+					<dd><code>string</code><br>$as (Optional) adds an AS syntax, but only if it's a string. The value is the
+alias the identifier should have for the query.</dd>
+				</dl></div>
 
-
-
-				<h4>See</h4>
+				<h4>Returns</h4>
 				<div class="list">
-						self::escapeIdentifier<br />
+					<code>string</code><br />
 				</div>
+
+
 
 
 		</div>
@@ -1006,7 +1088,7 @@ identifiers, each escaped, and joined with a dot.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_inTransaction">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#643-653" title="Go to source code">inTransaction</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#701-711" title="Go to source code">inTransaction</a>( )</code>
 
 		<div class="description short">
 			
@@ -1038,14 +1120,14 @@ calls.</p>
 
 		<td class="attributes"><code>
 			 public 
-			
+			mixed
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_startTransaction">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#655-671" title="Go to source code">startTransaction</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#713-731" title="Go to source code">startTransaction</a>( )</code>
 
 		<div class="description short">
 			
@@ -1060,6 +1142,10 @@ calls.</p>
 
 
 
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>Do not rely on this return value; it may change in the future.<br />
+				</div>
 
 
 
@@ -1071,14 +1157,14 @@ calls.</p>
 
 		<td class="attributes"><code>
 			 public 
-			
+			mixed
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_commit">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#673-688" title="Go to source code">commit</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#733-750" title="Go to source code">commit</a>( )</code>
 
 		<div class="description short">
 			
@@ -1093,6 +1179,10 @@ calls.</p>
 
 
 
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>Do not rely on this return value; it may change in the future.<br />
+				</div>
 
 
 
@@ -1104,14 +1194,14 @@ calls.</p>
 
 		<td class="attributes"><code>
 			 public 
-			
+			mixed
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_rollback">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#690-705" title="Go to source code">rollback</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#752-769" title="Go to source code">rollback</a>( )</code>
 
 		<div class="description short">
 			
@@ -1126,6 +1216,10 @@ calls.</p>
 
 
 
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>Do not rely on this return value; it may change in the future.<br />
+				</div>
 
 
 
@@ -1144,7 +1238,7 @@ calls.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_query">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#707-720" title="Go to source code">query</a>( <span>string <var>$sql</var></span>, <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span> ()</span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#771-784" title="Go to source code">query</a>( <span>string <var>$sql</var></span>, <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span> ()</span> )</code>
 
 		<div class="description short">
 			
@@ -1181,14 +1275,14 @@ calls.</p>
 
 		<td class="attributes"><code>
 			 public 
-			string
+			string|integer
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getOne">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#722-736" title="Go to source code">getOne</a>( <span>string <var>$sql</var></span>, <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span> ()</span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#786-800" title="Go to source code">getOne</a>( <span>string <var>$sql</var></span>, <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span> ()</span> )</code>
 
 		<div class="description short">
 			
@@ -1214,7 +1308,7 @@ Throws a warning if no rows were found.</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>string</code><br />
+					<code>string|integer</code><br />
 				</div>
 
 
@@ -1227,14 +1321,14 @@ Throws a warning if no rows were found.</p>
 
 		<td class="attributes"><code>
 			 public 
-			string
+			string|integer|null
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getOneNull">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#738-754" title="Go to source code">getOneNull</a>( <span>string <var>$sql</var></span>, <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span> ()</span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#802-818" title="Go to source code">getOneNull</a>( <span>string <var>$sql</var></span>, <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span> ()</span> )</code>
 
 		<div class="description short">
 			
@@ -1260,13 +1354,13 @@ without throwing an error.</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>string</code><br />
+					<code>string|integer|null</code><br />
 				</div>
 
 
 				<h4>See</h4>
 				<div class="list">
-						$this-&gt;getOne()<br />
+						<code><code><a href="class-AMysql_Abstract.html#_getOne">AMysql_Abstract::getOne()</a></code></code><br />
 				</div>
 
 
@@ -1277,14 +1371,14 @@ without throwing an error.</p>
 
 		<td class="attributes"><code>
 			 public 
-			string
+			integer
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getOneInt">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#756-772" title="Go to source code">getOneInt</a>( <span>string <var>$sql</var></span>, <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span> ()</span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#820-836" title="Go to source code">getOneInt</a>( <span>string <var>$sql</var></span>, <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span> ()</span> )</code>
 
 		<div class="description short">
 			
@@ -1310,13 +1404,13 @@ thrown when there is no result.</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>string</code><br />
+					<code>integer</code><br />
 				</div>
 
 
 				<h4>See</h4>
 				<div class="list">
-						$this-&gt;getOne()<br />
+						<code><code><a href="class-AMysql_Abstract.html#_getOne">AMysql_Abstract::getOne()</a></code></code><br />
 				</div>
 
 
@@ -1334,7 +1428,7 @@ thrown when there is no result.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_prepare">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#774-786" title="Go to source code">prepare</a>( <span>string <var>$sql</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#838-850" title="Go to source code">prepare</a>( <span>string <var>$sql</var></span> )</code>
 
 		<div class="description short">
 			
@@ -1351,12 +1445,12 @@ thrown when there is no result.</p>
 				<h4>Parameters</h4>
 				<div class="list"><dl>
 					<dt><var>$sql</var></dt>
-					<dd><code>string</code><br>$sql The SQL string.</dd>
+					<dd><code>string</code><br>$sql The unbound SQL string.</dd>
 				</dl></div>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code><code><a href="class-AMysql_Statement.html">AMysql_Statement</a></code></code><br />
+					<code><code><a href="class-AMysql_Statement.html">AMysql_Statement</a></code></code><br>A new statement instance.<br />
 				</div>
 
 
@@ -1376,7 +1470,7 @@ thrown when there is no result.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_select">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#788-804" title="Go to source code">select</a>( <span>mixed <var>$columns</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#852-870" title="Go to source code">select</a>( <span>mixed <var>$columns</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1397,15 +1491,19 @@ $amysql-&gt;select('*')-&gt;...)</p>
 				<h4>Parameters</h4>
 				<div class="list"><dl>
 					<dt><var>$columns</var></dt>
-					<dd><code>mixed</code><br>$columns (Optional) @see AMysql_Select::column()</dd>
+					<dd><code>mixed</code><br>$columns (Optional)</dd>
 				</dl></div>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code><code><a href="class-AMysql_Select.html">AMysql_Select</a></code></code><br />
+					<code><code><a href="class-AMysql_Select.html">AMysql_Select</a></code></code><br>A new instance of this class<br />
 				</div>
 
 
+				<h4>See</h4>
+				<div class="list">
+						<code><code><a href="class-AMysql_Select.html#_column">AMysql_Select::column()</a></code></code><br />
+				</div>
 
 
 		</div>
@@ -1422,7 +1520,7 @@ $amysql-&gt;select('*')-&gt;...)</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_newStatement">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#806-814" title="Go to source code">newStatement</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#872-880" title="Go to source code">newStatement</a>( )</code>
 
 		<div class="description short">
 			
@@ -1459,7 +1557,7 @@ $amysql-&gt;select('*')-&gt;...)</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_upd">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#816-835" title="Go to source code">upd</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span>, <span>string <var>$where</var></span>, <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span>()</span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#882-901" title="Go to source code">upd</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span>, <span>string <var>$where</var></span>, <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span>()</span> )</code>
 
 		<div class="description short">
 			
@@ -1508,7 +1606,7 @@ names and values as their values.</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_update">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#837-853" title="Go to source code">update</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span>, <span>string <var>$where</var></span>, <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span>()</span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#903-919" title="Go to source code">update</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span>, <span>string <var>$where</var></span>, <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span>()</span> )</code>
 
 		<div class="description short">
 			
@@ -1557,7 +1655,7 @@ names and values as their values.</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_updateMultipleByData">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#855-893" title="Go to source code">updateMultipleByData</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span>, <span>string <var>$column</var> = <span class="php-quote">'id'</span> </span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#921-975" title="Go to source code">updateMultipleByData</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span>, <span>string <var>$column</var> = <span class="php-quote">'id'</span> </span> )</code>
 
 		<div class="description short">
 			
@@ -1578,17 +1676,21 @@ $this-&gt;multipleAffectedRows.</p>
 					<dt><var>$tableName</var></dt>
 					<dd><code>string</code><br>$tableName The table name.</dd>
 					<dt><var>$data</var></dt>
-					<dd><code>array</code><br>$data The array of data changes. A one-dimensional array with keys as column
-names and values as their values. One of the keys should be the one with the
-value to search for for replacement.</dd>
+					<dd><code>array[]</code><br>$data The array of data changes. An array of an array of column-value pairs to
+update for that row. One of the column keys should be the one with the value to
+search for for updating (typically the primary key) e.g. [ [ 'id' =&gt; 1,
+'col1' =&gt; 'newStringValue', 'col2' =&gt; 'newStringValue2' ], [ 'id' =&gt; 2,
+'col1' =&gt; 'anotherNewStringValue', 'col2' =&gt; 'anotherNewStringValue2' ],
+... ]</dd>
 					<dt><var>$column</var></dt>
-					<dd><code>string</code><br>$column (Options) the name of the column and key to search for. The default is
-'id'.</dd>
+					<dd><code>string</code><br>$column (Options) the name of the column to search for, and key to use among the
+data. The default is 'id'.</dd>
 				</dl></div>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>boolean</code><br />
+					<code>boolean</code><br>Whether there was an equal amount of successful updates (whether a row was
+affected or not) as the size of the inputted data array.<br />
 				</div>
 
 
@@ -1608,7 +1710,7 @@ value to search for for replacement.</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_updateMultipleByKey">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#895-942" title="Go to source code">updateMultipleByKey</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span>, <span>string <var>$column</var> = <span class="php-quote">'id'</span></span>, <span>string <var>$updateSameColumn</var> = <span class="php-keyword1">false</span> </span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#977-1036" title="Go to source code">updateMultipleByKey</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span>, <span>string <var>$column</var> = <span class="php-quote">'id'</span></span>, <span>boolean <var>$updateSameColumn</var> = <span class="php-keyword1">false</span> </span> )</code>
 
 		<div class="description short">
 			
@@ -1631,14 +1733,17 @@ $this-&gt;multipleAffectedRows.</p>
 					<dt><var>$tableName</var></dt>
 					<dd><code>string</code><br>$tableName The table name.</dd>
 					<dt><var>$data</var></dt>
-					<dd><code>array</code><br>$data The array of data changes. A one-dimensional array with keys as column
-names and values as their values. Each data row must be under the key that is
-the same as the value of the column being searched for.</dd>
+					<dd><code>array[]</code><br>$data The array of data changes. An array indexed by the value of the column to
+apply the update to (typically the primary) key containing an array of
+column-value pairs to update for that row. e.g. [ 1 =&gt; [ 'col1' =&gt;
+'newStringValue', 'col2' =&gt; 'newStringValue2' ], 2 =&gt; [ 'id' =&gt; 2,
+'col1' =&gt; 'anotherNewStringValue', 'col2' =&gt; 'anotherNewStringValue2' ],
+... ]</dd>
 					<dt><var>$column</var></dt>
 					<dd><code>string</code><br>$column (Options) the name of the column and key to search for. The default is
 'id'.</dd>
 					<dt><var>$updateSameColumn</var></dt>
-					<dd><code>string</code><br>$updateSameColumn (Options) If the column being searched for is within the a
+					<dd><code>boolean</code><br>$updateSameColumn (Optional) If the column being searched for is within the a
 data row, if this is false, that key should be removed before updating the data.
 This is the default.</dd>
 				</dl></div>
@@ -1665,17 +1770,17 @@ This is the default.</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_ins">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#944-969" title="Go to source code">ins</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1038-1063" title="Go to source code">ins</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span> )</code>
 
 		<div class="description short">
 			
-<p>Performs an instant INSERT.</p>
+<p>Performs an instant INSERT, returning the statement.</p>
 
 		</div>
 
 		<div class="description detailed hidden">
 			
-<p>Performs an instant INSERT.</p>
+<p>Performs an instant INSERT, returning the statement.</p>
 
 
 
@@ -1707,14 +1812,14 @@ each value represents the value for the new row of that key.</dd>
 
 		<td class="attributes"><code>
 			 public 
-			mixed
+			integer|boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_insert">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#971-990" title="Go to source code">insert</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1065-1098" title="Go to source code">insert</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span> )</code>
 
 		<div class="description short">
 			
@@ -1735,12 +1840,17 @@ away.</p>
 					<dt><var>$tableName</var></dt>
 					<dd><code>string</code><br>$tableName The table name.</dd>
 					<dt><var>$data</var></dt>
-					<dd><code>array</code><br>$data @see $this-&gt;ins()</dd>
+					<dd><code>array</code><br>$data A one or two-dimensional array. 1D: an associative array of keys as column
+names and values as their values. This inserts one row. 2D numeric: A numeric
+array where each value is an associative array with column-value pairs. Each
+outer, numeric value represents a row of data. 2D associative: An associative
+array where the keys are the columns, the values are numerical arrays, where
+each value represents the value for the new row of that key.</dd>
 				</dl></div>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>mixed</code><br>The mysql_insert_id(), if the query succeeded and there exists a primary key.
+					<code>integer|boolean</code><br>The mysql_insert_id(), if the query succeeded and there exists a primary key.
 Otherwise the boolean of whether the insert was successful.<br />
 				</div>
 
@@ -1761,7 +1871,7 @@ Otherwise the boolean of whether the insert was successful.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_rep">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#992-1005" title="Go to source code">rep</a>( <span>mixed <var>$tableName</var></span>, <span>array <var>$data</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1100-1125" title="Go to source code">rep</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span> )</code>
 
 		<div class="description short">
 			
@@ -1775,6 +1885,18 @@ Otherwise the boolean of whether the insert was successful.<br />
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$tableName</var></dt>
+					<dd><code>string</code><br>$tableName The table name.</dd>
+					<dt><var>$data</var></dt>
+					<dd><code>array</code><br>$data A one or two-dimensional array. 1D: an associative array of keys as column
+names and values as their values. This inserts one row. 2D numeric: A numeric
+array where each value is an associative array with column-value pairs. Each
+outer, numeric value represents a row of data. 2D associative: An associative
+array where the keys are the columns, the values are numerical arrays, where
+each value represents the value for the new row of that key.</dd>
+				</dl></div>
 
 				<h4>Returns</h4>
 				<div class="list">
@@ -1782,10 +1904,6 @@ Otherwise the boolean of whether the insert was successful.<br />
 				</div>
 
 
-				<h4>See</h4>
-				<div class="list">
-						$this-&gt;insert()<br />
-				</div>
 
 
 		</div>
@@ -1802,20 +1920,32 @@ Otherwise the boolean of whether the insert was successful.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_replace">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1007-1018" title="Go to source code">replace</a>( <span>mixed <var>$tableName</var></span>, <span>array <var>$data</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1127-1155" title="Go to source code">replace</a>( <span>string <var>$tableName</var></span>, <span>array <var>$data</var></span> )</code>
 
 		<div class="description short">
 			
-<p>Performs an instant REPLACE, returning the success.</p>
+<p>Performs an instant REPLACE, returning its success.</p>
 
 		</div>
 
 		<div class="description detailed hidden">
 			
-<p>Performs an instant REPLACE, returning the success.</p>
+<p>Performs an instant REPLACE, returning its success.</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$tableName</var></dt>
+					<dd><code>string</code><br>$tableName The table name.</dd>
+					<dt><var>$data</var></dt>
+					<dd><code>array</code><br>$data A one or two-dimensional array. 1D: an associative array of keys as column
+names and values as their values. This inserts one row. 2D numeric: A numeric
+array where each value is an associative array with column-value pairs. Each
+outer, numeric value represents a row of data. 2D associative: An associative
+array where the keys are the columns, the values are numerical arrays, where
+each value represents the value for the new row of that key.</dd>
+				</dl></div>
 
 				<h4>Returns</h4>
 				<div class="list">
@@ -1823,10 +1953,6 @@ Otherwise the boolean of whether the insert was successful.<br />
 				</div>
 
 
-				<h4>See</h4>
-				<div class="list">
-						$this-&gt;insert()<br />
-				</div>
 
 
 		</div>
@@ -1843,7 +1969,7 @@ Otherwise the boolean of whether the insert was successful.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_save">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1020-1051" title="Go to source code">save</a>( <span>mixed <var>$tableName</var></span>, <span>mixed <var>$data</var></span>, <span>mixed <var>$columnName</var></span>, <span>mixed <var>$value</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1157-1188" title="Go to source code">save</a>( <span>mixed <var>$tableName</var></span>, <span>mixed <var>$data</var></span>, <span>mixed <var>$columnName</var></span>, <span>mixed <var>$value</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1901,7 +2027,7 @@ mysql_insert_id() of the newly INSERTED row.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_del">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1053-1068" title="Go to source code">del</a>( <span>string <var>$tableName</var></span>, <span>string <var>$where</var></span>, <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span> ()</span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1190-1206" title="Go to source code">del</a>( <span>string <var>$tableName</var></span>, <span>string <var>$where</var></span>, <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span> ()</span> )</code>
 
 		<div class="description short">
 			
@@ -1947,7 +2073,7 @@ mysql_insert_id() of the newly INSERTED row.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_delete">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1070-1082" title="Go to source code">delete</a>( <span>string <var>$tableName</var></span>, <span>string <var>$where</var></span>, <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span> ()</span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1208-1222" title="Go to source code">delete</a>( <span>string <var>$tableName</var></span>, <span>string <var>$where</var></span>, <span>mixed <var>$binds</var> = <span class="php-keyword1">array</span> ()</span> )</code>
 
 		<div class="description short">
 			
@@ -1986,14 +2112,14 @@ mysql_insert_id() of the newly INSERTED row.<br />
 
 		<td class="attributes"><code>
 			 public 
-			
+			integer
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_foundRows">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1084-1098" title="Go to source code">foundRows</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1224-1238" title="Go to source code">foundRows</a>( )</code>
 
 		<div class="description short">
 			
@@ -2012,6 +2138,10 @@ ignored.</p>
 
 
 
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br>Number of found rows.<br />
+				</div>
 
 
 
@@ -2030,7 +2160,7 @@ ignored.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_expr">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1100-1119" title="Go to source code">expr</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1240-1260" title="Go to source code">expr</a>( )</code>
 
 		<div class="description short">
 			
@@ -2079,19 +2209,21 @@ $amysql-&gt;expr('CURRENT_TIMESTAMP') ))</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_escapeLike">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1121-1136" title="Go to source code">escapeLike</a>( <span>string <var>$s</var></span>, <span>string <var>$escapeStr</var> = <span class="php-quote">'='</span></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1262-1279" title="Go to source code">escapeLike</a>( <span>string <var>$s</var></span>, <span>string <var>$escapeStr</var> = <span class="php-quote">'='</span></span> )</code>
 
 		<div class="description short">
 			
 <p>Escapes LIKE. The after the LIKE &lt;string&gt; syntax, you must place an
-ESCAPE statement with '=' or whatever you pass here as $escapeStr</p>
+ESCAPE statement with '=' or whatever you pass here as $escapeStr It is not
+recommended to call this static method externally; please use <code><a href="class-AMysql_Expr.html">AMysql_Expr</a></code> instead.</p>
 
 		</div>
 
 		<div class="description detailed hidden">
 			
 <p>Escapes LIKE. The after the LIKE &lt;string&gt; syntax, you must place an
-ESCAPE statement with '=' or whatever you pass here as $escapeStr</p>
+ESCAPE statement with '=' or whatever you pass here as $escapeStr It is not
+recommended to call this static method externally; please use <code><a href="class-AMysql_Expr.html">AMysql_Expr</a></code> instead.</p>
 
 
 
@@ -2100,7 +2232,7 @@ ESCAPE statement with '=' or whatever you pass here as $escapeStr</p>
 					<dt><var>$s</var></dt>
 					<dd><code>string</code><br>$s The string to LIKE escape</dd>
 					<dt><var>$escapeStr</var></dt>
-					<dd><code>string</code><br>$escapeChar (Opcionális) The escape character</dd>
+					<dd><code>string</code><br>$escapeChar (Optional) The escape character</dd>
 				</dl></div>
 
 
@@ -2114,14 +2246,14 @@ ESCAPE statement with '=' or whatever you pass here as $escapeStr</p>
 
 		<td class="attributes"><code>
 			 public 
-			
+			string|integer
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_escape">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1138-1180" title="Go to source code">escape</a>( <span>mixed <var>$value</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1281-1338" title="Go to source code">escape</a>( <span>mixed <var>$value</var></span> )</code>
 
 		<div class="description short">
 			
@@ -2145,6 +2277,11 @@ apostrophes around bind marks! Those are handled by this escaping method.</p>
 					<dd><code>mixed</code><br>The value to escape</dd>
 				</dl></div>
 
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string|integer</code><br>The value safe to put into a query, including surrounding apostrophes if the
+value is string-like, not including apostrophes if it's an int or an <code><a href="class-AMysql_Expr.html">AMysql_Expr</a></code> or <code><a href="class-AMysql_Select.html">AMysql_Select</a></code> (for selectception)<br />
+				</div>
 
 
 
@@ -2163,7 +2300,7 @@ apostrophes around bind marks! Those are handled by this escaping method.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_transpose">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1182-1232" title="Go to source code">transpose</a>( <span>array <var>$array</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1340-1390" title="Go to source code">transpose</a>( <span>array <var>$array</var></span> )</code>
 
 		<div class="description short">
 			
@@ -2206,14 +2343,14 @@ $output: array ( 'col1' =&gt; array ( 3 =&gt; 'bla', 9 =&gt; 'ney' ), 'col2'
 
 		<td class="attributes"><code>
 			 public 
-			mixed
+			<code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code>
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_addQuery">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1234-1247" title="Go to source code">addQuery</a>( <span>string <var>$query</var></span>, <span>float <var>$queryTime</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1392-1405" title="Go to source code">addQuery</a>( <span>string <var>$query</var></span>, <span>float <var>$queryTime</var></span> )</code>
 
 		<div class="description short">
 			
@@ -2239,7 +2376,7 @@ AMysql_Statement. Do not call externally!</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>mixed</code><br>$this<br />
+					<code><code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code></code><br>(chainable)<br />
 				</div>
 
 
@@ -2259,7 +2396,7 @@ AMysql_Statement. Do not call externally!</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_pingReconnect">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1249-1280" title="Go to source code">pingReconnect</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1407-1439" title="Go to source code">pingReconnect</a>( )</code>
 
 		<div class="description short">
 			
@@ -2292,14 +2429,14 @@ reconnection wasn't successful.<br />
 
 		<td class="attributes"><code>
 			 public 
-			
+			<code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code>
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_autoPing">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1282-1302" title="Go to source code">autoPing</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1441-1461" title="Go to source code">autoPing</a>( )</code>
 
 		<div class="description short">
 			
@@ -2314,6 +2451,10 @@ reconnection wasn't successful.<br />
 
 
 
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code></code><br>(chainable)<br />
+				</div>
 
 
 
@@ -2332,7 +2473,7 @@ reconnection wasn't successful.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_autoPingConnect">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1304-1315" title="Go to source code">autoPingConnect</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1463-1474" title="Go to source code">autoPingConnect</a>( )</code>
 
 		<div class="description short">
 			
@@ -2369,7 +2510,7 @@ reconnection wasn't successful.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getQueries">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1317-1327" title="Go to source code">getQueries</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1476-1486" title="Go to source code">getQueries</a>( )</code>
 
 		<div class="description short">
 			
@@ -2408,7 +2549,7 @@ connected by this object.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getQueriesData">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1329-1342" title="Go to source code">getQueriesData</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1488-1501" title="Go to source code">getQueriesData</a>( )</code>
 
 		<div class="description short">
 			
@@ -2452,7 +2593,7 @@ the query took (float)</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getProfiler">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1344-1357" title="Go to source code">getProfiler</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1503-1516" title="Go to source code">getProfiler</a>( )</code>
 
 		<div class="description short">
 			
@@ -2484,14 +2625,14 @@ profiler results.</p>
 
 		<td class="attributes"><code>
 			 public 
-			mixed
+			<code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code>
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_useNewProfiler">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1359-1369" title="Go to source code">useNewProfiler</a>( )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1518-1528" title="Go to source code">useNewProfiler</a>( )</code>
 
 		<div class="description short">
 			
@@ -2508,7 +2649,7 @@ profiler results.</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>mixed</code><br>$this<br />
+					<code><code><a href="class-AMysql_Abstract.html">AMysql_Abstract</a></code></code><br>(chainable)<br />
 				</div>
 
 
@@ -2528,17 +2669,17 @@ profiler results.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_handleError">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1371-1393" title="Go to source code">handleError</a>( <span>mixed <var>$msg</var></span>, <span>mixed <var>$code</var></span>, <span>mixed <var>$query</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1530-1552" title="Go to source code">handleError</a>( <span>mixed <var>$msg</var></span>, <span>mixed <var>$code</var></span>, <span>mixed <var>$query</var></span> )</code>
 
 		<div class="description short">
 			
-<p>handleError</p>
+<p>For internal use.</p>
 
 		</div>
 
 		<div class="description detailed hidden">
 			
-<p>handleError</p>
+<p>For internal use.</p>
 
 
 
@@ -2574,17 +2715,17 @@ profiler results.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_handleException">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1395-1416" title="Go to source code">handleException</a>( <span><code><a href="class-AMysql_Exception.html">AMysql_Exception</a></code> <var>$ex</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1554-1575" title="Go to source code">handleException</a>( <span><code><a href="class-AMysql_Exception.html">AMysql_Exception</a></code> <var>$ex</var></span> )</code>
 
 		<div class="description short">
 			
-<p>handleException</p>
+<p>For internal use.</p>
 
 		</div>
 
 		<div class="description detailed hidden">
 			
-<p>handleException</p>
+<p>For internal use.</p>
 
 
 
@@ -2616,7 +2757,7 @@ profiler results.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#___get">#</a>
-		<code><a href="source-class-AMysql_Abstract.html#1418-1426" title="Go to source code">__get</a>( <span>mixed <var>$name</var></span> )</code>
+		<code><a href="source-class-AMysql_Abstract.html#1577-1585" title="Go to source code">__get</a>( <span>mixed <var>$name</var></span> )</code>
 
 		<div class="description short">
 			

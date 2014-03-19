@@ -7,7 +7,7 @@
 	<title>Class AMysql_Expr</title>
 
 	<script type="text/javascript" src="resources/combined.js?1487491625"></script>
-	<script type="text/javascript" src="elementlist.js?774651034"></script>
+	<script type="text/javascript" src="elementlist.js?3042082368"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -136,7 +136,7 @@ href="https://github.com/amcsi/amysql">https://github.com/amcsi/amysql</a></p>
 				Szerémi Attila<br />
 				<b>Created:</b>
 				2011.06.10. 13:26:56<br />
-		<b>Located at</b> <a href="source-class-AMysql_Expr.html#2-207" title="Go to source code">AMysql/Expr.php</a><br />
+		<b>Located at</b> <a href="source-class-AMysql_Expr.html#2-218" title="Go to source code">AMysql/Expr.php</a><br />
 	</div>
 
 
@@ -154,7 +154,7 @@ href="https://github.com/amcsi/amysql">https://github.com/amcsi/amysql</a></p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-AMysql_Expr.html#74-97" title="Go to source code">__construct</a>( )</code>
+		<code><a href="source-class-AMysql_Expr.html#74-99" title="Go to source code">__construct</a>( )</code>
 
 		<div class="description short">
 			
@@ -174,8 +174,12 @@ everything, if the first parameter is an AMysql instance, it is saved, and is
 shifted from the arguments array, and the following applies in either case: The
 first parameter is mandatory: the one that gives the type of expression. The
 types of expressions can be found as constants on this class, and their
-documentation can be found above each constant type declaration. In case of a
-literal string, you can just pass the literal string as the only parameter.<br />
+documentation can be found above each constant type declaration.<br />
+				</div>
+				<h4>Params</h4>
+				<div class="list">
+						...$variadic In case of a literal string, you can just pass the literal string
+as the only parameter.<br />
 				</div>
 
 
@@ -193,7 +197,7 @@ literal string, you can just pass the literal string as the only parameter.<br /
 
 		<td class="name"><div>
 		<a class="anchor" href="#_set">#</a>
-		<code><a href="source-class-AMysql_Expr.html#99-109" title="Go to source code">set</a>( )</code>
+		<code><a href="source-class-AMysql_Expr.html#101-111" title="Go to source code">set</a>( )</code>
 
 		<div class="description short">
 			
@@ -222,7 +226,7 @@ literal string, you can just pass the literal string as the only parameter.<br /
 
 		<td class="name"><div>
 		<a class="anchor" href="#_setByArray">#</a>
-		<code><a href="source-class-AMysql_Expr.html#111-177" title="Go to source code">setByArray</a>( <span>array <var>$args</var></span> )</code>
+		<code><a href="source-class-AMysql_Expr.html#113-182" title="Go to source code">setByArray</a>( <span>array <var>$args</var></span> )</code>
 
 		<div class="description short">
 			
@@ -245,7 +249,8 @@ handle, otherwise call and return the parent's setByArray() method</p>
 				<h4>Parameters</h4>
 				<div class="list"><dl>
 					<dt><var>$args</var></dt>
-					<dd><code>array</code><br>$args</dd>
+					<dd><code>array</code><br>$args The first index should contain the type of expression to use, the rest
+depends on the type of expression. See the class constants for available types.</dd>
 				</dl></div>
 
 				<h4>Returns</h4>
@@ -270,7 +275,7 @@ handle, otherwise call and return the parent's setByArray() method</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_escapeTable">#</a>
-		<code><a href="source-class-AMysql_Expr.html#179-185" title="Go to source code">escapeTable</a>( <span>mixed <var>$table</var></span> )</code>
+		<code><a href="source-class-AMysql_Expr.html#184-190" title="Go to source code">escapeTable</a>( <span>mixed <var>$table</var></span> )</code>
 
 		<div class="description short">
 			
@@ -299,7 +304,7 @@ handle, otherwise call and return the parent's setByArray() method</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_escapeColumn">#</a>
-		<code><a href="source-class-AMysql_Expr.html#187-193" title="Go to source code">escapeColumn</a>( <span>mixed <var>$column</var></span> )</code>
+		<code><a href="source-class-AMysql_Expr.html#192-198" title="Go to source code">escapeColumn</a>( <span>mixed <var>$column</var></span> )</code>
 
 		<div class="description short">
 			
@@ -328,7 +333,7 @@ handle, otherwise call and return the parent's setByArray() method</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_toString">#</a>
-		<code><a href="source-class-AMysql_Expr.html#195-201" title="Go to source code">toString</a>( )</code>
+		<code><a href="source-class-AMysql_Expr.html#200-206" title="Go to source code">toString</a>( )</code>
 
 		<div class="description short">
 			
@@ -350,24 +355,32 @@ handle, otherwise call and return the parent's setByArray() method</p>
 
 		<td class="attributes"><code>
 			 public 
-			
+			string
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#___toString">#</a>
-		<code><a href="source-class-AMysql_Expr.html#203-206" title="Go to source code">__toString</a>( )</code>
+		<code><a href="source-class-AMysql_Expr.html#208-217" title="Go to source code">__toString</a>( )</code>
 
 		<div class="description short">
 			
+<p>Returns the literal string this expression should resolve to.</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Returns the literal string this expression should resolve to.</p>
 
 
 
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br />
+				</div>
 
 
 

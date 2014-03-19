@@ -7,7 +7,7 @@
 	<title>Class AMysql_Exception</title>
 
 	<script type="text/javascript" src="resources/combined.js?1487491625"></script>
-	<script type="text/javascript" src="elementlist.js?774651034"></script>
+	<script type="text/javascript" src="elementlist.js?3042082368"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -158,7 +158,7 @@ server has gone away</p>
 				<a href="http://dev.mysql.com/doc/refman/5.7/en/error-messages-server.html">http://dev.mysql.com/doc/refman/5.7/en/error-messages-server.html</a><br />
 				<b>Link:</b>
 				<a href="http://dev.mysql.com/doc/refman/5.7/en/error-messages-client.html">Visit https://github.com/amcsi/amysql</a><br />
-		<b>Located at</b> <a href="source-class-AMysql_Exception.html#2-147" title="Go to source code">AMysql/Exception.php</a><br />
+		<b>Located at</b> <a href="source-class-AMysql_Exception.html#2-167" title="Go to source code">AMysql/Exception.php</a><br />
 	</div>
 
 
@@ -176,16 +176,31 @@ server has gone away</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-AMysql_Exception.html#41-49" title="Go to source code">__construct</a>( <span>mixed <var>$msg</var></span>, <span>mixed <var>$errno</var></span>, <span>mixed <var>$query</var></span>, <span>mixed <var>$previous</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-AMysql_Exception.html#41-61" title="Go to source code">__construct</a>( <span>string <var>$msg</var></span>, <span>integer <var>$errno</var></span>, <span>string <var>$query</var></span>, <span><code><a href="class-Exception.html">Exception</a></code> <var>$previous</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
+<p>__construct</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>__construct</p>
 
 
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$msg</var></dt>
+					<dd><code>string</code><br>$msg The mysql error message or custom message</dd>
+					<dt><var>$errno</var></dt>
+					<dd><code>integer</code><br>$errno The mysql error code or custom error code</dd>
+					<dt><var>$query</var></dt>
+					<dd><code>string</code><br>$query The mysql query string used or a message hinting the action taken</dd>
+					<dt><var>$previous</var></dt>
+					<dd><code><code><a href="class-Exception.html">Exception</a></code></code><br>$previous The previous exception</dd>
+				</dl></div>
 
 
 
@@ -207,7 +222,7 @@ server has gone away</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getDetails">#</a>
-		<code><a href="source-class-AMysql_Exception.html#51-54" title="Go to source code">getDetails</a>( )</code>
+		<code><a href="source-class-AMysql_Exception.html#63-66" title="Go to source code">getDetails</a>( )</code>
 
 		<div class="description short">
 			
@@ -236,7 +251,7 @@ server has gone away</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getLogMessage">#</a>
-		<code><a href="source-class-AMysql_Exception.html#56-59" title="Go to source code">getLogMessage</a>( )</code>
+		<code><a href="source-class-AMysql_Exception.html#68-71" title="Go to source code">getLogMessage</a>( )</code>
 
 		<div class="description short">
 			
@@ -265,7 +280,7 @@ server has gone away</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getParams">#</a>
-		<code><a href="source-class-AMysql_Exception.html#61-124" title="Go to source code">getParams</a>( <span>integer <var>$index</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-AMysql_Exception.html#73-136" title="Go to source code">getParams</a>( <span>integer <var>$index</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -318,7 +333,7 @@ E_NOTICE is raised.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_triggerErrorOnce">#</a>
-		<code><a href="source-class-AMysql_Exception.html#126-139" title="Go to source code">triggerErrorOnce</a>( )</code>
+		<code><a href="source-class-AMysql_Exception.html#138-151" title="Go to source code">triggerErrorOnce</a>( )</code>
 
 		<div class="description short">
 			
@@ -353,14 +368,18 @@ already been called on this object.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#___toString">#</a>
-		<code><a href="source-class-AMysql_Exception.html#141-146" title="Go to source code">__toString</a>( )</code>
+		<code><a href="source-class-AMysql_Exception.html#153-166" title="Go to source code">__toString</a>( )</code>
 
 		<div class="description short">
 			
+<p>The details of the exception described in a string.</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>The details of the exception described in a string.</p>
+
 
 
 
