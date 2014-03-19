@@ -511,8 +511,12 @@ class AMysql_Statement implements IteratorAggregate, Countable
         }
         $extraArgs = $this->_fetchModeExtraArgs;
         $method = array ($this, $methodName);
-        $result instanceof Mysqli_Result ? $result->data_seek(0) : mysql_data_seek($result, 0);
-        while (($row = call_user_func_array($method, $extraArgs)) && isset($row)) {
+        $result instanceof Mysqli_Result ?
+            $result->data_seek(0) :
+            mysql_data_seek($result, 0);
+        while (
+            ($row = call_user_func_array($method, $extraArgs)) && isset($row)
+        ) {
             $ret[] = $row;
         }
         return $ret;
@@ -638,7 +642,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
     /**
      * Fetches the next row with column names and their indexes as keys.
      * 
-     * @return array
+     * @return array|FALSE
      */
     public function fetchArray()
     {
@@ -689,8 +693,8 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * 
      * 
      * @param mixed $default	The value to return if the field is not found.
-     * @param int $row		(Optional) The row number.
-     * @param int $field	(Optional) The field.
+     * @param int $row		    (Optional) The row number.
+     * @param int $field	    (Optional) The field.
      * @return mixed
      */
     public function resultDefault($default, $row = 0, $field = 0)
@@ -721,7 +725,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * 
      * @param int $row		(Optional) The row number.
      * @param int $field	(Optional) The field.
-     * @return integer
+     * @return int
      */
     public function resultInt($row = 0, $field = 0)
     {
@@ -734,11 +738,11 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * value column specified.
      * 
      * @param mixed $keyColumn	    (Optional) column number or string for
-     *				    the keys.
-     *				    Default: 0.
+     *				                the keys.
+     *				                Default: 0.
      * @param mixed $valueColumn    (Optional) column number or string for
-     *				    the values.
-     *				    Default: 1.
+     *				                the values.
+     *				                Default: 1.
      * @access public
      * @return array
      */
@@ -752,6 +756,10 @@ class AMysql_Statement implements IteratorAggregate, Countable
         return $ret;
     }
 
+    /**
+     * Alias of {@link AMysql_Statement::fetchPairs()}
+     * 
+     */
     public function pairUp($keyColumn = 0, $valueColumn = 1)
     {
         return $this->fetchPairs($keyColumn, $valueColumn);
@@ -761,8 +769,8 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * Returns all values of a specified column as an array.
      * 
      * @param mixed $column	    (Optional) column number or string for
-     *				    the values.
-     *				    Default: 0.
+     *				            the values.
+     *				            Default: 0.
      * @access public
      * @return array
      */
@@ -781,9 +789,32 @@ class AMysql_Statement implements IteratorAggregate, Countable
     }
 
     /**
-     * Fetches all rows and returns them as an array of columns containing an array
-     * of values.
-     * Works simalarly to fetchAllAssoc(), but with the resulting array transposed.
+     * Fetches all rows and returns them as an array of columns containing an 
+     * array of values.  Works simalarly to fetchAllAssoc(), but with the 
+     * resulting array transposed.
+     *
+     *  e.g.
+     *  [
+     *      'id' => ['1', '2'],
+     *      'val' => ['val1', 'val2']
+     *  ]
+     *
+     * @param string|int $keyColumn         When building an array of arrays
+     *                                      (list of values for that column)
+     *                                      if this value is given, the indexes
+     *                                      of the inner array will be equal to
+     *                                      the value of the column in the row
+     *                                      equivalent of data. Typically you
+     *                                      want to choose the primary key.
+     *                                      e.g. if $keyColumn is 'id', the
+     *                                      example changes to:
+     *                                      [
+     *                                          'id' => ['1' => '1', '2' => '2'],
+     *                                          'val' => [
+     *                                              '1' => 'val1',
+     *                                              '2' => 'val2'
+     *                                          ]
+     *                                      ]
      *
      * @access public
      * @return array
@@ -797,11 +828,14 @@ class AMysql_Statement implements IteratorAggregate, Countable
             // ok
         } elseif (!$keyColumnGiven) {
             /**
-             * If $keyColumn isn't given, let's build the returning array here to
+             * If $keyColumn isn't given i.e. the resulting array indexes
+             * don't matter, let's build the returning array here to
              * dodge unnecessary overhead.
              **/
             $result = $this->result;
-            $result instanceof Mysqli_Result ? $result->data_seek(0) : mysql_data_seek($result, 0);
+            $result instanceof Mysqli_Result ?
+                $result->data_seek(0) :
+                mysql_data_seek($result, 0);
             $firstRow = $this->fetchAssoc();
             foreach ($firstRow as $colName => $val) {
                 $ret[$colName] = array ($val);
@@ -854,7 +888,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
     /**
      * Returns the number of affected rows.
      * 
-     * @return integer
+     * @return int
      */
     public function affectedRows()
     {
@@ -877,6 +911,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
 
     /**
      * Throws an AMysqlException for the last mysql error.
+     * For internal use (if even used).
      * 
      * @throws AMysql_Exception
      */
@@ -885,13 +920,21 @@ class AMysql_Statement implements IteratorAggregate, Countable
         throw new AMysql_Exception($this->error, $this->errno, $this->query);
     }
 
+    /**
+     * @deprecated
+     */
     public function escapeIdentifierSimple($columnName)
     {
         return AMysql_Abstract::escapeIdentifierSimple($columnName);
     }
 
     /**
-     * @see AMysql_Abstract::escapeIdentifier
+     * Escapes an identifier and puts it between identifier quotes.
+     *
+     * @param string $identifier    The identifier
+     * @param string $qc            The quote character. Default: `
+     *
+     * @return string               The escaped identifier.
      **/
     public function escapeIdentifier($columnName, $as = null)
     {
@@ -901,7 +944,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
     /**
      * Appends a string to the prepared string.
      *
-     * @param string $sql The string to append.
+     * @param string $sql           The string to append.
      * @return AMysql_Statement (chainable)
      **/
     public function appendPrepare($sql)
@@ -914,31 +957,31 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * Binds a value to the sql string.
      *
      * @param mixed $key	    If an integer, then the given index
-     *				    question mark will be replaced.
-     *				    If a string, then then, if it starts
-     *				    with an alphanumberic or 128+ ascii
-     *				    character, then a colon plus the string
-     *				    given will be replaced, otherwise the
-     *				    given string literally will be replaced.
-     *				    Example: if the string is
-     *				    foo
-     *				    then :foo will be replaced.
-     *				    if the string is
-     *				    !foo
-     *				    then !foo will be replaced
-     *				    if the string is
-     *				    :foo:
-     *				    then :foo: will be replaced.
-     *				    Note: don't worry about keys that have a
-     *				    common beginning. If foo and fool are set,
-     *				    :fool will not be replaced with the value
-     *				    given for foo.
+     *				            question mark will be replaced.
+     *				            If a string, then then, if it starts
+     *				            with an alphanumberic or 128+ ascii
+     *				            character, then a colon plus the string
+     *				            given will be replaced, otherwise the
+     *				            given string literally will be replaced.
+     *				            Example: if the string is
+     *				            foo
+     *				            then :foo will be replaced.
+     *				            if the string is
+     *				            !foo
+     *				            then !foo will be replaced
+     *				            if the string is
+     *				            :foo:
+     *				            then :foo: will be replaced.
+     *				            Note: don't worry about keys that have a
+     *				            common beginning. If foo and fool are set,
+     *				            :fool will not be replaced with the value
+     *				            given for foo.
      *
      * @param mixed $val	    Bind this value for replacing the mark
-     *				    defined by $key. The value is escaped
-     *				    depeding on its type, apostrophes included,
-     *				    so do not add apostrophes in your
-     *				    prepared sqls.
+     *				            defined by $key. The value is escaped
+     *				            depeding on its type, apostrophes included,
+     *				            so do not add apostrophes in your
+     *				            prepared sqls.
      *
      * @return AMysql_Statement (chainable)
      **/
@@ -955,7 +998,11 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * The same as $this->bindValue(), except that $val is binded by
      * reference, meaning its value is extracted on execute.
      *
-     * @see $this->bindValue()
+     * @see AMysql_Statement::bindValue()
+     * @param mixed $key	    @see AMysql_Statement::bindValue()
+     * @param mixed &$val	    Like $val in
+     *                          {@link AMysql_Statement::bindValue()}, but by
+     *                          reference.
      *
      * @return AMysql_Statement (chainable)
      */
@@ -996,7 +1043,14 @@ class AMysql_Statement implements IteratorAggregate, Countable
     }
 
     /**
-     * Builds a columns list with values as a string
+     * Builds a columns list with values as a string. Can be an
+     * array of column-value pairs (2D for one row), can be an
+     * array of array of key-value pairs (3D for multiple rows),
+     * or can be an array with column names as the keys, each value
+     * being an array of values (3D for multiple rows).
+     *
+     * e.g. (`col1`, `col2`) VALUES ('col1val1', 'col1val2'),
+     *  ('col2val1', 'col2val2')
      *
      * @param array $data @see $this->insertReplace()
      * @return string
@@ -1079,14 +1133,13 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * of the query.
      *
      * @param string $tableName 	The table name.
-     * @param array $data 		The array of data changes. A
-     *					    one-dimensional array
-     * 					with keys as column names and values
-     *					    as their values.
-     * @param string $where		An SQL substring of the WHERE clause.
+     * @param array $data 		    The array of data changes. A
+     *					            one-dimensional array
+     * 					            with keys as column names and values
+     *					            as their values.
+     * @param string $where		    An SQL substring of the WHERE clause.
      *
      * @return AMysql_Statement (chainable)
-     * @throws AMysql_Exception                
      **/
     public function update($tableName, array $data, $where)
     {
@@ -1113,24 +1166,22 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * It is rather recommended to use AMysql_Abstract::insert() instead, which
      * returns the last inserted id already.
      *
-     * @param string $type              "$type INTO..." (INSERT, INSERT IGNORE, REPLACE)
-     *                                  etc.
+     * @param string $type          "$type INTO..." (INSERT, INSERT IGNORE, REPLACE) etc.
      * @param string $tableName 	The table name.
-     * @param array $data		A one or two-dimensional array.
-     * 					1D:
-     * 					an associative array of keys as column names and values
-     * 					as their values. This inserts one row.
-     * 					2D numeric:
-     * 					A numeric array where each value is an associative array
-     * 					with column-value pairs. Each outer, numeric value represents
-     * 					a row of data.
-     * 					2D associative:
-     * 					An associative array where the keys are the columns, the
-     * 					values are numerical arrays, where each value represents the
-     * 					value for the new row of that key.
+     * @param array $data		    A one or two-dimensional array.
+     * 					            1D:
+     * 					            an associative array of keys as column names and values
+     * 					            as their values. This inserts one row.
+     * 					            2D numeric:
+     * 					            A numeric array where each value is an associative array
+     * 					            with column-value pairs. Each outer, numeric value represents
+     * 					            a row of data.
+     * 					            2D associative:
+     * 					            An associative array where the keys are the columns, the
+     * 					            values are numerical arrays, where each value represents the
+     * 					            value for the new row of that key.
      *
      * @return AMysql_Statement (chainable)
-     * @throws AMysql_Exception                              
      **/
     public function insertReplace($type, $tableName, array $data)
     {
@@ -1184,7 +1235,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * of the query.
      *
      * @param string $tableName 	The table name.
-     * @param string $where		An SQL substring of the WHERE clause.
+     * @param string $where		    An SQL substring of the WHERE clause.
      *
      * @see AMysql_Abstract::delete()
      *
@@ -1233,6 +1284,13 @@ class AMysql_Statement implements IteratorAggregate, Countable
         }
     }
 
+    /**
+     * Returns the number of rows in the result. 
+     * 
+     * @throws LogicException   If the query was not a read query.
+     * @access public
+     * @return int
+     */
     public function count()
     {
         if (!is_resource($this->result) && !is_object($this->result)) {
@@ -1248,6 +1306,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * Handle an ErrorException thrown with the help of
      * $this->errorHandlerCallback. For now, just suppress the
      * error.
+     * For internal use.
      * 
      * @param ErrorException $ex 
      * @access public
@@ -1259,8 +1318,17 @@ class AMysql_Statement implements IteratorAggregate, Countable
 
     /**
      * Changes warnings into exceptions. 
-     *
+     * For internal use.
      * Mainly for handling warnings generated by mysql functions/methods.
+     * 
+     * @param int $errno 
+     * @param string $errstr 
+     * @param string $errfile 
+     * @param int $errline 
+     * @param array $errcontext 
+     * @access public
+     * @throws ErrorException
+     * @return void
      */
     public function errorHandlerCallback(
         $errno,
@@ -1275,9 +1343,9 @@ class AMysql_Statement implements IteratorAggregate, Countable
     /**
      * handleError 
      * 
-     * @param mixed $msg 
-     * @param mixed $code 
-     * @param mixed $query 
+     * @param string $msg 
+     * @param int $code 
+     * @param string $query 
      * @access protected
      * @throws AMysql_Exception
      * @return void

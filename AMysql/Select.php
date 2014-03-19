@@ -16,6 +16,9 @@
  *
  * Please check @link tests/AMysql/SelectTest.php for examples.
  *
+ * @todo    not choosing any columns should default to all columns rather than
+ *          failing
+ *
  * Anatomy of a select:
  * SELECT <SELECT OPTIONS> <COLUMNS> FROM <FROMS> <JOINS> <WHERES> <GROUP BYS> <HAVINGS>
  * <ORDER BYS> <LIMIT> <OFFSET>
@@ -48,7 +51,7 @@ class AMysql_Select extends AMysql_Statement
      *
      * @param string $selectOption       The select option.
      * @access public
-     * @return $this
+     * @return AMysql_Select (chainable)
      */
     public function option($selectOption)
     {
@@ -91,7 +94,7 @@ class AMysql_Select extends AMysql_Statement
      *                                                  columnPrefix - prefix each column with this
      *                                                  table prefix
      * @access public
-     * @return $this
+     * @return AMysql_Select (chainable)
      */
     public function column($columns, $options = array ())
     {
@@ -113,7 +116,7 @@ class AMysql_Select extends AMysql_Statement
      *
      * @param string $columnLiteral       Literal string
      * @access public
-     * @return $this
+     * @return AMysql_Select (chainable)
      */
     public function columnLiteral($columnLiteral)
     {
@@ -164,7 +167,7 @@ class AMysql_Select extends AMysql_Statement
      *                                                  The columns from this table to select.
      *                                                  Do not use if you are selecting from more than 1 tables!
      * @access public
-     * @return $this
+     * @return AMysql_Select (chainable)
      */
     public function from($tables, $columns = array ())
     {
@@ -195,7 +198,7 @@ class AMysql_Select extends AMysql_Statement
      * @param boolean $prepend  (Optional) whether to prepend this JOIN to the other
      *                          joins. Default: false (append).
      * @access public
-     * @return $this
+     * @return AMysql_Select (chainable)
      */
     public function join($type, $table, $on, $columns = array (), $prepend = false)
     {
@@ -234,7 +237,7 @@ class AMysql_Select extends AMysql_Statement
      * 
      * @param string $where     Unbound WHERE fragment
      * @access public
-     * @return $this
+     * @return AMysql_Select (chainable)
      */
     public function where($where)
     {
@@ -244,12 +247,15 @@ class AMysql_Select extends AMysql_Statement
 
     /**
      * Syntactic sugar for $this->where($where)->bindValue($key, $val);
+     *
+     * Usage e.g.
+     *  $select->whereBind('id = :id', 'id', 3)
      * 
      * @param string $where     Unbound WHERE fragment
-     * @param mixed $key        @see AMysql_Statement
-     * @param mixed $val        @see AMysql_Statement
+     * @param mixed $key        @see AMysql_Statement::bindValue()
+     * @param mixed $val        @see AMysql_Statement::bindValue()
      * @access public
-     * @return $this
+     * @return AMysql_Select (chainable)
      */
     public function whereBind($where, $key, $val)
     {
@@ -261,10 +267,10 @@ class AMysql_Select extends AMysql_Statement
      * 
      * @param name $col         Column name
      * @param bool $desc        (Optional) Whether to sort DESC. Default: false
-     * @param int $prepend      (Optional) Whether to prepend this parameter.
-     *                              Default: false
+     * @param bool $prepend     (Optional) Whether to prepend this parameter.
+     *                          Default: FALSE
      * @access public
-     * @return $this;
+     * @return AMysql_Select (chainable)
      */
     public function groupBy($col, $desc = false, $prepend = false)
     {
@@ -284,10 +290,10 @@ class AMysql_Select extends AMysql_Statement
      * Adds an GROUP BY parameter with no escaping.
      * 
      * @param name $col         What to group by. Can list multiple literals separated by commas.
-     * @param int $prepend      (Optional) Whether to prepend this parameter.
-     *                              Default: false
+     * @param bool $prepend     (Optional) Whether to prepend this parameter.
+     *                          Default: FALSE
      * @access public
-     * @return $this;
+     * @return AMysql_Select (chainable)
      */
     public function groupByLiteral($what, $prepend = false)
     {
@@ -305,7 +311,7 @@ class AMysql_Select extends AMysql_Statement
      * 
      * @param string $having        Unbound HAVING fragment
      * @access public
-     * @return $this
+     * @return AMysql_Select (chainable)
      */
     public function having($having)
     {
@@ -318,10 +324,10 @@ class AMysql_Select extends AMysql_Statement
      * 
      * @param name $col         Column name
      * @param bool $desc        (Optional) Whether to sort DESC. Default: false
-     * @param int $prepend      (Optional) Whether to prepend this parameter.
-     *                              Default: false
+     * @param bool $prepend     (Optional) Whether to prepend this parameter.
+     *                          Default: FALSE
      * @access public
-     * @return $this;
+     * @return AMysql_Select (chainable)
      */
     public function orderBy($col, $desc = false, $prepend = false)
     {
@@ -341,10 +347,10 @@ class AMysql_Select extends AMysql_Statement
      * Adds an ORDER BY parameter with no escaping.
      * 
      * @param name $col         What to order by. Can list multiple literals separated by commas.
-     * @param int $prepend      (Optional) Whether to prepend this parameter.
-     *                              Default: false
+     * @param bool $prepend     (Optional) Whether to prepend this parameter.
+     *                          Default: FALSE
      * @access public
-     * @return $this;
+     * @return AMysql_Select (chainable)
      */
     public function orderByLiteral($what, $prepend = false)
     {
@@ -364,7 +370,7 @@ class AMysql_Select extends AMysql_Statement
      * 
      * @param int $limit    The LIMIT
      * @access public
-     * @return $this
+     * @return AMysql_Select (chainable)
      */
     public function limit($limit)
     {
@@ -377,11 +383,13 @@ class AMysql_Select extends AMysql_Statement
      * 
      * @param int $offset   The OFFSET
      * @access public
-     * @return $this
+     * @return AMysql_Select (chainable)
      */
     public function offset($offset)
     {
-        $this->offset = (is_numeric($offset) && 0 <= $offset) ? (int) $offset : null;
+        $this->offset = (is_numeric($offset) && 0 <= $offset) ?
+            (int) $offset :
+            null;
         return $this;
     }
 

@@ -38,6 +38,18 @@ class AMysql_Exception extends RuntimeException
     const CODE_CHILD_FOREIGN_KEY_CONSTRAINT_FAILS = 1452;
     const CODE_SERVER_GONE_AWAY = 2006;
 
+    /**
+     * __construct 
+     * 
+     * @param string $msg                   The mysql error message or custom
+     *                                      message
+     * @param int $errno                    The mysql error code or custom
+     *                                      error code
+     * @param string $query                 The mysql query string used or a
+     *                                      message hinting the action taken
+     * @param Exception $previous           The previous exception
+     * @access public
+     */
     public function __construct($msg, $errno, $query, $previous = null)
     {
         $this->query = $query;
@@ -138,6 +150,14 @@ class AMysql_Exception extends RuntimeException
         }
     }
 
+    /**
+     * The details of the exception described in a string.
+     *
+     * @todo Include the previous exception here.
+     * 
+     * @access public
+     * @return void
+     */
     public function __toString()
     {
         return "AMysqlException: `$this->message`\n" .

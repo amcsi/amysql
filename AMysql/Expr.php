@@ -81,6 +81,8 @@ class AMysql_Expr
      * expression. The types of expressions can be found as constants on this
      * class, and their documentation can be found above each constant type
      * declaration.
+     *
+     * @params ...$variadic
      * 
      * In case of a literal string, you can just pass the literal string as
      * the only parameter.
@@ -116,7 +118,10 @@ class AMysql_Expr
      * is something that you want to handle, otherwise call and return
      * the parent's setByArray() method
      * 
-     * @param array $args 
+     * @param array $args           The first index should contain the type
+     *                              of expression to use, the rest depends on
+     *                              the type of expression. See the class
+     *                              constants for available types.
      * @access protected
      * @return string               The literal string to use
      */
@@ -200,6 +205,12 @@ class AMysql_Expr
         return (string) $this->prepared;
     }
 
+    /**
+     * Returns the literal string this expression should resolve to.
+     * 
+     * @access public
+     * @return string
+     */
     public function __toString()
     {
         return (string) $this->toString();

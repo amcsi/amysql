@@ -14,7 +14,7 @@ Also contains many tools to help build queries, manage them, profile them.
 
 Then AMysql is the library for your project!
 
-### What AMysql tries to be/do
+### What AMysql tries to be
 
 * A library that allows you to work with mysql with any PHP configuration without requiring any extensions.
 * A practical library that provides great tools for common situations in MySQL. This includes tools not available in any MySQL API (extension level or PHP level), or the combination of tools that would otherwise only be available separately in several different APIs, but never together.
@@ -36,11 +36,12 @@ Available on packagist.
 
 See [INSTALL](INSTALL.md) file.
 
-
 Usage
 =====
 
 Typically you want to make one instance of AMysql per db connection. AMysql lazy connects by default.
+
+Apigen docs are available for this project: http://amcsi.github.io/amysql/apigen/
 
 #### Instantiating AMysql
 
@@ -147,7 +148,7 @@ $descriptionLike = $amysql->expr(
 ));
 
 $sql = "SELECT * FROM articles WHERE description LIKE :descriptionLike";
-$amysql->query($sql, array('descriptionLike' => descriptionLike));
+$amysql->query($sql, array('descriptionLike' => $descriptionLike));
 // SELECT * FROM articles WHERE description LIKE '%part%' ESCAPE '='
 
 
@@ -161,7 +162,7 @@ $descriptionLike = $amysql->expr(
 ));
 
 $sql = "SELECT * FROM articles WHERE description LIKE :descriptionLike";
-$amysql->query($sql, array('descriptionLike' => descriptionLike));
+$amysql->query($sql, array('descriptionLike' => $descriptionLike));
 // SELECT * FROM articles WHERE description LIKE '%100=% success' ESCAPE '='
 // note the automatic escaping of the (%) sign
 ```
@@ -402,6 +403,7 @@ $view->render('layout.phtml');
 
         <?php if ('dev' == APP_ENV): ?>
         <?php echo $this->profiler->getAsHtml() ?>
+        <?php endif ?>
     </body>
 </html>
 
@@ -412,6 +414,12 @@ Alternatively, check out [AMysql_Profiler](AMysql/Profiler.php) for more options
 #### Other methods
 
 Many other useful methods are available as well. Check out the source files and read the documentation for the methods.
+
+Apigen docs are available for this project: http://amcsi.github.io/amysql/apigen/
+
+## License
+
+MIT
 
 ## Contribution
 
