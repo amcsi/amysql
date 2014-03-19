@@ -237,9 +237,12 @@ class AMysql_Statement implements IteratorAggregate, Countable
      * select, insert etc.) is returned, having the placeholders being
      * replaced by their binded values. You can debug what the final SQL
      * string would be by calling this method.
+     * Call this method to see what exact SQL string was sent or is to be
+     * sent to the mysql server.
      *
      * @param string $prepared	(Optional) Use this prepared string
      *					        instead of the one set.
+     * @return string           The final SQL string.
      **/
     public function getSql($prepared = null)
     {
