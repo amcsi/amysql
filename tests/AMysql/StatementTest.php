@@ -379,6 +379,39 @@ class StatementTest extends AMysql_TestCase {
 	count($stmt);
     }
 
+    public function testFetchAllColumn()
+    {
+        $data = array (
+            array (
+                'string' => 3
+            ),
+            array (
+                'string' => 'blah',
+            )
+        );
+        $this->_amysql->insert($this->tableName, $data);
+        $stmt = $this->_amysql->lastStatement;
+        $sql = "SELECT * FROM $this->tableName";
+        $stmt = $this->_amysql->query($sql);
+
+
+        $result = $stmt->fetchAllColumn(0);
+        $expected = array (1, 2);
+        $this->assertEquals($expected, $result);
+
+        $result = $stmt->fetchAllColumn('id');
+        $expected = array (1, 2);
+        $this->assertEquals($expected, $result);
+
+        $result = $stmt->fetchAllColumn(1);
+        $expected = array ('3', 'blah');
+        $this->assertEquals($expected, $result);
+
+        $result = $stmt->fetchAllColumn('string');
+        $expected = array ('3', 'blah');
+        $this->assertEquals($expected, $result);
+    }
+
     public function testFetchAllColumns() {
 	$data = array (
 	    array (

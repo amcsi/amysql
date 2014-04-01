@@ -784,6 +784,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
         if (!$numRows) {
             return $ret;
         }
+        $result = $this->result;
         $this->isMysqli() ? $result->data_seek(0) : mysql_data_seek($result, 0);
         while ($row = $this->fetchArray()) {
             $ret[] = $row[$column];
