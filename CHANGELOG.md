@@ -1,5 +1,9 @@
 Changelog
 =========
+1.1.1 (2014-04-30)
+--
+* Fixed `AMysql_Statement::fetchAllColumn()`
+
 1.1.0 (2014-03-05)
 --
 * Backwards incompatible: AMysql_Exceptions do not trigger errors by default.
