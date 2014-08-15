@@ -1,5 +1,9 @@
 Changelog
 =========
+1.1.2 (2014-08-15)
+--
+* `AMysql_Statement::setCharset()` wasn't autoconnecting if autoPing was off
+
 1.1.1 (2014-04-30)
 --
 * Fixed `AMysql_Statement::fetchAllColumn()`

@@ -6,6 +6,11 @@
  * For information on binding placeholders, @see AMysql_Statement::execute()
  *
  * @todo Maybe remove automatic dot detection for identifier escaping.
+ * @todo Allow fetch methods to auto execute the statement, or throw an
+ *       exception if the query hasn't been executed yet.
+ * @todo Delay the call of some mysql queries to execute right before a
+ *       proper one. e.g. calling 'SET NAMES utf8' every time after setting
+ *       the connection params won't give you much use for lazy connection.
  *
  * Visit https://github.com/amcsi/amysql
  * @author      Szerémi Attila
@@ -516,7 +521,7 @@ abstract class AMysql_Abstract
     public function setCharset($charset)
     {
         $isMysqli = $this->isMysqli;
-        $this->autoPing();
+        $this->autoConnect();
         if ($isMysqli) {
             $result = $this->link->set_charset($charset);
         } else {
