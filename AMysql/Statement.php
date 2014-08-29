@@ -1263,8 +1263,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
      **/
     public function insertId()
     {
-        $ret = $this->isMysqli() ? $result->insert_id() : mysql_insert_id($this->getLink());
-        return $ret;
+        return $this->insertId;
     }
 
     /**

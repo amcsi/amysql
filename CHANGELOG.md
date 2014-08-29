@@ -1,5 +1,9 @@
 Changelog
 =========
+1.1.3 (2014-08-29)
+--
+* `AMysql_Statement::insertId()` wasn't working when using mysqli
+
 1.1.2 (2014-08-15)
 --
 * `AMysql_Statement::setCharset()` wasn't autoconnecting if autoPing was off

@@ -565,5 +565,23 @@ class StatementTest extends AMysql_TestCase {
         $queries = $this->_amysql->getQueries();
         $this->assertSame($queryString, $queries[0]);
     }
+
+    public function testInsertId()
+    {
+	$data = array (
+	    array (
+		'string' => 3
+	    ),
+	);
+        
+        $stmt = $this->_amysql->ins($this->tableName, $data);
+        $insertId = $stmt->insertId();
+        $stmt = $this->_amysql->ins($this->tableName, $data);
+        $insertId2 = $stmt->insertId();
+
+        $this->assertEquals(1, $insertId);
+        $this->assertEquals(2, $insertId2);
+    }
+
 }
 ?>
