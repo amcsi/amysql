@@ -1,5 +1,10 @@
 Changelog
 =========
+1.1.4 (2014-09-25)
+--
+* Bugfix: setCharset() wasn't working under mysqli when lazy connecting
+* Fixed a notice error in `AMysql_Profiler`
+
 1.1.3 (2014-08-29)
 --
 * `AMysql_Statement::insertId()` wasn't working when using mysqli
