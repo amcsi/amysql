@@ -520,8 +520,8 @@ abstract class AMysql_Abstract
      */
     public function setCharset($charset)
     {
-        $isMysqli = $this->isMysqli;
         $this->autoConnect();
+        $isMysqli = $this->isMysqli;
         if ($isMysqli) {
             $result = $this->link->set_charset($charset);
         } else {
