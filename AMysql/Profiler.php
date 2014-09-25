@@ -31,6 +31,7 @@ class AMysql_Profiler implements ArrayAccess
     protected $totalTime = 0.0;
     protected $queries = array();
     protected $queriesData = array();
+    private $defaultEncoding = 'utf-8';
 
     public function __construct(AMysql_Abstract $amysql)
     {
@@ -59,9 +60,8 @@ class AMysql_Profiler implements ArrayAccess
      */
     public function getAsHtml()
     {
-        if (!$encoding) {
-            $encoding = $this->defaultEncoding;
-        }
+        $encoding = $this->defaultEncoding;
+
         $tplBaseDir = dirname(__FILE__) . '/../tpl';
         $filename = "$tplBaseDir/profileTemplate.php";
         $profiler = $this;
