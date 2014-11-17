@@ -566,6 +566,56 @@ class StatementTest extends AMysql_TestCase {
         $this->assertSame($queryString, $queries[0]);
     }
 
+    public function testInsertIgnoreOnDuplicateKeyUpdate()
+    {
+	$data = array (
+	    array (
+                'id'    => 1,
+		'string' => 3,
+	    ),
+	    array (
+                'id'    => 2,
+		'string' => 'blah',
+	    )
+	);
+        $stmt = $this->_amysql->ins($this->tableName, $data);
+
+	$data = array (
+	    array (
+                'id'    => 2,
+		'string' => 'blah_modified',
+	    ),
+	    array (
+                'id'    => 3,
+		'string' => 'new',
+	    )
+	);
+        
+        $stmt = $this->_amysql->newStatement()->insertReplaceOnDuplicateKeyUpdate(
+            'INSERT',
+            $this->tableName,
+            $data
+        )->execute();
+
+        $expected = array (
+	    array (
+                'id'    => 1,
+		'string' => 3,
+	    ),
+	    array (
+                'id'    => 2,
+		'string' => 'blah_modified',
+	    ),
+	    array (
+                'id'    => 3,
+		'string' => 'new',
+	    ),
+	);
+
+        $actual = $this->_amysql->query("SELECT * FROM $this->tableName")->fetchAllAssoc();
+        $this->assertEquals($expected, $actual);
+    }
+
     public function testInsertId()
     {
 	$data = array (

@@ -1202,6 +1202,62 @@ class AMysql_Statement implements IteratorAggregate, Countable
     }
 
     /**
+     * insertReplaceOnDuplicateKeyUpdate  
+     * 
+     * @param string $type          "$type INTO..." (INSERT, INSERT IGNORE, REPLACE) etc.
+     * @param string $tableName 	The table name.
+     * @param array $data		    A one or two-dimensional array.
+     * 					            1D:
+     * 					            an associative array of keys as column names and values
+     * 					            as their values. This inserts one row.
+     * 					            2D numeric:
+     * 					            A numeric array where each value is an associative array
+     * 					            with column-value pairs. Each outer, numeric value represents
+     * 					            a row of data.
+     * 					            2D associative:
+     * 					            An associative array where the keys are the columns, the
+     * 					            values are numerical arrays, where each value represents the
+     * 					            value for the new row of that key.
+     * @param array $except         For updating, which columns to ignore.
+     * @access public
+     * @return self                 (chainable)
+     */
+    public function insertReplaceOnDuplicateKeyUpdate($type, $tableName, array $data, $except = array ())
+    {
+        $cols = array ();
+        $vals = array();
+        if (!$data) {
+            return false;
+        }
+        $tableSafe = AMysql_Abstract::escapeIdentifier($tableName);
+        $columnsValues = $this->buildColumnsValues($data);
+        $sql = "$type INTO $tableSafe $columnsValues";
+
+        $updates = array ();
+        if (is_array (reset($data))) {
+            if (is_int(key(reset($data)))) {
+                $updates = array_keys($data);
+            }
+            else {
+                $updates = array_keys(reset($data));
+            }
+        }
+        else {
+            $updates = array_keys($data);
+        }
+        $updates = array_diff($updates, $except);
+        foreach ($updates as &$val) {
+            $val = "$val=VALUES($val)";
+        }
+        $updatesString = join(', ', $updates);
+
+        $sql .=  "ON DUPLICATE KEY UPDATE $updatesString";
+
+        $this->prepare($sql);
+        return $this;
+    }
+
+    /**
      * Performs an INSERT.
      *
      * @see $this->insertReplace
