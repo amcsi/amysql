@@ -67,7 +67,7 @@ class AMysql_Iterator implements SeekableIterator
     {
         $isMysqli = $this->_stmt->isMysqli;
         if (0 <= $index && $index < $this->_count) {
-            $isMysqli ? $this->_stmt->result->data_seek($index) : mysql_data_seek($this->_stmt->result, $index);
+            $this->_stmt->dataSeek($index);
             $this->_resultIndex = $index;
             $this->_currentIndex = $index;
         }

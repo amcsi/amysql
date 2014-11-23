@@ -20,6 +20,7 @@ abstract class AMysql_Abstract
 {
 
     public $insertId; // last insert id
+    protected $driver;
     public $lastStatement; // last AMysql_Statement
     public $link = null; // mysql link
     public $isMysqli; // mysql or mysqli
@@ -490,12 +491,11 @@ abstract class AMysql_Abstract
     public function selectDb($db)
     {
         $this->connDetails['db'] = $db; // for reconnecting later
-        $isMysqli = $this->isMysqli;
-        $link = $this->autoPingConnect();
-        $result = $isMysqli ? $link->select_db($db) : mysql_select_db($db, $link);
+        $driver = $this->getDriver();
+        $result = $driver->selectDb($db);
         if (!$result) {
-            $error = $isMysqli ? $link->error : mysql_error($link);
-            $errno = $isMysqli ? $link->errno : mysql_errno($link);
+            $error = $driver->getError();
+            $errno = $driver->getErrno();
             $this->handleError($error, $errno, 'USE ' . $db);
         }
         return $this;
@@ -521,21 +521,11 @@ abstract class AMysql_Abstract
     public function setCharset($charset)
     {
         $this->autoConnect();
-        $isMysqli = $this->isMysqli;
-        if ($isMysqli) {
-            $result = $this->link->set_charset($charset);
-        } else {
-            if (!function_exists('mysql_set_charset')) {
-                function mysql_set_charset($charset, $link = null)
-                {
-                    return mysql_query("SET CHARACTER SET '$charset'", $link);
-                }
-            }
-            $result = mysql_set_charset($charset, $this->link);
-        }
+        $driver = $this->getDriver();
+        $result = $driver->setCharset($charset);
         if (!$result) {
-            $error = $isMysqli ? $this->link->error : mysql_error($this->link);
-            $errno = $isMysqli ? $this->link->errno : mysql_errno($this->link);
+            $error = $driver->getError();
+            $errno = $driver->getErrno();
             $this->handleError($error, $errno, "(setting charset)");
         }
         return $this;
@@ -1303,13 +1293,6 @@ abstract class AMysql_Abstract
     public function escape($value)
     {
         $res = $this->autoConnect();
-        $isValidLink =
-            $res instanceof Mysqli ||
-            0 === strpos(get_resource_type($res), 'mysql link');
-        if (!$isValidLink) {
-            throw new RuntimeException('Resource is not a mysql resource.', 0);
-        }
-        $isMysqli = $this->isMysqli;
         // If it's an int, place it there literally
         if (is_int($value)) {
             return $value;
@@ -1332,14 +1315,7 @@ abstract class AMysql_Abstract
         }
         // In the case of a string or anything else, let's escape it and
         // put it between apostrophes.
-        return
-            "'" .
-                ($isMysqli ?
-                    $this->link->real_escape_string($value) :
-                    mysql_real_escape_string($value, $res))
-                .
-            "'"
-        ;
+        return "'" . $this->getDriver()->realEscapeString($value) .  "'";
     }
 
     /**
@@ -1495,8 +1471,6 @@ abstract class AMysql_Abstract
      * consists of:
      *  - query - The SQL query performed
      *  - time - The amount of seconds the query took (float)
-     *
-     * If profileQueries wss off at any query, its time value will be null.
      * 
      * @return array[]
      */
@@ -1587,5 +1561,37 @@ abstract class AMysql_Abstract
                 return $profiler->totalTime;
         }
         trigger_error("Undefined property: `$name`");
+    }
+
+    /**
+     * getDriver 
+     * 
+     * @access public
+     * @return AMysql_Driver_Abstract
+     */
+    public function getDriver()
+    {
+        if (!$this->driver) {
+            if (!$this->link) {
+                $this->connect();
+            }
+            if (!class_exists('AMysql_Driver_Abstract')) {
+                require_once dirname(__FILE__) . '/Driver/Abstract.php';
+            }
+            if (is_resource($this->link)) {
+                if (!class_exists('AMysql_Driver_Mysql')) {
+                    require_once dirname(__FILE__) . '/Driver/Mysql.php';
+                }
+                $driver = new AMysql_Driver_Mysql($this->link);
+            }
+            else if ($this->link instanceof Mysqli) {
+                if (!class_exists('AMysql_Driver_Mysqli')) {
+                    require_once dirname(__FILE__) . '/Driver/Mysqli.php';
+                }
+                $driver = new AMysql_Driver_Mysqli($this->link);
+            }
+            $this->driver = $driver;
+        }
+        return $this->driver;
     }
 }
