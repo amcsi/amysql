@@ -415,6 +415,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
                 $this->results[] = $result;
                 $this->amysql->affectedRows = $this->affectedRows;
                 $this->amysql->insertId = $this->insertId;
+                $this->_executed = true;
             } else {
                 throw new RuntimeException(
                     "Query was not successful.",
@@ -729,7 +730,7 @@ class AMysql_Statement implements IteratorAggregate, Countable
         if (!$numRows) {
             return $ret;
         }
-        $this->getDriver()->dataSeek($result, 0);
+        $this->getDriver()->dataSeek($this->result, 0);
         while ($row = $this->fetchArray()) {
             $ret[] = $row[$column];
         }
@@ -1281,6 +1282,12 @@ class AMysql_Statement implements IteratorAggregate, Countable
         $errline = null,
         $errcontext = null
     ) {
+        if (
+            2 === $errno &&
+            false !== strpos($errstr, 'Error while sending STMT_PREPARE packet')) {
+            // ignore this error
+            return true;
+        }
         throw new ErrorException($errstr, $errno, 1, $errfile, $errline);
     }
 

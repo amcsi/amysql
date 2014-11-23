@@ -18,24 +18,18 @@ class AMysql_Driver_Mysqli extends AMysql_Driver_Abstract
 
     public function query($sql) {
 
+        $success = false;
         $link = $this->link;
         $this->lastQueryTime = null;
 
-        if ($this->profileQueries) {
-            $startTime = microtime(true);
-            $stmt = $link->prepare($sql);
-            if ($stmt) {
-                $success = $stmt->execute();
-            }
-            $duration = microtime(true) - $startTime;
-            $this->lastQueryTime = $duration;
+        $startTime = microtime(true);
+        $stmt = $link->prepare($sql);
+        if ($stmt) {
+            $success = $stmt->execute();
         }
-        else {
-            $stmt = $link->prepare($sql);
-            if ($stmt) {
-                $success = $stmt->execute();
-            }
-        }
+        $duration = microtime(true) - $startTime;
+        $this->lastQueryTime = $duration;
+
         $result = $stmt ? $stmt->get_result() : false;
         if (!$result && $success) {
             /**
@@ -46,8 +40,10 @@ class AMysql_Driver_Mysqli extends AMysql_Driver_Abstract
              */
             $result = true;
         }
-        $this->lastInsertId = $stmt->insert_id;
-        $this->lastAffectedRows = $stmt->affected_rows;
+        if ($stmt) {
+            $this->lastInsertId = $stmt->insert_id;
+            $this->lastAffectedRows = $stmt->affected_rows;
+        }
         $this->lastError = '';
         $this->lastErrno = 0;
         if (false === $result) {
@@ -119,7 +115,7 @@ class AMysql_Driver_Mysqli extends AMysql_Driver_Abstract
 
     public function setCharset($charset)
     {
-        return $this->link->setCharset($charset);
+        return $this->link->set_charset($charset);
     }
 
     public function free($result)
@@ -129,12 +125,12 @@ class AMysql_Driver_Mysqli extends AMysql_Driver_Abstract
 
     public function getError()
     {
-        return $this->link->error;
+        return $this->lastError;
     }
 
     public function getErrno()
     {
-        return $this->link->errno;
+        return $this->lastErrno;
     }
 
     public function getConnectionError()

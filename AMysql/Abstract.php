@@ -347,6 +347,9 @@ abstract class AMysql_Abstract
         if ($res) {
             $this->lastPingTime = time(); // otherwise can cause infinite recursion.
             $this->link = $res;
+            if ($this->driver) {
+                $this->driver->setLink($res);
+            }
 
             if (!$isMysqli && !empty($cd['db'])) {
                 $this->selectDb($cd['db']);

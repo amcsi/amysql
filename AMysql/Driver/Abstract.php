@@ -25,6 +25,11 @@ abstract class AMysql_Driver_Abstract {
         $this->link = $link;
     }
 
+    public function setLink($link)
+    {
+        $this->link = $link;
+    }
+
     /**
      * Selects a db 
      * 
