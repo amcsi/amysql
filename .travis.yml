@@ -1,7 +1,8 @@
 language: php
 env:
-  - AMYSQL_DRIVER=mysqli
-  - AMYSQL_DRIVER=mysql
+  matrix:
+    - AMYSQL_DRIVER=mysqli
+    - AMYSQL_DRIVER=mysql
 matrix:
   include:
     - php: 5.2
