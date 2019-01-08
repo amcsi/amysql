@@ -2,14 +2,17 @@ language: php
 env:
   - AMYSQL_DRIVER=mysqli
   - AMYSQL_DRIVER=mysql
-php:
-  - 5.2
-  - 5.3
-  - 5.4
-  - 5.5
-  - 5.6
-  - 7.0
-  - hhvm
+matrix:
+  include:
+    - php: 5.2
+      dist: precise
+    - php: 5.3
+      dist: precise
+    - php: 5.4
+    - php: 5.5
+    - php: 5.6
+    - php: 7.0
+    - php: hhvm
 before_script:
   - "mysql -e 'DROP DATABASE IF EXISTS amysql;'"
   - "mysql -e 'create database amysql;'"
